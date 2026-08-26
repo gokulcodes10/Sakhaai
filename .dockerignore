@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/dist
+.git
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.superdesign
+apps/api/uploads
+*.pdf
+*.docx

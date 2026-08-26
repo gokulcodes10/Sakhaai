@@ -1,0 +1,23 @@
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+.DS_Store
+.vscode/
+.idea/
+apps/api/uploads/
+apps/api/prisma/migrations/dev.db*
+.superdesign/
+.cache/
+*.tsbuildinfo
+content/.snapshots/
+infra/nginx/certs/
+
+# Internal strategy docs
+*.pdf
+*.docx

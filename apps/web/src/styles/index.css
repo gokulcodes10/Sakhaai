@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Design tokens
+
+   Palette reasoning: the brand words are trust and grit, and the market
+   position is "we are the honest, unglamorous ones". So: warm paper rather
+   than clinical white, a near-black with a brown cast rather than pure grey,
+   one saffron accent doing all the emphasis work, and a deep teal reserved
+   exclusively for governance and trust surfaces. No gradients, no glow — the
+   whole point is to look like the opposite of an AI landing page.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ink: 26 22 20;          /* #1A1614 warm near-black */
+  --paper: 251 249 246;     /* #FBF9F6 warm off-white  */
+  --surface: 255 255 255;
+  --raised: 246 243 238;
+  --line: 226 220 211;
+  --muted: 106 98 90;
+  --subtle: 148 139 129;
+
+  --accent: 194 84 24;      /* #C25418 burnt saffron */
+  --accent-soft: 253 240 230;
+  --accent-ink: 255 255 255;
+
+  --trust: 14 79 74;        /* #0E4F4A deep teal, governance surfaces only */
+  --trust-soft: 232 243 241;
+
+  --danger: 176 42 42;
+  --success: 22 110 78;
+  --warning: 176 116 20;
+
+  --shadow: 40 30 20;
+
+  --panel-width: 400px;
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --ink: 240 236 230;
+  --paper: 20 18 16;
+  --surface: 28 25 22;
+  --raised: 38 34 30;
+  --line: 56 50 45;
+  --muted: 162 152 141;
+  --subtle: 124 115 106;
+
+  --accent: 232 122 58;
+  --accent-soft: 48 30 18;
+  --accent-ink: 24 16 10;
+
+  --trust: 94 196 184;
+  --trust-soft: 18 40 38;
+
+  --danger: 226 106 106;
+  --success: 92 190 150;
+  --warning: 224 172 74;
+
+  --shadow: 0 0 0;
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+
+  html {
+    @apply antialiased;
+    scroll-behavior: smooth;
+    /* Never let the assistant panel's appearance shift the page. */
+    scrollbar-gutter: stable;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans text-base;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'cv11' 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display font-semibold text-ink;
+    font-variation-settings: 'SOFT' 12, 'WONK' 0;
+    text-wrap: balance;
+  }
+
+  p { text-wrap: pretty; }
+
+  /* One focus treatment everywhere, visible on every background. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2;
+    --tw-ring-offset-color: rgb(var(--paper));
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.18);
+  }
+
+  /* Inputs inherit the type stack rather than reverting to the UA default. */
+  input, textarea, select, button { font: inherit; color: inherit; }
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-shell px-5 sm:px-8;
+  }
+
+  /* Small caps label used above every section heading. */
+  .eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-[0.14em] text-accent;
+  }
+
+  .prose-sakha {
+    @apply max-w-prose text-lg leading-relaxed text-muted;
+  }
+  .prose-sakha strong { @apply text-ink font-semibold; }
+
+  .card {
+    @apply rounded-lg border border-line bg-surface shadow-subtle;
+  }
+
+  .rule {
+    @apply border-0 border-t border-line;
+  }
+
+  /* Thin scrollbar for the assistant panel and admin tables. */
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line)) transparent;
+  }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: rgb(var(--line));
+    border-radius: 4px;
+  }
+
+  /* When the assistant is docked open on a wide screen the page shifts rather
+     than being covered, so a visitor can read and ask at the same time. */
+  .with-panel {
+    @apply lg:pr-[var(--panel-width)];
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgb(var(--line) / 0.5) 1px, transparent 1px);
+    background-size: 100% 100%;
+  }
+}

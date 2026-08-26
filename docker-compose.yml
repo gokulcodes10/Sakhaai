@@ -1,0 +1,155 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Sakha AI — local and production stack.
+#
+#  Day to day:   npm run infra:up     (postgres + redis only, apps run on host)
+#  Full stack:   npm run stack:up     (everything, behind nginx)
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: sakha
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sakha-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sakha}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sakha_dev_password_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-sakha}
+      # Deterministic collation so full-text ranking does not drift between
+      # a developer's machine and the server.
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=C'
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-sakha} -d ${POSTGRES_DB:-sakha}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: sakha-redis
+    restart: unless-stopped
+    # noeviction is required by BullMQ: under allkeys-lru Redis will happily
+    # evict a queued job hash and the work silently disappears. Safe here
+    # because every key this app writes carries a TTL (cache, rate-limit
+    # windows, locks, revocations), so memory is self-limiting rather than
+    # unbounded, and cacheSet/rateLimitCheck both degrade on a write failure.
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy noeviction
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Runs once per deploy, applies migrations, exits. api and worker wait for it
+  # to finish successfully, so neither can ever start against an old schema.
+  migrate:
+    profiles: ['full']
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+      target: migrate
+    container_name: sakha-migrate
+    restart: 'no'
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sakha}:${POSTGRES_PASSWORD:-sakha_dev_password_change_me}@postgres:5432/${POSTGRES_DB:-sakha}?schema=public
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    profiles: ['full']
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+      target: runtime
+    container_name: sakha-api
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      NODE_ENV: production
+      POSTGRES_HOST: postgres
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sakha}:${POSTGRES_PASSWORD:-sakha_dev_password_change_me}@postgres:5432/${POSTGRES_DB:-sakha}?schema=public
+      REDIS_URL: redis://redis:6379
+      TRUST_PROXY: 'true'
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    volumes:
+      - uploads:/app/apps/api/uploads
+      - ./content:/app/content
+    expose: ['4000']
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Background jobs run in their own container so a long re-index or crawl can
+  # never compete with request handling for the API's event loop.
+  worker:
+    profiles: ['full']
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+      target: runtime
+    container_name: sakha-worker
+    restart: unless-stopped
+    command: ['node', 'apps/api/src/jobs/worker.js']
+    env_file: [.env]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sakha}:${POSTGRES_PASSWORD:-sakha_dev_password_change_me}@postgres:5432/${POSTGRES_DB:-sakha}?schema=public
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    volumes:
+      - ./content:/app/content
+
+  web:
+    profiles: ['full']
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: sakha-web
+    restart: unless-stopped
+    expose: ['80']
+
+  nginx:
+    profiles: ['full']
+    image: nginx:1.27-alpine
+    container_name: sakha-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./infra/nginx/certs:/etc/nginx/certs:ro
+      - uploads:/var/www/uploads:ro
+    depends_on: [api, web]
+
+volumes:
+  postgres-data:
+  redis-data:
+  uploads:

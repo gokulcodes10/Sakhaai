@@ -1,0 +1,564 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  Sakha AI — data model
+//  Postgres. Run `npm run db:migrate` to apply.
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  IDENTITY & ACCESS
+// ══════════════════════════════════════════════════════════════════════════════
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String?
+  name         String
+  title        String?
+  phone        String?
+  company      String?
+  avatarUrl    String?
+  status       String   @default("invited") // active | invited | suspended
+  emailVerifiedAt DateTime?
+  lastLoginAt  DateTime?
+  // Cheap brute-force damper that survives a Redis flush.
+  failedLoginCount Int      @default(0)
+  lockedUntil      DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  roles          UserRole[]
+  // Permissions granted to this user directly, on top of their roles.
+  grants         UserGrant[]
+  refreshTokens  RefreshToken[]
+  passwordResets PasswordReset[]
+  auditLogs      AuditLog[]      @relation("AuditActor")
+  conversations  Conversation[]
+  ownedLeads     Lead[]          @relation("LeadOwner")
+  clientAccount  ClientAccount?  @relation(fields: [clientAccountId], references: [id], onDelete: SetNull)
+  clientAccountId String?
+  contentRevisions ContentRevision[]
+  uploadedMedia  Media[]
+  authoredPages  Page[]
+  knowledgeDocs  KnowledgeDocument[]
+  tickets        Ticket[]
+
+  @@index([status])
+  @@index([clientAccountId])
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  key         String   @unique // super_admin, admin, employee, client, or a custom slug
+  name        String
+  description String?
+  // Higher rank may manage lower. Prevents an admin escalating to super admin.
+  rank        Int      @default(30)
+  isSystem    Boolean  @default(false) // system roles cannot be deleted or re-keyed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       UserRole[]
+  permissions RolePermission[]
+
+  @@index([rank])
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. cms.content.publish
+  domain      String            // e.g. cms
+  label       String
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles RolePermission[]
+  users UserGrant[]
+
+  @@index([domain])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  grantedAt    DateTime @default(now())
+  grantedById  String?
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+/// A permission granted to one specific user, outside their roles.
+/// This is how the super admin hands CMS access to Malarvizhi without
+/// promoting every admin in the system.
+model UserGrant {
+  userId       String
+  permissionId String
+  grantedAt    DateTime  @default(now())
+  grantedById  String?
+  expiresAt    DateTime?
+  reason       String?
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, permissionId])
+  @@index([permissionId])
+  @@map("user_grants")
+}
+
+model UserRole {
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  assignedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+/// Refresh tokens are stored hashed so a database leak cannot mint sessions.
+/// Revocation also mirrors into Redis for O(1) checks on the hot path.
+model RefreshToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  family     String    // rotation family — reuse of an old token kills the family
+  userAgent  String?
+  ip         String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  replacedBy String?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([family])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_resets")
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  CMS
+// ══════════════════════════════════════════════════════════════════════════════
+
+/// Every publish writes an immutable snapshot of the whole content tree.
+/// Reverting is just "publish revision N again" — no destructive edits, ever.
+model ContentRevision {
+  id          String   @id @default(cuid())
+  version     Int      @unique @default(autoincrement())
+  data        Json
+  message     String?
+  isPublished Boolean  @default(false)
+  publishedAt DateTime?
+  authorId    String?
+  createdAt   DateTime @default(now())
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([isPublished, publishedAt])
+  @@map("content_revisions")
+}
+
+/// The working copy. Exactly one row, id = "singleton".
+/// Editors mutate this; publishing snapshots it into ContentRevision.
+model ContentDraft {
+  id        String   @id @default("singleton")
+  data      Json
+  updatedAt DateTime @updatedAt
+  updatedById String?
+
+  @@map("content_draft")
+}
+
+/// CMS-managed pages beyond the fixed content tree: industry pages,
+/// extra case studies, blog posts. Adding an industry needs no deploy.
+model Page {
+  id             String    @id @default(cuid())
+  slug           String
+  kind           String    @default("page") // page | industry | service | case_study | post
+  title          String
+  summary        String?
+  body           String?   @db.Text
+  data           Json?
+  status         String    @default("draft") // draft | published | archived
+  seoTitle       String?
+  seoDescription String?
+  ogImage        String?
+  order          Int       @default(0)
+  publishedAt    DateTime?
+  authorId       String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@unique([kind, slug])
+  @@index([status, kind, order])
+  @@map("pages")
+}
+
+model Media {
+  id         String   @id @default(cuid())
+  filename   String
+  originalName String
+  mimeType   String
+  size       Int
+  url        String
+  width      Int?
+  height     Int?
+  alt        String?
+  folder     String   @default("uploads")
+  uploadedById String?
+  createdAt  DateTime @default(now())
+
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([folder, createdAt])
+  @@map("media")
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  CRM
+// ══════════════════════════════════════════════════════════════════════════════
+
+model Lead {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  company    String?
+  phone      String?
+  workflow   String   @db.Text
+  budgetTier String?
+  source     String?  @default("website")
+  stage      String   @default("new") // new | qualified | memo_sent | won | lost
+  notes      String?  @db.Text
+  ownerId    String?
+  // When a lead arrives via the assistant we keep the thread that produced it.
+  conversationId String?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  owner        User?         @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([stage, createdAt])
+  @@index([email])
+  @@index([ownerId])
+  @@map("leads")
+}
+
+model ClientAccount {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  industry  String?
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  projects  Project[]
+  documents Document[]
+  tickets   Ticket[]
+
+  @@map("client_accounts")
+}
+
+model Project {
+  id              String    @id @default(cuid())
+  clientAccountId String
+  name            String
+  slug            String
+  tier            String?   // pilot | single-workflow | multi-workflow
+  status          String    @default("discovery") // discovery | build | staged | live | handed_over
+  autonomyLevel   Int       @default(0)           // 0 shadow .. 3 autonomous
+  summary         String?   @db.Text
+  metricLabel     String?
+  metricBaseline  String?
+  metricCurrent   String?
+  startedAt       DateTime?
+  liveAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  clientAccount ClientAccount   @relation(fields: [clientAccountId], references: [id], onDelete: Cascade)
+  updates       ProjectUpdate[]
+  documents     Document[]
+
+  @@unique([clientAccountId, slug])
+  @@index([status])
+  @@map("projects")
+}
+
+model ProjectUpdate {
+  id        String   @id @default(cuid())
+  projectId String
+  title     String
+  body      String   @db.Text
+  kind      String   @default("note") // note | milestone | incident
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+  @@map("project_updates")
+}
+
+model Document {
+  id              String   @id @default(cuid())
+  clientAccountId String
+  projectId       String?
+  title           String
+  url             String
+  mimeType        String?
+  size            Int?
+  createdAt       DateTime @default(now())
+
+  clientAccount ClientAccount @relation(fields: [clientAccountId], references: [id], onDelete: Cascade)
+  project       Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([clientAccountId])
+  @@map("documents")
+}
+
+model Ticket {
+  id              String   @id @default(cuid())
+  clientAccountId String
+  raisedById      String
+  subject         String
+  body            String   @db.Text
+  priority        String   @default("normal")
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clientAccount ClientAccount @relation(fields: [clientAccountId], references: [id], onDelete: Cascade)
+  raisedBy      User          @relation(fields: [raisedById], references: [id], onDelete: Cascade)
+
+  @@index([clientAccountId, status])
+  @@map("tickets")
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SAKHA — knowledge base
+// ══════════════════════════════════════════════════════════════════════════════
+
+model KnowledgeDocument {
+  id         String   @id @default(cuid())
+  source     String   // cms | doc | crawl | db | manual
+  sourceKey  String   // stable identity within the source: content path, file path, URL
+  title      String
+  body       String   @db.Text
+  sourceUrl  String?
+  // Content hash. If unchanged we skip re-chunking and re-embedding entirely,
+  // which is what makes an hourly refresh cheap enough to actually run.
+  checksum   String
+  tags       String[] @default([])
+  visibility String   @default("public") // public | client | internal
+  authorId   String?
+  indexedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  author User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  chunks KnowledgeChunk[]
+
+  @@unique([source, sourceKey])
+  @@index([source, visibility])
+  @@index([checksum])
+  @@map("knowledge_documents")
+}
+
+model KnowledgeChunk {
+  id         String   @id @default(cuid())
+  documentId String
+  ordinal    Int
+  content    String   @db.Text
+  tokens     Int      @default(0)
+  heading    String?
+  visibility String   @default("public")
+  // Populated only when EMBEDDING_PROVIDER is configured. Lexical retrieval
+  // (tsvector + trigram) works without it, so the KB is never dead weight.
+  embedding  Float[]  @default([])
+  createdAt  DateTime @default(now())
+
+  document KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, ordinal])
+  @@index([visibility])
+  @@map("knowledge_chunks")
+}
+
+model CrawlSource {
+  id          String    @id @default(cuid())
+  url         String    @unique
+  label       String?
+  enabled     Boolean   @default(true)
+  maxPages    Int       @default(20)
+  lastCrawledAt DateTime?
+  lastStatus  String?
+  lastError   String?
+  pagesFound  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("crawl_sources")
+}
+
+/// One row per knowledge rebuild. Gives the CMS an honest "last updated"
+/// and gives you somewhere to look when Sakha starts answering from stale data.
+model IndexRun {
+  id            String    @id @default(cuid())
+  trigger       String    // schedule | publish | manual | startup
+  status        String    @default("running") // running | ok | failed | partial
+  documentsSeen Int       @default(0)
+  documentsChanged Int    @default(0)
+  chunksWritten Int       @default(0)
+  sources       Json?
+  error         String?   @db.Text
+  startedAt     DateTime  @default(now())
+  finishedAt    DateTime?
+  durationMs    Int?
+
+  @@index([status, startedAt])
+  @@map("index_runs")
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SAKHA — conversations
+// ══════════════════════════════════════════════════════════════════════════════
+
+model Conversation {
+  id         String   @id @default(cuid())
+  userId     String?
+  // Anonymous visitors get a signed browser id so a session survives a reload
+  // without us setting an identifying cookie.
+  visitorId  String?
+  title      String?
+  channel    String   @default("web")
+  pagePath   String?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  messages Message[]
+  leads    Lead[]
+
+  @@index([userId, updatedAt])
+  @@index([visitorId, updatedAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String   // user | assistant | tool | system
+  content        String   @db.Text
+  // What Sakha retrieved and which tools she called, kept for the citation UI
+  // and for debugging a bad answer after the fact.
+  citations      Json?
+  toolCalls      Json?
+  model          String?
+  promptTokens   Int?
+  completionTokens Int?
+  latencyMs      Int?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  feedback     MessageFeedback[]
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+model MessageFeedback {
+  id        String   @id @default(cuid())
+  messageId String
+  rating    String   // up | down
+  comment   String?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("message_feedback")
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  OPS
+// ══════════════════════════════════════════════════════════════════════════════
+
+/// Append-only. Nothing in the app updates or deletes a row here.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorEmail String?
+  action     String   // e.g. cms.content.publish, iam.grant
+  entity     String?  // e.g. User, Role, ContentRevision
+  entityId   String?
+  before     Json?
+  after      Json?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
+
+/// Runtime settings the super admin can change without a deploy:
+/// Sakha's system prompt, model, refresh cadence, feature flags.
+model Setting {
+  key       String   @id
+  value     Json
+  category  String   @default("general")
+  updatedAt DateTime @updatedAt
+  updatedById String?
+
+  @@index([category])
+  @@map("settings")
+}

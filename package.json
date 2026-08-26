@@ -1,0 +1,50 @@
+{
+  "name": "sakha",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sakha AI — sakhaai.com. Agentic AI automation for SMBs. Built by Sakha InfoTech.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --workspace @sakha/api",
+    "dev:web": "npm run dev --workspace @sakha/web",
+    "build": "npm run build --workspace @sakha/web",
+    "start": "npm run start --workspace @sakha/api",
+    "db:generate": "npm run db:generate --workspace @sakha/api",
+    "db:migrate": "npm run db:migrate --workspace @sakha/api",
+    "db:deploy": "npm run db:deploy --workspace @sakha/api",
+    "db:seed": "npm run db:seed --workspace @sakha/api",
+    "db:reset": "npm run db:reset --workspace @sakha/api",
+    "db:studio": "npm run db:studio --workspace @sakha/api",
+    "knowledge:reindex": "npm run knowledge:reindex --workspace @sakha/api",
+    "worker": "npm run worker --workspace @sakha/api",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\"",
+    "test": "npm run test --workspaces --if-present",
+    "infra:up": "docker compose up -d postgres redis",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f",
+    "stack:up": "docker compose --profile full up -d --build",
+    "stack:down": "docker compose --profile full down",
+    "setup": "node scripts/setup.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^15.15.0",
+    "prettier": "^3.4.2"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0"
+  }
+}

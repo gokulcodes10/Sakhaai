@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#C25418" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141210" media="(prefers-color-scheme: dark)" />
+
+    <title>Sakha AI — Automation that ships. Outcomes you can measure.</title>
+    <meta
+      name="description"
+      content="Sakha AI builds AI agents that answer your customers and act inside your systems — live in weeks, with published prices and code you own. By Sakha InfoTech."
+    />
+    <link rel="canonical" href="https://sakhaai.com/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sakha AI" />
+    <meta property="og:title" content="Sakha AI — Automation that ships. Outcomes you can measure." />
+    <meta property="og:description" content="AI agents that reach production, with published prices and code you own." />
+    <meta property="og:url" content="https://sakhaai.com/" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      // Applied before first paint so a dark-mode visitor never sees a flash of
+      // the light theme.
+      (function () {
+        try {
+          var stored = localStorage.getItem('sakha-theme');
+          var prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (stored === 'dark' || (!stored && prefers)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

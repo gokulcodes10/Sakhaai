@@ -1,0 +1,685 @@
+{
+  "$schema": "./site-content.schema.json",
+  "_meta": {
+    "version": 1,
+    "note": "Single source of truth for every word on sakhaai.com. The CMS reads and writes this shape; publishing writes a new ContentRevision row and re-indexes Sakha. Any key prefixed with _ is editorial guidance for admins and is never rendered.",
+    "locale": "en-IN",
+    "currency": "INR"
+  },
+
+  "company": {
+    "brandName": "Sakha AI",
+    "legalName": "Sakha InfoTech",
+    "domain": "sakhaai.com",
+    "tagline": "Trust. Grit. Agents that ship.",
+    "originLine": "Made possible by three friends, with trust and grit.",
+    "elevatorPitch": "We build AI agents that do the work your team keeps doing by hand — answering customers, chasing follow-ups, updating your systems — and we put them into production in weeks, with a number attached.",
+    "email": "hello@sakhaai.com",
+    "salesEmail": "malarvizhi@sakhaai.com",
+    "phone": "+91 00000 00000",
+    "_phoneNote": "Publish a real founder-reachable number. The blueprint is explicit: published founder contact + fast response is an underrated differentiator against slow agencies.",
+    "whatsapp": "+91 00000 00000",
+    "address": {
+      "line1": "Sakha InfoTech",
+      "line2": "",
+      "city": "Coimbatore",
+      "state": "Tamil Nadu",
+      "country": "India",
+      "postcode": ""
+    },
+    "responsePromise": "A founder replies to every enquiry within 24 hours. Not an SDR, not a bot.",
+    "social": {
+      "linkedin": "https://www.linkedin.com/company/sakha-infotech",
+      "github": "",
+      "x": "",
+      "clutch": ""
+    }
+  },
+
+  "nav": {
+    "primary": [
+      { "label": "What we build", "href": "/services" },
+      { "label": "Industries", "href": "/industries", "children": "@industries" },
+      { "label": "Pricing", "href": "/pricing" },
+      { "label": "Work", "href": "/work" },
+      { "label": "About", "href": "/about" }
+    ],
+    "cta": { "label": "Get a build memo", "href": "/contact" },
+    "secondary": [
+      { "label": "Sign in", "href": "/signin" },
+      { "label": "Client portal", "href": "/portal", "authOnly": true }
+    ]
+  },
+
+  "home": {
+    "hero": {
+      "eyebrow": "Sakha means friend",
+      "headline": "Automation that ships. Outcomes you can measure.",
+      "subhead": "Most AI pilots never reach production. We build agents that answer your customers, act inside your systems, and go live in weeks — with the number they moved published on this site.",
+      "primaryCta": { "label": "See our prices", "href": "/pricing" },
+      "secondaryCta": { "label": "Book a 30-minute build memo", "href": "/contact" },
+      "assurance": "Working prototype in 5 days · You own all the code · Fixed, published prices",
+      "_note": "Comet Lab test — read this headline aloud. If a buzzword crept in, cut it."
+    },
+
+    "trustStrip": {
+      "enabled": true,
+      "label": "Built the way we would want it built",
+      "items": [
+        { "icon": "shield", "text": "You own the code, the infra and the docs from day one" },
+        { "icon": "gauge", "text": "Every engagement has one metric, agreed before we write code" },
+        { "icon": "eye", "text": "Human-in-the-loop by default. You choose the autonomy level" },
+        { "icon": "receipt", "text": "Prices published. No 'book a call to find out'" }
+      ]
+    },
+
+    "problem": {
+      "eyebrow": "The uncomfortable part",
+      "headline": "Your team is the integration layer.",
+      "body": "Someone reads the WhatsApp message, opens the CRM, checks the ERP, types the reply, sets a reminder to follow up — and does it again four hundred times a month. That work is not hard. It is just relentless, and it is why your people are busy instead of useful.",
+      "points": [
+        { "title": "Enquiries decay", "body": "A lead that waits four hours is a lead someone else already answered." },
+        { "title": "Follow-ups leak", "body": "The second and third chase are where the revenue is, and they are the first thing a busy team drops." },
+        { "title": "Systems don't talk", "body": "The CRM knows one thing, the ERP another, WhatsApp a third. A human reconciles them, badly, all day." }
+      ]
+    },
+
+    "servicesIntro": {
+      "eyebrow": "What we build",
+      "headline": "Four things. We do them properly.",
+      "body": "We keep the menu short on purpose. A four-item list we can execute beats a twenty-item list that makes us a generalist.",
+      "cta": { "label": "See how each one works", "href": "/services" }
+    },
+
+    "howItWorks": {
+      "eyebrow": "How an engagement runs",
+      "headline": "Five days to something real. Four to six weeks to production.",
+      "body": "The speed is not a stunt. It is the only advantage a small team genuinely has over a large one, so we built the whole process around protecting it.",
+      "steps": [
+        {
+          "day": "Day 0",
+          "title": "A call, then a memo",
+          "body": "A founder takes the call — no SDR, no deck. Afterwards you get a written build memo: what we would build, what it should move, what it costs, and what we would not build. Sometimes the memo says wait. We send it anyway."
+        },
+        {
+          "day": "Days 1–2",
+          "title": "Access and the data audit",
+          "body": "We look at the data your agent will read before we promise anything about the agent. An agent is only as good as what it can see, and this is where most projects quietly fail."
+        },
+        {
+          "day": "Day 5",
+          "title": "Working prototype",
+          "body": "Not a slide. A running agent on your real data, handling the real workflow, that you can break in front of us."
+        },
+        {
+          "day": "Weeks 2–6",
+          "title": "Production, with guardrails",
+          "body": "Exception paths, audit trail, human-in-the-loop review queue, staged rollout from supervised to autonomous. The unglamorous half is the half that decides whether it survives."
+        },
+        {
+          "day": "Handover",
+          "title": "Keys, then a choice",
+          "body": "Code, infrastructure, prompts, evaluation harness and documentation are yours. Keep running it yourself, or put it on a managed plan. Both are real options — that is the point."
+        }
+      ]
+    },
+
+    "proof": {
+      "eyebrow": "Proof, not adjectives",
+      "headline": "Every engagement publishes a number.",
+      "body": "We instrument the metric before we write code, because a project you cannot measure is a project you cannot sell twice.",
+      "cta": { "label": "Read the case studies", "href": "/work" }
+    },
+
+    "assistantPitch": {
+      "eyebrow": "Case study #1 is this website",
+      "headline": "Meet Sakha. She is running right now, on the right of your screen.",
+      "body": "We would not ask you to deploy an agent we had not deployed on ourselves first. Sakha knows every page, price, service and policy on this site, re-reads them the moment we change anything, and answers your questions using live data instead of a scripted FAQ tree. Ask her something hard.",
+      "cta": { "label": "Open Sakha", "action": "open-assistant" },
+      "suggestions": [
+        "What would a WhatsApp agent for my business actually cost?",
+        "What do you refuse to build?",
+        "How is this different from hiring an n8n freelancer?",
+        "What happens if the agent gets something wrong?"
+      ]
+    },
+
+    "finalCta": {
+      "headline": "Tell us the workflow that keeps breaking.",
+      "body": "Thirty minutes, a founder on the call, and a written memo afterwards whether or not you hire us.",
+      "primaryCta": { "label": "Get a build memo", "href": "/contact" },
+      "secondaryCta": { "label": "See the prices first", "href": "/pricing" }
+    }
+  },
+
+  "services": {
+    "meta": {
+      "title": "What we build",
+      "description": "AI agents for customer response, follow-up, internal support and system integration — built to reach production."
+    },
+    "hero": {
+      "eyebrow": "What we build",
+      "headline": "Four services. Each one ends in production.",
+      "subhead": "Every item on this list has shipped end to end. When something has only shipped twice, we say so."
+    },
+    "items": [
+      {
+        "slug": "customer-response-agents",
+        "name": "Customer response agents",
+        "oneLiner": "Answer every customer in under a minute, on the channel they already use.",
+        "icon": "message",
+        "body": "An agent that reads incoming messages on WhatsApp, web chat, email or a phone line, understands what is actually being asked, looks the answer up in your systems, and replies. Not a decision-tree bot — it reads your live order data, your price list and your policies, and it hands over to a human the moment it is out of its depth.",
+        "outcomes": [
+          "First response measured in seconds instead of hours",
+          "Out-of-hours and weekend cover with no rota",
+          "Every conversation logged and searchable"
+        ],
+        "includes": [
+          "WhatsApp Business API, web chat, email or voice",
+          "Retrieval over your real catalogue, policies and order data",
+          "Confidence thresholds with automatic human handover",
+          "Full transcript audit trail"
+        ],
+        "goodFitWhen": "You get more than roughly 200 repetitive enquiries a month and the answers already exist somewhere in your systems.",
+        "notAFitWhen": "Your answers live only in one person's head and nowhere else. Fix that first — we will tell you how, and it does not need us."
+      },
+      {
+        "slug": "follow-up-and-revenue-agents",
+        "name": "Follow-up and revenue agents",
+        "oneLiner": "The second and third chase, done every time, by something that never gets busy.",
+        "icon": "trending",
+        "body": "Most revenue leaks in the gap between interest and action. This agent watches your pipeline, chases quotes that went quiet, confirms and re-confirms appointments, recovers abandoned carts, and keeps your CRM honest without anyone typing into it.",
+        "outcomes": [
+          "Fewer no-shows and abandoned quotes",
+          "A CRM that reflects reality without manual data entry",
+          "Follow-up that happens on the third attempt, not just the first"
+        ],
+        "includes": [
+          "Pipeline and calendar monitoring",
+          "Multi-step, multi-channel follow-up sequences",
+          "Two-way CRM sync",
+          "Escalation to a human when the reply is not routine"
+        ],
+        "goodFitWhen": "You have a defined pipeline and you know follow-up is being dropped.",
+        "notAFitWhen": "You have no CRM at all. Start there — an agent cannot chase a pipeline that does not exist."
+      },
+      {
+        "slug": "internal-operations-agents",
+        "name": "Internal operations agents",
+        "oneLiner": "Give your own team the answer instead of the form.",
+        "icon": "building",
+        "body": "An agent your staff talk to instead of raising a ticket. Leave balances, policy questions, order status, stock levels, approval routing, report generation. It reads your HR system, your ERP and your document store, and it can act — file the request, book the slot, raise the invoice — inside the permissions you give it.",
+        "outcomes": [
+          "Tier-one internal tickets absorbed rather than queued",
+          "Managers stop being a lookup service",
+          "Policy answered consistently, with the source cited"
+        ],
+        "includes": [
+          "Read access across HR, ERP, finance and document stores",
+          "Scoped write actions with approval steps",
+          "Per-role permissions, so people see only what they should",
+          "Cited answers — every response links to the document behind it"
+        ],
+        "goodFitWhen": "The same twenty questions reach your managers every week.",
+        "notAFitWhen": "Your policies contradict each other. The agent will surface that contradiction publicly, which is useful but rarely comfortable."
+      },
+      {
+        "slug": "system-integration",
+        "name": "System integration and data groundwork",
+        "oneLiner": "Your agent is only as good as the data it can read.",
+        "icon": "plug",
+        "body": "The least glamorous service and the one that decides whether the others work. We connect the systems that do not talk — CRM, ERP, accounting, spreadsheets, that one Windows machine in the back office — clean up what the agent will read, and build the connector layer once so every future agent inherits it.",
+        "outcomes": [
+          "One connector layer that every later agent reuses",
+          "Data quality problems found before they become agent failures",
+          "No more manual re-keying between systems"
+        ],
+        "includes": [
+          "Data audit with a written findings report",
+          "Connectors for your CRM, ERP and accounting stack",
+          "Browser automation where a system has no API",
+          "Scheduled sync with failure alerting"
+        ],
+        "goodFitWhen": "Almost always. We usually recommend starting here.",
+        "notAFitWhen": "Never, honestly — but it can sometimes be scoped smaller than you expect. We will tell you when."
+      }
+    ],
+    "reusableModules": {
+      "eyebrow": "Why we are fast",
+      "headline": "We do not rebuild the plumbing for every client.",
+      "body": "Authentication, WhatsApp delivery, document search, CRM sync, payment capture, voice, analytics and the human-review queue are built once and configured per client. You pay for the part of your problem that is genuinely yours, not for us to write a login screen again.",
+      "modules": [
+        "Identity and access",
+        "WhatsApp Business connector",
+        "Voice channel",
+        "Document search and retrieval",
+        "CRM and ERP connectors",
+        "Payments",
+        "Human review queue",
+        "Analytics and evaluation harness"
+      ]
+    }
+  },
+
+  "industries": {
+    "meta": {
+      "title": "Industries",
+      "description": "Where our agents are running, and the workflow that mattered in each."
+    },
+    "hero": {
+      "eyebrow": "Industries",
+      "headline": "We go deep where we go at all.",
+      "subhead": "Three clients in one industry beats ten scattered across many — the referrals compound and so does the knowledge. These are the sectors we are actively building in."
+    },
+    "_note": "Industry pages are CMS-managed. Add one from the CMS in about five minutes: name, the workflow, the metric, the objection. It appears in the Industries dropdown automatically. Do not add an industry you have not shipped in.",
+    "items": [
+      {
+        "slug": "manufacturing",
+        "name": "Manufacturing and distribution",
+        "headline": "\"Where is my order?\" answered by your ERP, not your sales desk.",
+        "workflow": "Order status, dispatch updates, RFQ intake and reorder reminders across WhatsApp and email, reading live from your ERP.",
+        "metric": "Sales desk time recovered per week",
+        "objection": "Our ERP is old and has no API.",
+        "objectionAnswer": "That is the usual case. Where there is no API we automate the interface itself, on a scheduled sync with alerting. We have done it against systems older than the team using them.",
+        "published": true
+      },
+      {
+        "slug": "healthcare",
+        "name": "Clinics and diagnostics",
+        "headline": "Appointments booked, confirmed and re-confirmed without a receptionist on hold.",
+        "workflow": "Booking, rescheduling, no-show recovery, report-ready notifications and routine patient queries.",
+        "metric": "No-show rate",
+        "objection": "Patient data cannot leave our building.",
+        "objectionAnswer": "Then it does not. We deploy on infrastructure you control, keep identifiers out of model calls, and give you an audit trail of every access. Ask us for the responsible deployment checklist before you decide.",
+        "published": true
+      },
+      {
+        "slug": "education",
+        "name": "Colleges and training institutes",
+        "headline": "Admissions season without the phone room.",
+        "workflow": "Admissions enquiries, eligibility questions, document checklists, fee reminders and student support triage.",
+        "metric": "Enquiries answered within 5 minutes",
+        "objection": "Our volume is seasonal — is it worth it?",
+        "objectionAnswer": "Seasonality is the argument for it, not against. The agent absorbs the peak you currently staff up for, and costs almost nothing in the trough.",
+        "published": true
+      }
+    ]
+  },
+
+  "pricing": {
+    "meta": {
+      "title": "Pricing",
+      "description": "Published price ranges for pilots, single-workflow builds and multi-workflow programmes. No 'book a call to find out'."
+    },
+    "hero": {
+      "eyebrow": "Pricing",
+      "headline": "Here are our prices.",
+      "subhead": "Almost nobody in this industry publishes them. We think that is a tell. These are real ranges — where you land inside one depends on how many systems we have to touch and how clean your data is, and we will tell you which end you are at in the build memo, before you commit.",
+      "_note": "REVIEW THESE NUMBERS BEFORE LAUNCH. They are considered defaults for the Indian SMB market, not a quote from your books. Publishing a price you cannot deliver at is worse than publishing nothing."
+    },
+    "currencyNote": "Prices in Indian Rupees, excluding GST. International engagements are quoted in USD at the equivalent tier.",
+    "tiers": [
+      {
+        "slug": "pilot",
+        "name": "Pilot",
+        "tagline": "Prove it on one workflow, on your real data.",
+        "priceFrom": 150000,
+        "priceTo": 400000,
+        "priceDisplay": "₹1.5L – ₹4L",
+        "duration": "2 to 3 weeks",
+        "featured": false,
+        "bestFor": "You have one painful workflow and you want evidence before you commit budget.",
+        "includes": [
+          "Data audit and written findings",
+          "Working prototype by day 5",
+          "One workflow, one channel, real data",
+          "The metric instrumented and measured",
+          "A written go / no-go recommendation at the end"
+        ],
+        "notIncluded": ["Production hardening", "Ongoing support", "Multi-system integration"],
+        "cta": { "label": "Start with a pilot", "href": "/contact?tier=pilot" }
+      },
+      {
+        "slug": "single-workflow",
+        "name": "Single workflow, in production",
+        "tagline": "One agent, live, with guardrails and your name on the code.",
+        "priceFrom": 500000,
+        "priceTo": 1200000,
+        "priceDisplay": "₹5L – ₹12L",
+        "duration": "4 to 6 weeks",
+        "featured": true,
+        "badge": "Most engagements start here",
+        "bestFor": "You already know which workflow to automate and you want it running properly, not demoed.",
+        "includes": [
+          "Everything in the Pilot",
+          "Production deployment on infrastructure you own",
+          "Integration with your CRM, ERP or helpdesk",
+          "Human-in-the-loop review queue and exception paths",
+          "Audit trail and staged autonomy rollout",
+          "Evaluation harness so you can prove it still works in six months",
+          "Full handover: code, infra, prompts, documentation",
+          "30 days of post-launch support"
+        ],
+        "notIncluded": ["Ongoing managed operation (see below)"],
+        "cta": { "label": "Scope a single workflow", "href": "/contact?tier=single" }
+      },
+      {
+        "slug": "multi-workflow",
+        "name": "Multi-workflow programme",
+        "tagline": "Several agents on one connector layer, built to keep going.",
+        "priceFrom": 1200000,
+        "priceTo": null,
+        "priceDisplay": "From ₹12L",
+        "duration": "8 to 16 weeks",
+        "featured": false,
+        "bestFor": "You want the integration layer built once and three or more agents running on top of it.",
+        "includes": [
+          "Everything in Single workflow, across multiple agents",
+          "Shared connector and identity layer",
+          "Cross-agent orchestration and shared memory",
+          "Role-based access across your team",
+          "Quarterly review against the agreed metrics",
+          "Priority response"
+        ],
+        "notIncluded": [],
+        "cta": { "label": "Talk through a programme", "href": "/contact?tier=multi" }
+      }
+    ],
+    "managed": {
+      "enabled": true,
+      "eyebrow": "After launch",
+      "headline": "Run it yourself, or let us run it.",
+      "body": "You own everything either way — that is not a lever we pull. Managed plans exist because most teams would rather not carry a pager for an agent, not because you would be locked out if you did.",
+      "plans": [
+        {
+          "name": "Self-hosted",
+          "price": "₹0",
+          "priceNote": "You already own it",
+          "includes": ["All code, infra and documentation", "Evaluation harness", "Community support"]
+        },
+        {
+          "name": "Managed",
+          "price": "₹35,000 – ₹1,20,000",
+          "priceNote": "per month, by scale",
+          "includes": [
+            "Monitoring, uptime and incident response",
+            "Model and prompt updates as the landscape moves",
+            "Monthly performance report against your metric",
+            "Prompt and workflow tuning as your business changes"
+          ]
+        }
+      ]
+    },
+    "faq": [
+      {
+        "q": "Why publish prices at all?",
+        "a": "Because it saves us both a call. If ₹5L is not the right order of magnitude for your business, you have found that out in ten seconds instead of after two meetings. It also means we cannot quietly charge the next client more for the same work."
+      },
+      {
+        "q": "What makes a project land at the top of a range?",
+        "a": "Almost always the number of systems involved and the state of the data inside them. A single clean system sits at the bottom. Four systems, one of which is a spreadsheet someone maintains by hand, sits at the top. The data audit in week one tells us which you are, and we tell you before you sign."
+      },
+      {
+        "q": "Do you really hand over all the code?",
+        "a": "Yes, and it is written into the contract by default rather than negotiated. Lock-in is how incumbents defend a position. We do not have one to defend yet, so ownership is the more honest trade — and frankly it makes us build it better."
+      },
+      {
+        "q": "What if the pilot says do not proceed?",
+        "a": "Then it says that, in writing, and we would rather lose the follow-on than sell you a build we do not believe in. It has happened. It will happen again."
+      },
+      {
+        "q": "Do you charge for the first call?",
+        "a": "No. The call and the written build memo afterwards are free, whether or not you hire us."
+      }
+    ]
+  },
+
+  "work": {
+    "meta": {
+      "title": "Work",
+      "description": "Engagements, with the numbers attached."
+    },
+    "hero": {
+      "eyebrow": "Work",
+      "headline": "A number in every case study. No exceptions.",
+      "subhead": "If we cannot measure what an agent changed, we treat that as our failure to instrument it, not as a case study we can still publish."
+    },
+    "_note": "Only case studies with `published: true` are rendered. Never publish one without a real, measured number and the client's written consent to be named. An unpublished placeholder is honest; an invented metric ends the company.",
+    "caseStudies": [
+      {
+        "slug": "sakha-on-sakhaai",
+        "client": "Sakha InfoTech",
+        "clientNote": "Ourselves — case study #1",
+        "industry": "Professional services",
+        "published": true,
+        "isDogfood": true,
+        "headline": "We put the first agent on our own operations.",
+        "challenge": "We were asking prospects to trust an AI agent with their customer conversations before we had trusted one with ours. So Sakha went on our own site first, wired into our own content, pricing and lead pipeline — with the same guardrails, audit trail and human handover we sell.",
+        "approach": "Sakha reads every page, price and policy on this site through a retrieval layer that re-indexes the moment we publish a change in the CMS, plus a scheduled crawl of our public sources. She can look up live facts, cite the page she got them from, and hand a qualified conversation to a human with the context attached.",
+        "metrics": [
+          { "label": "Knowledge freshness after a CMS publish", "value": "Under 30 seconds", "note": "Measured from publish to first correct answer" },
+          { "label": "Answers with a cited source", "value": "100%", "note": "Sakha is instructed to say she does not know rather than answer uncited" }
+        ],
+        "quote": null,
+        "_metricsNote": "Add the live numbers once you have a month of traffic: enquiries handled without a human, median response time, share of conversations that became leads."
+      }
+    ],
+    "reviews": {
+      "enabled": false,
+      "_note": "Turn this on once you have three or more verified reviews on a platform your buyers actually search. Clutch first — it dominates services search. Ask at the moment of delivery, every client, no exceptions. An empty reviews section is worse than none.",
+      "platforms": []
+    }
+  },
+
+  "about": {
+    "meta": {
+      "title": "About",
+      "description": "Sakha InfoTech — three friends building AI agents that reach production."
+    },
+    "hero": {
+      "eyebrow": "About",
+      "headline": "Made possible by three friends, with trust and grit.",
+      "subhead": "That sentence is not marketing. It is the entire origin of the company, and it is still how decisions get made here."
+    },
+    "story": {
+      "headline": "Why 'Sakha'",
+      "body": [
+        "Sakha means friend. Not an assistant, not a servant, not a tool you operate — a friend, which in the older sense means someone who tells you the truth even when a more agreeable answer was available.",
+        "We picked it because the thing we kept noticing about this industry is how much of it is agreeable. Every vendor says yes. Every pilot is a success right up until the point where nobody can say what it changed. Nobody publishes a price, nobody publishes a failure, and the software quietly stops being used about four months after the case study goes out.",
+        "So we built the company around the three things we could actually promise on day one, with no funding and no logos: we would be fast, we would be honest about what not to build, and we would go deep in a few places instead of shallow everywhere.",
+        "Trust and grit were the only assets three friends had at the start. They turned out to be the right ones."
+      ]
+    },
+    "principles": [
+      {
+        "title": "We will tell you not to buy",
+        "body": "Every call ends in a written memo that includes what we would not build. It costs us occasional work. It has never cost us a relationship."
+      },
+      {
+        "title": "You own everything",
+        "body": "Code, infrastructure, prompts, evaluation harness and documentation — yours from day one, in the contract, not as a concession. If the work continues without us, we did it right."
+      },
+      {
+        "title": "A number or it did not happen",
+        "body": "We agree the metric before we write code. If we cannot measure it, we say so at the start rather than explain it away at the end."
+      },
+      {
+        "title": "We run it on ourselves first",
+        "body": "Sakha, on the right of this page, is our own agent on our own operations. We do not ship a pattern we have not carried."
+      },
+      {
+        "title": "Human in the loop until you say otherwise",
+        "body": "Every agent starts supervised and earns its autonomy in stages you control. Nervous is a reasonable way to start."
+      }
+    ],
+    "team": [
+      {
+        "slug": "gokul-madhesh",
+        "name": "Gokul Madhesh",
+        "role": "Chief Executive Officer & Chief Technology Officer",
+        "shortRole": "CEO & CTO",
+        "bio": "Gokul leads the technical direction and takes the first call on every engagement. If you are talking to Sakha AI about architecture, you are talking to him.",
+        "photo": "",
+        "linkedin": "",
+        "email": "gokul@sakhaai.com",
+        "order": 1
+      },
+      {
+        "slug": "malarvizhi",
+        "name": "Malarvizhi",
+        "role": "Business Development Manager",
+        "shortRole": "Business Development",
+        "bio": "Malarvizhi runs client relationships and the build memo process. She is the reason the follow-up you were promised actually arrives.",
+        "photo": "",
+        "linkedin": "",
+        "email": "malarvizhi@sakhaai.com",
+        "order": 2
+      },
+      {
+        "slug": "sai",
+        "name": "Sai",
+        "role": "Chief Research Officer",
+        "shortRole": "Chief Research Officer",
+        "bio": "Sai owns evaluation and the research agenda — how we prove an agent works, and how we know when it has stopped working.",
+        "photo": "",
+        "linkedin": "",
+        "email": "sai@sakhaai.com",
+        "order": 3
+      }
+    ],
+    "_teamNote": "Add a real photo and LinkedIn URL for each founder before launch. Named, photographed people outperform anonymous logos by a wide margin — buyers are checking whether you exist."
+  },
+
+  "responsibleAi": {
+    "meta": {
+      "title": "Responsible deployment",
+      "description": "The one-page checklist that goes into every Sakha AI proposal."
+    },
+    "hero": {
+      "eyebrow": "Responsible deployment",
+      "headline": "The checklist that goes in every proposal.",
+      "subhead": "Enterprise buyers ask for this and most small firms have nothing to hand them. It costs us nothing to have written it down, and it wins the compliance-nervous buyer that scares other boutiques off."
+    },
+    "autonomyLevels": [
+      { "level": 0, "name": "Shadow", "description": "The agent drafts, a human sends. Nothing reaches a customer without review. Every engagement starts here." },
+      { "level": 1, "name": "Supervised", "description": "The agent acts on routine cases and routes anything below its confidence threshold to a human queue." },
+      { "level": 2, "name": "Autonomous with exceptions", "description": "The agent handles the defined workflow end to end. Named exception categories always escalate." },
+      { "level": 3, "name": "Autonomous", "description": "Full autonomy inside a scoped domain, with sampled human review and alerting on drift. Reached by evidence, never by default." }
+    ],
+    "checklist": [
+      { "item": "Named metric agreed and instrumented before build", "why": "An unmeasured agent cannot be defended or improved." },
+      { "item": "Data audit completed and findings shared in writing", "why": "Most agent failures are data failures wearing a costume." },
+      { "item": "Autonomy level agreed and written into the scope", "why": "So nobody discovers after launch that it was sending emails on its own." },
+      { "item": "Human-in-the-loop review queue in place", "why": "Somewhere for the agent to put the things it should not decide." },
+      { "item": "Audit trail of every agent action, retained and queryable", "why": "When someone asks 'why did it do that', there is an answer." },
+      { "item": "Escalation and exception paths defined per workflow", "why": "The unhappy path is where trust is won or lost." },
+      { "item": "PII handling documented; identifiers minimised in model calls", "why": "Send the model what it needs, never the whole record." },
+      { "item": "Access scoped per role, least privilege by default", "why": "An agent should not see more than the person asking." },
+      { "item": "Staged rollout plan with rollback", "why": "Ship to ten percent before you ship to everyone." },
+      { "item": "Evaluation harness handed over with the code", "why": "So you can prove in six months that it still works." }
+    ]
+  },
+
+  "contact": {
+    "meta": {
+      "title": "Get a build memo",
+      "description": "Thirty minutes with a founder, and a written recommendation afterwards — whether or not you hire us."
+    },
+    "hero": {
+      "eyebrow": "Get in touch",
+      "headline": "Tell us the workflow that keeps breaking.",
+      "subhead": "You will get thirty minutes with a founder and, afterwards, a written build memo: what we would build, what it should move, what it costs, and what we would not build."
+    },
+    "form": {
+      "workflowLabel": "Which workflow is costing you the most time right now?",
+      "workflowPlaceholder": "For example: our sales desk answers the same 'where is my order' question about 40 times a day by looking it up in Tally, and enquiries after 6pm wait until morning.",
+      "workflowHelp": "Be specific. A vague answer gets a vague memo.",
+      "budgetLabel": "Rough budget range",
+      "budgetHelp": "Honest answers get honest scoping. 'Not sure yet' is a real option.",
+      "submitLabel": "Send it to a founder",
+      "successTitle": "That is with us.",
+      "successBody": "A founder will reply within 24 hours — not an SDR, not an autoresponder. If your question was specific, so will the reply be.",
+      "consent": "We use what you send us only to reply to you. We do not sell it, and we do not add you to a mailing list you did not ask for."
+    },
+    "alternatives": [
+      { "label": "Email a founder directly", "value": "hello@sakhaai.com", "href": "mailto:hello@sakhaai.com" },
+      { "label": "WhatsApp us", "value": "+91 00000 00000", "href": "https://wa.me/910000000000" },
+      { "label": "Ask Sakha first", "value": "She knows our prices and our scope", "action": "open-assistant" }
+    ]
+  },
+
+  "assistant": {
+    "name": "Sakha",
+    "meaning": "friend",
+    "greeting": "I'm Sakha. I know this company — the services, the prices, what we will and won't build. Ask me anything, and I'll tell you when I don't know.",
+    "placeholder": "Ask about pricing, scope, timelines…",
+    "openLabel": "Ask Sakha",
+    "closeLabel": "Close",
+    "disclaimer": "Sakha can be wrong. Anything about contracts or price needs a founder's confirmation.",
+    "emptyStateSuggestions": [
+      "What does a pilot actually include?",
+      "How fast can you go live?",
+      "Do we own the code?",
+      "What would you refuse to build for us?"
+    ],
+    "handoffPrompt": "Want a founder to pick this up? I can pass along what we've discussed.",
+    "unknownAnswer": "I don't have that on hand, and I'd rather say so than guess. A founder can answer it properly — shall I take your email?",
+    "_promptNote": "The system prompt itself lives in the CMS under Sakha → Settings so it can be tuned without a deploy. This block is only the user-facing copy."
+  },
+
+  "footer": {
+    "blurb": "Sakha AI builds agents that answer your customers and act inside your systems — in production, in weeks, with your name on the code.",
+    "columns": [
+      {
+        "title": "What we build",
+        "links": [
+          { "label": "Customer response agents", "href": "/services/customer-response-agents" },
+          { "label": "Follow-up and revenue agents", "href": "/services/follow-up-and-revenue-agents" },
+          { "label": "Internal operations agents", "href": "/services/internal-operations-agents" },
+          { "label": "System integration", "href": "/services/system-integration" }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          { "label": "About", "href": "/about" },
+          { "label": "Work", "href": "/work" },
+          { "label": "Pricing", "href": "/pricing" },
+          { "label": "Responsible deployment", "href": "/responsible-ai" },
+          { "label": "Contact", "href": "/contact" }
+        ]
+      },
+      {
+        "title": "Clients",
+        "links": [
+          { "label": "Sign in", "href": "/signin" },
+          { "label": "Create an account", "href": "/signup" },
+          { "label": "Client portal", "href": "/portal" }
+        ]
+      }
+    ],
+    "legal": {
+      "copyright": "Sakha InfoTech",
+      "links": [
+        { "label": "Privacy", "href": "/privacy" },
+        { "label": "Terms", "href": "/terms" }
+      ],
+      "registration": "Sakha InfoTech · Registered in India",
+      "_registrationNote": "Add your CIN / GSTIN here once registration completes. Buyers do check."
+    }
+  },
+
+  "seo": {
+    "defaultTitle": "Sakha AI — Automation that ships. Outcomes you can measure.",
+    "titleTemplate": "%s · Sakha AI",
+    "defaultDescription": "Sakha AI builds AI agents that answer your customers and act inside your systems — live in weeks, with published prices and code you own. By Sakha InfoTech.",
+    "ogImage": "/og/sakha-default.png",
+    "twitterHandle": "",
+    "organizationSchema": {
+      "legalName": "Sakha InfoTech",
+      "alternateName": "Sakha AI",
+      "foundingDate": "2026",
+      "sameAs": []
+    }
+  }
+}
