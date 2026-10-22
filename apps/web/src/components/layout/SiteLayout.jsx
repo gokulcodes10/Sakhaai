@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import clsx from 'clsx';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
+import RebrandNotice from './RebrandNotice.jsx';
 import SakhaPanel from '../sakha/SakhaPanel.jsx';
 import SakhaLauncher from '../sakha/SakhaLauncher.jsx';
 import { selectSakhaOpen } from '../../features/sakha/sakhaSlice.js';
@@ -30,6 +31,7 @@ export default function SiteLayout() {
       {/* On a wide screen the docked panel pushes the page rather than covering
           it, so a visitor can read and interrogate simultaneously. */}
       <div className={clsx('flex flex-1 flex-col transition-[padding] duration-300 ease-out', panelOpen && 'with-panel')}>
+        <RebrandNotice />
         <Header />
         <main id="main" className="flex-1">
           <Outlet />

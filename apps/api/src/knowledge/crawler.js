@@ -53,7 +53,7 @@ export function parseRobots(text) {
   }
 
   // Prefer a group naming us; otherwise the wildcard group.
-  const ua = 'sakhabot';
+  const ua = 'asphalixbot';
   const mine =
     groups.find((g) => g.agents.some((a) => ua.includes(a) && a !== '*')) ??
     groups.find((g) => g.agents.includes('*'));

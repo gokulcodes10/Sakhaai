@@ -17,9 +17,9 @@ import logger from '../lib/logger.js';
 import { redis } from '../lib/redis.js';
 
 export const QUEUE_NAMES = {
-  KNOWLEDGE: 'sakha-knowledge',
-  MAIL: 'sakha-mail',
-  MAINTENANCE: 'sakha-maintenance',
+  KNOWLEDGE: 'asphalix-knowledge',
+  MAIL: 'asphalix-mail',
+  MAINTENANCE: 'asphalix-maintenance',
 };
 
 export const JOBS = {
@@ -28,6 +28,7 @@ export const JOBS = {
   LEAD_NOTIFICATION: 'mail:lead-notification',
   WELCOME: 'mail:welcome',
   PASSWORD_RESET: 'mail:password-reset',
+  TICKET_EVENT: 'mail:ticket-event',
   PRUNE_TOKENS: 'maintenance:prune-tokens',
   PRUNE_CONVERSATIONS: 'maintenance:prune-conversations',
 };
@@ -82,6 +83,11 @@ export function enqueueReindex({ trigger = 'manual', sources = ['cms', 'doc', 'd
 
 export function enqueueLeadNotification(leadId) {
   return safeAdd(mailQueue, JOBS.LEAD_NOTIFICATION, { leadId }, { jobId: `lead-${leadId}` });
+}
+
+/** event: 'created' | 'staff-reply' | 'client-reply' | 'status' */
+export function enqueueTicketEmail(ticketId, event, extra = {}) {
+  return safeAdd(mailQueue, JOBS.TICKET_EVENT, { ticketId, event, ...extra });
 }
 
 export function enqueueWelcome(userId) {

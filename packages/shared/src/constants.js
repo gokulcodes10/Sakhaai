@@ -3,11 +3,12 @@
  */
 
 export const COMPANY = {
-  legalName: 'Sakha InfoTech',
-  brandName: 'Sakha AI',
-  domain: 'sakhaai.com',
+  legalName: 'Asphalix',
+  brandName: 'Asphalix',
+  formerName: 'Sakha AI (Sakha InfoTech)',
+  domain: 'asphalix.com',
   tagline: 'Trust. Grit. Agents that ship.',
-  originLine: 'Made possible by three friends, with trust and grit.',
+  originLine: 'Made possible by two friends, with trust and grit.',
   assistantName: 'Sakha',
   assistantMeaning: 'friend',
 };

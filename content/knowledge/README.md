@@ -6,7 +6,7 @@ visibility: internal
 # The knowledge folder
 
 Every markdown file in this directory is chunked and indexed into Sakha's
-knowledge base. Drop a file in, and she can answer questions from it within
+knowledge base. Drop a file in, and Sakha can answer questions from it within
 fifteen minutes — no deploy, no database work.
 
 ## Frontmatter
@@ -14,9 +14,9 @@ fifteen minutes — no deploy, no database work.
 ```
 ---
 title: What a pilot actually involves
-tags: [pricing, process]
+tags: [scope, process]
 visibility: public
-url: /pricing
+url: /services
 ---
 ```
 
@@ -26,6 +26,9 @@ url: /pricing
 | `tags` | Free-form labels, for filtering in the CMS. |
 | `visibility` | `public` (anyone), `client` (signed-in clients), `internal` (staff only). Defaults to `public`. |
 | `url` | Where Sakha should link when she cites this. Optional. |
+
+**Never put prices, rates or ranges in any file here, at any visibility.**
+Asphalix does not publish prices and Sakha must not be able to quote one.
 
 ## What belongs here
 

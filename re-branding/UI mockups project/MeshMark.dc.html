@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<svg viewBox="0 0 64 64" width="{{ w }}" height="{{ h }}" fill="none" style="display:block">
+  <path d="M32 16 L15 47 L49 47 Z" stroke="{{ edge }}" stroke-width="5" stroke-linejoin="round"></path>
+  <circle cx="32" cy="16" r="9.5" fill="{{ c3 }}"></circle>
+  <circle cx="15" cy="47" r="9.5" fill="{{ c1 }}"></circle>
+  <circle cx="49" cy="47" r="9.5" fill="{{ c2 }}"></circle>
+</svg>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:200,&quot;height&quot;:200},&quot;c1&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#3A5BD9&quot;,&quot;options&quot;:[&quot;#3A5BD9&quot;,&quot;#18937F&quot;,&quot;#E0603C&quot;,&quot;#7A4FD4&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;c2&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#18937F&quot;,&quot;options&quot;:[&quot;#3A5BD9&quot;,&quot;#18937F&quot;,&quot;#E0603C&quot;,&quot;#7A4FD4&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;c3&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#E0603C&quot;,&quot;options&quot;:[&quot;#3A5BD9&quot;,&quot;#18937F&quot;,&quot;#E0603C&quot;,&quot;#7A4FD4&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;edge&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#8A8F94&quot;,&quot;options&quot;:[&quot;#8A8F94&quot;,&quot;#14161A&quot;,&quot;#F5F4F1&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;size&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;100%&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, size = p.size ?? '100%';
+    return { w: size, h: size, c1: p.c1 ?? '#3A5BD9', c2: p.c2 ?? '#18937F', c3: p.c3 ?? '#E0603C', edge: p.edge ?? '#8A8F94' };
+  }
+}
+</script>
+</body>
+</html>

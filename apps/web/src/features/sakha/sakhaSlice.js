@@ -31,6 +31,18 @@ export const rateMessage = createAsyncThunk('sakha/rate', async ({ messageId, ra
   return { messageId, rating };
 });
 
+/** Open the panel and send a question on the visitor's behalf (prompt chips, "Talk to a human"). */
+export const askSakha = (message) => (dispatch, getState) => {
+  dispatch(sakhaSlice.actions.openPanel());
+  if (getState().sakha.pending) return;
+  dispatch(
+    sendMessage({
+      message,
+      pageContext: { path: window.location.pathname, title: document.title },
+    })
+  );
+};
+
 const STORAGE_KEY = 'sakha-conversation';
 
 const restoreConversationId = () => {

@@ -13,7 +13,7 @@ import {
   permissionSatisfies,
   permissionSatisfiesAll,
   permissionSatisfiesAny,
-} from '@sakha/shared';
+} from '@asphalix/shared';
 
 test('exact permission match', () => {
   assert.equal(permissionSatisfies(['cms.content.publish'], 'cms.content.publish'), true);

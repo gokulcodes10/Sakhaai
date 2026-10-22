@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  Sakha AI — data model
+//  Asphalix — data model
 //  Postgres. Run `npm run db:migrate` to apply.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -49,7 +49,9 @@ model User {
   uploadedMedia  Media[]
   authoredPages  Page[]
   knowledgeDocs  KnowledgeDocument[]
-  tickets        Ticket[]
+  tickets         Ticket[]        @relation("TicketRaisedBy")
+  assignedTickets Ticket[]        @relation("TicketAssignee")
+  ticketMessages  TicketMessage[]
 
   @@index([status])
   @@index([clientAccountId])
@@ -360,20 +362,56 @@ model Document {
 
 model Ticket {
   id              String   @id @default(cuid())
-  clientAccountId String
-  raisedById      String
+  // Human-facing reference ("#1042"), shown to clients and in emails.
+  number          Int      @unique @default(autoincrement())
+  // Null for a visitor handoff that is not linked to a client organisation yet.
+  clientAccountId String?
+  raisedById      String?
+  // Who to reply to when there is no user account (Sakha's request_human).
+  requesterName   String?
+  requesterEmail  String?
   subject         String
   body            String   @db.Text
-  priority        String   @default("normal")
-  status          String   @default("open")
+  category        String?  // question | bug | change | access | billing | other
+  priority        String   @default("normal") // low | normal | high | urgent
+  status          String   @default("open")   // open | pending | resolved | closed
+  source          String   @default("portal") // portal | sakha | email | admin
+  assigneeId      String?
+  // The Sakha thread the ticket came from, so staff read the whole context.
+  conversationId  String?
+  lastActivityAt  DateTime @default(now())
+  closedAt        DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  clientAccount ClientAccount @relation(fields: [clientAccountId], references: [id], onDelete: Cascade)
-  raisedBy      User          @relation(fields: [raisedById], references: [id], onDelete: Cascade)
+  clientAccount ClientAccount? @relation(fields: [clientAccountId], references: [id], onDelete: Cascade)
+  raisedBy      User?          @relation("TicketRaisedBy", fields: [raisedById], references: [id], onDelete: SetNull)
+  assignee      User?          @relation("TicketAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  conversation  Conversation?  @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  messages      TicketMessage[]
 
   @@index([clientAccountId, status])
+  @@index([status, priority, lastActivityAt])
+  @@index([assigneeId, status])
+  @@index([conversationId])
   @@map("tickets")
+}
+
+model TicketMessage {
+  id         String   @id @default(cuid())
+  ticketId   String
+  authorType String   // client | staff | sakha | system
+  authorId   String?
+  body       String   @db.Text
+  // Staff-only notes. Never returned by a portal endpoint or read by Sakha.
+  internal   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_messages")
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -482,6 +520,7 @@ model Conversation {
   user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   messages Message[]
   leads    Lead[]
+  tickets  Ticket[]
 
   @@index([userId, updatedAt])
   @@index([visitorId, updatedAt])

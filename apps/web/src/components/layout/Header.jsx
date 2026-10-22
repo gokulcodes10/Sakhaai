@@ -6,6 +6,7 @@ import { selectContent } from '../../features/content/contentSlice.js';
 import { selectIsStaff, selectUser, signOut } from '../../features/auth/authSlice.js';
 import { selectTheme, toggleTheme } from '../../features/ui/uiSlice.js';
 import { Button } from '../ui/index.jsx';
+import { Lockup } from '../brand/Emblem.jsx';
 
 export default function Header() {
   const content = useSelector(selectContent);
@@ -34,20 +35,12 @@ export default function Header() {
     <header
       className={clsx(
         'sticky top-0 z-30 border-b transition-colors duration-200',
-        scrolled ? 'border-line bg-paper/85 backdrop-blur-md' : 'border-transparent bg-paper'
+        scrolled ? 'border-line bg-paper/90 backdrop-blur-[10px]' : 'border-transparent bg-paper'
       )}
     >
-      <div className="shell flex h-16 items-center gap-6">
-        <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Sakha AI, home">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-ink font-display text-lg font-semibold text-accent">
-            S
-          </span>
-          <span className="flex flex-col leading-none">
-            <span className="font-display text-base font-semibold text-ink">Sakha AI</span>
-            <span className="mt-0.5 text-2xs uppercase tracking-[0.1em] text-subtle">
-              Sakha InfoTech
-            </span>
-          </span>
+      <div className="shell flex h-[68px] items-center gap-6">
+        <Link to="/" className="flex shrink-0 items-center" aria-label="Asphalix, home">
+          <Lockup size={32} />
         </Link>
 
         <nav className="hidden flex-1 items-center gap-1 lg:flex" aria-label="Primary">
@@ -57,8 +50,8 @@ export default function Header() {
               to={item.href}
               className={({ isActive }) =>
                 clsx(
-                  'rounded px-3 py-1.5 text-sm font-medium transition-colors',
-                  isActive ? 'text-ink' : 'text-muted hover:text-ink'
+                  'rounded-sm px-3 py-1.5 text-sm font-medium transition-colors',
+                  isActive ? 'bg-raised text-ink' : 'text-muted hover:bg-raised hover:text-ink'
                 )
               }
             >
@@ -105,7 +98,7 @@ export default function Header() {
           )}
 
           {cta && (
-            <Button to={cta.href} variant="accent" size="sm" className="hidden sm:inline-flex">
+            <Button to={cta.href} variant="primary" size="sm" className="hidden sm:inline-flex">
               {cta.label}
             </Button>
           )}

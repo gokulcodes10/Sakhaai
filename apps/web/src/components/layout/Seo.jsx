@@ -10,20 +10,23 @@ import { selectContent } from '../../features/content/contentSlice.js';
  * genuinely matters, the answer is prerendering, not a bigger meta library —
  * see docs/DEPLOYMENT.md.
  */
+const SITE_URL = 'https://asphalix.com';
+
 export default function Seo({ title, description, canonical, noindex }) {
   const content = useSelector(selectContent);
   const seo = content?.seo;
 
   useEffect(() => {
-    const template = seo?.titleTemplate ?? '%s · Sakha AI';
-    document.title = title ? template.replace('%s', title) : (seo?.defaultTitle ?? 'Sakha AI');
+    const template = seo?.titleTemplate ?? '%s · Asphalix';
+    document.title = title ? template.replace('%s', title) : (seo?.defaultTitle ?? 'Asphalix');
 
     setMeta('name', 'description', description ?? seo?.defaultDescription ?? '');
     setMeta('property', 'og:title', document.title);
     setMeta('property', 'og:description', description ?? seo?.defaultDescription ?? '');
+    if (seo?.ogImage) setMeta('property', 'og:image', new URL(seo.ogImage, SITE_URL).href);
     setMeta('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow');
 
-    const href = canonical ?? `https://sakhaai.com${window.location.pathname}`;
+    const href = canonical ?? `${SITE_URL}${window.location.pathname}`;
     let link = document.querySelector('link[rel="canonical"]');
     if (!link) {
       link = document.createElement('link');

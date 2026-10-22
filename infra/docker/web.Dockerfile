@@ -6,14 +6,14 @@ COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY packages/shared/package.json ./packages/shared/
-RUN npm ci --workspace @sakha/web --workspace @sakha/shared --include-workspace-root
+RUN npm ci --workspace @asphalix/web --workspace @asphalix/shared --include-workspace-root
 
 COPY packages/shared ./packages/shared
 COPY apps/web ./apps/web
 
 ARG VITE_API_URL=/api
 ENV VITE_API_URL=$VITE_API_URL
-RUN npm run build --workspace @sakha/web
+RUN npm run build --workspace @asphalix/web
 
 # ── Runtime ──────────────────────────────────────────────────────────────────
 FROM nginx:1.27-alpine AS runtime

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    body { margin: 0; background: #F5F4F1; }
+    a { color: #3A5BD9; text-decoration: none; }
+    a:hover { color: #2C47B0; }
+  </style>
+</helmet>
+
+<div style="font-family:Archivo,Helvetica,sans-serif;color:#14161A;background:#F5F4F1;text-wrap:pretty;-webkit-font-smoothing:antialiased">
+
+  <sc-if value="{{ showNotice }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#14161A;color:#C9CCD0;font-size:13px;padding:10px 20px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;color:#8A8F94">NEW NAME</span>
+      <span>Sakha AI is now <strong style="color:#F5F4F1;font-weight:600">Asphalix</strong>. Same founders, same prices, same code you own.</span>
+    </div>
+  </sc-if>
+
+  <header style="position:sticky;top:0;z-index:30;background:rgba(245,244,241,0.92);backdrop-filter:blur(10px);border-bottom:1px solid #E2E0DB">
+    <div style="max-width:1248px;margin:0 auto;padding:0 28px;height:68px;display:flex;align-items:center;gap:28px">
+      <a href="#" style="display:flex;align-items:center;gap:12px;flex:none;color:#14161A">
+        <dc-import name="Emblem" style="width:32px;height:32px;flex:none" hint-size="32px,32px"></dc-import>
+        <span style="font-size:16px;font-weight:600;letter-spacing:0.24em;margin-right:-0.24em">ASPHALIX</span>
+      </a>
+      <nav style="display:flex;gap:4px;flex:1;flex-wrap:wrap;min-width:0">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+          <a href="#" style="padding:8px 12px;font-size:14px;font-weight:500;color:#5A5F66;border-radius:6px;white-space:nowrap" style-hover="color:#14161A;background:#ECEAE6">{{ n }}</a>
+        </sc-for>
+      </nav>
+      <div style="display:flex;align-items:center;gap:8px;flex:none">
+        <a href="#" style="padding:8px 12px;font-size:14px;font-weight:500;color:#5A5F66">Sign in</a>
+        <a href="#" style="height:36px;padding:0 16px;display:flex;align-items:center;background:#14161A;color:#F5F4F1;font-size:14px;font-weight:500;border-radius:6px" style-hover="background:#2A2D33;color:#F5F4F1">Get a build memo</a>
+      </div>
+    </div>
+  </header>
+
+  <section style="border-bottom:1px solid #E2E0DB;overflow:hidden">
+    <div style="max-width:1248px;margin:0 auto;padding:88px 28px 96px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px;align-items:center">
+      <div style="max-width:680px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:26px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;color:#5A5F66">
+          <span style="width:22px;height:2px;background:#E0603C"></span>
+          <span>ASPHALĒS — GREEK FOR "NOT LIABLE TO FALL"</span>
+        </div>
+        <h1 style="font-size:clamp(40px,5.6vw,72px);font-weight:600;letter-spacing:-0.035em;line-height:1.0;margin:0;text-wrap:balance">Automation that ships. Outcomes you can measure.</h1>
+        <p style="font-size:20px;line-height:1.55;color:#4A4E54;margin:28px 0 0;max-width:600px">Most AI pilots never reach production. We build agents that answer your customers, act inside your systems, and go live in weeks — on infrastructure you control, with the number they moved published on this site.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:36px">
+          <a href="#" style="height:50px;padding:0 24px;display:flex;align-items:center;background:#3A5BD9;color:#fff;font-size:16px;font-weight:500;border-radius:7px" style-hover="background:#2C47B0;color:#fff">See our prices</a>
+          <a href="#" style="height:50px;padding:0 24px;display:flex;align-items:center;background:#fff;border:1px solid #D6D3CD;color:#14161A;font-size:16px;font-weight:500;border-radius:7px" style-hover="border-color:#14161A;color:#14161A">Book a 30-minute build memo</a>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:30px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#6A6F76">
+          <span>Prototype in 5 days</span><span style="color:#C4C1BA">/</span><span>You own all the code</span><span style="color:#C4C1BA">/</span><span>Fixed, published prices</span>
+        </div>
+      </div>
+      <div style="position:relative;aspect-ratio:1/1;max-width:500px;width:100%;justify-self:center">
+        <div style="position:absolute;inset:0;background:#14161A;border-radius:28px"></div>
+        <div style="position:absolute;inset:0;background-image:linear-gradient(to right,rgba(245,244,241,0.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(245,244,241,0.06) 1px,transparent 1px);background-size:12.5% 12.5%;border-radius:28px"></div>
+        <div style="position:absolute;inset:16%">
+          <dc-import name="Emblem" style="width:100%;height:100%" hint-size="100%,100%"></dc-import>
+        </div>
+        <div style="position:absolute;left:24px;right:24px;bottom:20px;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.14em;color:#8A8F94">
+          <span>YOUR DATA</span><span>YOUR MODELS</span><span>YOUR PERIMETER</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="background:#fff;border-bottom:1px solid #E2E0DB">
+    <div style="max-width:1248px;margin:0 auto;padding:30px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px 36px">
+      <sc-for list="{{ trust }}" as="t" hint-placeholder-count="4">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span style="width:8px;height:8px;border-radius:2px;background:{{ t.hex }};flex:none;margin-top:7px"></span>
+          <span style="font-size:14.5px;line-height:1.5;color:#4A4E54">{{ t.text }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <section style="max-width:1248px;margin:0 auto;padding:104px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:56px">
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#E0603C;margin-bottom:16px">THE UNCOMFORTABLE PART</div>
+      <h2 style="font-size:clamp(32px,3.6vw,46px);font-weight:600;letter-spacing:-0.03em;line-height:1.08;margin:0">Your team is the integration layer.</h2>
+      <p style="font-size:18px;line-height:1.6;color:#4A4E54;margin:22px 0 0;max-width:540px">Someone reads the WhatsApp message, opens the CRM, checks the ERP, types the reply, sets a reminder to follow up — and does it again four hundred times a month. That work is not hard. It is just relentless.</p>
+    </div>
+    <div style="display:grid;gap:0;align-content:start">
+      <sc-for list="{{ problems }}" as="p" hint-placeholder-count="3">
+        <div style="display:grid;grid-template-columns:48px 1fr;gap:16px;padding:24px 0;border-top:1px solid #E2E0DB">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8F94;padding-top:5px">{{ p.n }}</span>
+          <div>
+            <h3 style="font-size:21px;font-weight:600;letter-spacing:-0.01em;margin:0">{{ p.title }}</h3>
+            <p style="font-size:16px;line-height:1.6;color:#4A4E54;margin:8px 0 0">{{ p.body }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background:#fff;border-top:1px solid #E2E0DB;border-bottom:1px solid #E2E0DB">
+    <div style="max-width:1248px;margin:0 auto;padding:104px 28px">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:52px">
+        <div style="max-width:640px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#3A5BD9;margin-bottom:16px">WHAT WE BUILD</div>
+          <h2 style="font-size:clamp(32px,3.6vw,46px);font-weight:600;letter-spacing:-0.03em;line-height:1.08;margin:0">Four things. We do them properly.</h2>
+          <p style="font-size:18px;line-height:1.6;color:#4A4E54;margin:20px 0 0">A four-item list we can execute beats a twenty-item list that makes us a generalist.</p>
+        </div>
+        <a href="#" style="font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px">See how each one works <span>→</span></a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+        <sc-for list="{{ services }}" as="s" hint-placeholder-count="4">
+          <a href="#" style="display:flex;flex-direction:column;background:#F5F4F1;border:1px solid #E2E0DB;border-radius:14px;overflow:hidden;color:#14161A" style-hover="border-color:#14161A;color:#14161A">
+            <div style="height:6px;background:{{ s.hex }}"></div>
+            <div style="padding:26px 24px 24px;display:flex;flex-direction:column;flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8F94">{{ s.n }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.14em;color:{{ s.hex }}">{{ s.tag }}</span>
+              </div>
+              <h3 style="font-size:21px;font-weight:600;letter-spacing:-0.015em;line-height:1.2;margin:18px 0 0">{{ s.name }}</h3>
+              <p style="font-size:15.5px;line-height:1.55;color:#4A4E54;margin:10px 0 0;flex:1">{{ s.oneLiner }}</p>
+              <span style="margin-top:22px;font-size:14px;font-weight:500;color:{{ s.hex }}">How it works →</span>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1248px;margin:0 auto;padding:104px 28px">
+    <div style="max-width:720px;margin-bottom:56px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#18937F;margin-bottom:16px">HOW AN ENGAGEMENT RUNS</div>
+      <h2 style="font-size:clamp(32px,3.6vw,46px);font-weight:600;letter-spacing:-0.03em;line-height:1.08;margin:0">Five days to something real. Four to six weeks to production.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:28px;border-top:2px solid #14161A">
+      <sc-for list="{{ steps }}" as="st" hint-placeholder-count="5">
+        <div style="padding:26px 0 8px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8F94">{{ st.n }}</div>
+          <div style="font-size:17px;font-weight:600;color:#18937F;margin-top:6px">{{ st.day }}</div>
+          <h3 style="font-size:19px;font-weight:600;letter-spacing:-0.01em;margin:16px 0 0">{{ st.title }}</h3>
+          <p style="font-size:15px;line-height:1.6;color:#4A4E54;margin:10px 0 0">{{ st.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background:#fff;border-top:1px solid #E2E0DB;border-bottom:1px solid #E2E0DB">
+    <div style="max-width:1248px;margin:0 auto;padding:104px 28px">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:48px">
+        <div style="max-width:620px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#7A4FD4;margin-bottom:16px">PRICING</div>
+          <h2 style="font-size:clamp(32px,3.6vw,46px);font-weight:600;letter-spacing:-0.03em;line-height:1.08;margin:0">We publish our prices.</h2>
+          <p style="font-size:18px;line-height:1.6;color:#4A4E54;margin:18px 0 0">Almost nobody in this industry does. We think that is a tell.</p>
+        </div>
+        <a href="#" style="height:44px;padding:0 18px;display:flex;align-items:center;border:1px solid #D6D3CD;border-radius:7px;color:#14161A;font-size:15px;font-weight:500" style-hover="border-color:#14161A;color:#14161A">See the full breakdown</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px">
+        <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+          <div style="background:{{ t.bg }};color:{{ t.fg }};border:1px solid {{ t.border }};border-radius:14px;padding:28px;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:24px">
+              <span style="font-size:17px;font-weight:600">{{ t.name }}</span>
+              <sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;background:#3A5BD9;color:#fff;padding:4px 8px;border-radius:4px;white-space:nowrap">MOST START HERE</span>
+              </sc-if>
+            </div>
+            <div style="font-size:38px;font-weight:600;letter-spacing:-0.03em;margin-top:22px;line-height:1">{{ t.price }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:{{ t.sub }};margin-top:10px">{{ t.duration }}</div>
+            <p style="font-size:15px;line-height:1.55;color:{{ t.sub }};margin:20px 0 0">{{ t.tagline }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8F94;margin:20px 0 0">INR, excluding GST. International engagements quoted in USD at the equivalent tier.</p>
+    </div>
+  </section>
+
+  <section style="max-width:1248px;margin:0 auto;padding:104px 28px">
+    <div style="max-width:640px;margin-bottom:44px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#E0603C;margin-bottom:16px">PROOF, NOT ADJECTIVES</div>
+      <h2 style="font-size:clamp(32px,3.6vw,46px);font-weight:600;letter-spacing:-0.03em;line-height:1.08;margin:0">Every engagement publishes a number.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));background:#fff;border:1px solid #E2E0DB;border-radius:14px;overflow:hidden">
+      <div style="padding:36px">
+        <span style="display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.12em;color:#0F6E5F;background:#E3F2EF;padding:5px 9px;border-radius:4px">OUR OWN OPERATIONS</span>
+        <h3 style="font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.15;margin:18px 0 0">We put the first agent on our own operations.</h3>
+        <p style="font-size:14px;color:#8A8F94;margin:10px 0 0">Asphalix · Ourselves — case study #1</p>
+        <p style="font-size:16px;line-height:1.6;color:#4A4E54;margin:18px 0 0">We were asking prospects to trust an AI agent with their customer conversations before we had trusted one with ours. So {{ assistantName }} went on our own site first — with the same guardrails, audit trail and human handover we sell.</p>
+        <a href="#" style="display:inline-block;margin-top:20px;font-size:15px;font-weight:500">Read the whole thing →</a>
+      </div>
+      <div style="padding:36px;background:#F5F4F1;border-left:1px solid #E2E0DB;display:grid;gap:30px;align-content:center">
+        <div style="border-left:3px solid #18937F;padding-left:18px">
+          <div style="font-size:34px;font-weight:600;letter-spacing:-0.025em;line-height:1">Under 30 seconds</div>
+          <div style="font-size:15px;font-weight:500;margin-top:10px">Knowledge freshness after a CMS publish</div>
+          <div style="font-size:13px;color:#8A8F94;margin-top:4px">Measured from publish to first correct answer</div>
+        </div>
+        <div style="border-left:3px solid #3A5BD9;padding-left:18px">
+          <div style="font-size:34px;font-weight:600;letter-spacing:-0.025em;line-height:1">100%</div>
+          <div style="font-size:15px;font-weight:500;margin-top:10px">Answers with a cited source</div>
+          <div style="font-size:13px;color:#8A8F94;margin-top:4px">Instructed to say it does not know rather than answer uncited</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#14161A;color:#F5F4F1">
+    <div style="max-width:1248px;margin:0 auto;padding:104px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px;align-items:center">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#F0845F;margin-bottom:16px">CASE STUDY #1 IS THIS WEBSITE</div>
+        <h2 style="font-size:clamp(30px,3.4vw,44px);font-weight:600;letter-spacing:-0.03em;line-height:1.1;margin:0;color:#F5F4F1">Meet {{ assistantName }}. It is running right now, on the right of your screen.</h2>
+        <p style="font-size:18px;line-height:1.6;color:#B4B8BD;margin:22px 0 0;max-width:560px">{{ assistantName }} knows every page, price, service and policy on this site, re-reads them the moment we change anything, and answers using live data instead of a scripted FAQ tree. Ask it something hard.</p>
+        <a href="#" style="margin-top:32px;height:50px;padding:0 24px;display:inline-flex;align-items:center;gap:12px;background:#F5F4F1;color:#14161A;font-size:16px;font-weight:500;border-radius:7px" style-hover="background:#fff;color:#14161A">
+          <dc-import name="Emblem" style="width:20px;height:20px;flex:none" hint-size="20px,20px"></dc-import>
+          Open {{ assistantName }}
+        </a>
+      </div>
+      <div style="border:1px solid #2E3137;border-radius:14px;background:#1B1D21;padding:22px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid #2E3137">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;color:#8A8F94">THINGS PEOPLE ACTUALLY ASK</span>
+          <span style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#5CC4AE"><span style="width:7px;height:7px;border-radius:50%;background:#18937F"></span>LIVE</span>
+        </div>
+        <div style="display:grid;gap:10px;margin-top:16px">
+          <sc-for list="{{ asks }}" as="q" hint-placeholder-count="4">
+            <a href="#" style="display:block;border:1px solid #2E3137;border-radius:9px;padding:13px 15px;font-size:15px;line-height:1.45;color:#DADDE0" style-hover="border-color:#3A5BD9;color:#fff;background:#20232A">{{ q }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:760px;margin:0 auto;padding:112px 28px;text-align:center">
+    <h2 style="font-size:clamp(32px,3.8vw,48px);font-weight:600;letter-spacing:-0.03em;line-height:1.08;margin:0;text-wrap:balance">Tell us the workflow that keeps breaking.</h2>
+    <p style="font-size:18px;line-height:1.6;color:#4A4E54;margin:22px auto 0;max-width:560px">Thirty minutes, a founder on the call, and a written memo afterwards whether or not you hire us.</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:36px">
+      <a href="#" style="height:50px;padding:0 24px;display:flex;align-items:center;background:#3A5BD9;color:#fff;font-size:16px;font-weight:500;border-radius:7px" style-hover="background:#2C47B0;color:#fff">Get a build memo</a>
+      <a href="#" style="height:50px;padding:0 24px;display:flex;align-items:center;background:#fff;border:1px solid #D6D3CD;color:#14161A;font-size:16px;font-weight:500;border-radius:7px" style-hover="border-color:#14161A;color:#14161A">See the prices first</a>
+    </div>
+  </section>
+
+  <footer style="background:#fff;border-top:1px solid #E2E0DB">
+    <div style="max-width:1248px;margin:0 auto;padding:72px 28px 32px">
+      <div style="display:flex;flex-wrap:wrap;gap:40px 56px">
+        <div style="flex:1.6 1 300px;min-width:0;max-width:420px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <dc-import name="Emblem" style="width:34px;height:34px;flex:none" hint-size="34px,34px"></dc-import>
+            <span style="font-size:17px;font-weight:600;letter-spacing:0.24em">ASPHALIX</span>
+          </div>
+          <p style="font-size:14.5px;line-height:1.6;color:#4A4E54;margin:18px 0 0">Asphalix builds agents that answer your customers and act inside your systems — in production, in weeks, with your name on the code.</p>
+          <p style="font-size:18px;font-weight:600;letter-spacing:-0.01em;margin:18px 0 0">Trust. Grit. Agents that ship.</p>
+          <div style="display:grid;gap:6px;margin-top:18px;font-size:14px">
+            <a href="#">hello@asphalix.com</a>
+            <span style="color:#8A8F94">Coimbatore, Tamil Nadu, India</span>
+          </div>
+        </div>
+        <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+          <div style="flex:1 1 160px;min-width:0">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;color:#8A8F94">{{ c.title }}</div>
+            <div style="display:grid;gap:10px;margin-top:16px">
+              <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
+                <a href="#" style="font-size:14px;color:#4A4E54" style-hover="color:#3A5BD9">{{ l }}</a>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:56px;padding-top:22px;border-top:1px solid #E2E0DB;display:flex;flex-wrap:wrap;gap:14px 24px;justify-content:space-between;font-size:12.5px;color:#8A8F94">
+        <span>© 2026 Asphalix (formerly Sakha InfoTech) · Registered in India</span>
+        <div style="display:flex;gap:20px">
+          <a href="#" style="color:#8A8F94">Privacy</a><a href="#" style="color:#8A8F94">Terms</a><a href="#" style="color:#8A8F94">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNotice&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Rebrand&quot;},&quot;assistantName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sakha&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Rebrand&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const H = { blue: '#3A5BD9', teal: '#18937F', coral: '#E0603C', iris: '#7A4FD4' };
+    return {
+      showNotice: this.props.showNotice ?? true,
+      assistantName: this.props.assistantName ?? 'Sakha',
+      nav: ['What we build', 'Industries', 'Pricing', 'Work', 'About'],
+      trust: [
+        { hex: H.blue, text: 'You own the code, the infra and the docs from day one' },
+        { hex: H.teal, text: 'Every engagement has one metric, agreed before we write code' },
+        { hex: H.coral, text: 'Human-in-the-loop by default. You choose the autonomy level' },
+        { hex: H.iris, text: "Prices published. No 'book a call to find out'" },
+      ],
+      problems: [
+        { n: '01', title: 'Enquiries decay', body: 'A lead that waits four hours is a lead someone else already answered.' },
+        { n: '02', title: 'Follow-ups leak', body: 'The second and third chase are where the revenue is, and they are the first thing a busy team drops.' },
+        { n: '03', title: "Systems don't talk", body: 'The CRM knows one thing, the ERP another, WhatsApp a third. A human reconciles them, badly, all day.' },
+      ],
+      services: [
+        { n: '01', hex: H.blue, tag: 'RESPOND', name: 'Customer response agents', oneLiner: 'Answer every customer in under a minute, on the channel they already use.' },
+        { n: '02', hex: H.teal, tag: 'FOLLOW UP', name: 'Follow-up and revenue agents', oneLiner: 'The second and third chase, done every time, by something that never gets busy.' },
+        { n: '03', hex: H.coral, tag: 'OPERATE', name: 'Internal operations agents', oneLiner: 'Give your own team the answer instead of the form.' },
+        { n: '04', hex: H.iris, tag: 'CONNECT', name: 'System integration and data groundwork', oneLiner: 'Your agent is only as good as the data it can read.' },
+      ],
+      steps: [
+        { n: '01', day: 'Day 0', title: 'A call, then a memo', body: 'A founder takes the call. You get a written build memo: what we would build, what it should move, what it costs, and what we would not build.' },
+        { n: '02', day: 'Days 1–2', title: 'Access and the data audit', body: 'We look at the data your agent will read before we promise anything about the agent.' },
+        { n: '03', day: 'Day 5', title: 'Working prototype', body: 'Not a slide. A running agent on your real data that you can break in front of us.' },
+        { n: '04', day: 'Weeks 2–6', title: 'Production, with guardrails', body: 'Exception paths, audit trail, review queue, staged rollout from supervised to autonomous.' },
+        { n: '05', day: 'Handover', title: 'Keys, then a choice', body: 'Code, infra, prompts, evals and docs are yours. Run it yourself, or put it on a managed plan.' },
+      ],
+      tiers: [
+        { name: 'Pilot', price: '₹1.5L – ₹4L', duration: '2 to 3 weeks', tagline: 'Prove it on one workflow, on your real data.', badge: false, bg: '#F5F4F1', fg: '#14161A', sub: '#4A4E54', border: '#E2E0DB' },
+        { name: 'Single workflow, in production', price: '₹5L – ₹12L', duration: '4 to 6 weeks', tagline: 'One agent, live, with guardrails and your name on the code.', badge: true, bg: '#14161A', fg: '#F5F4F1', sub: '#B4B8BD', border: '#14161A' },
+        { name: 'Multi-workflow programme', price: 'From ₹12L', duration: '8 to 16 weeks', tagline: 'Several agents on one connector layer, built to keep going.', badge: false, bg: '#F5F4F1', fg: '#14161A', sub: '#4A4E54', border: '#E2E0DB' },
+      ],
+      asks: [
+        'What would a WhatsApp agent for my business actually cost?',
+        'What do you refuse to build?',
+        'How is this different from hiring an n8n freelancer?',
+        'What happens if the agent gets something wrong?',
+      ],
+      footerCols: [
+        { title: 'WHAT WE BUILD', links: ['Customer response agents', 'Follow-up and revenue agents', 'Internal operations agents', 'System integration'] },
+        { title: 'COMPANY', links: ['About', 'Work', 'Pricing', 'Responsible deployment', 'Contact'] },
+        { title: 'CLIENTS', links: ['Sign in', 'Create an account', 'Client portal'] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

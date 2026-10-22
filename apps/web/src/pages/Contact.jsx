@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router';
-import { leadSchema } from '@sakha/shared';
+import { leadSchema } from '@asphalix/shared';
 import { selectContent } from '../features/content/contentSlice.js';
 import { openPanel } from '../features/sakha/sakhaSlice.js';
 import api, { ApiError } from '../lib/api.js';
@@ -9,18 +8,19 @@ import { Alert, Button, Field, Input, Section, Select, Textarea } from '../compo
 import Seo from '../components/layout/Seo.jsx';
 import PageHero from '../components/layout/PageHero.jsx';
 
-const BUDGET_OPTIONS = [
-  { value: '', label: 'Select a range' },
-  { value: 'pilot', label: 'Pilot — around ₹1.5L to ₹4L' },
-  { value: 'single', label: 'One workflow in production — ₹5L to ₹12L' },
-  { value: 'multi', label: 'Multiple workflows — ₹12L and up' },
+// Scope, not budget: prices are quoted in the build memo, never on the site.
+// Values stay as the API's budgetTier enum so existing leads keep their meaning.
+const SCOPE_OPTIONS = [
+  { value: '', label: 'Select one' },
+  { value: 'pilot', label: 'A pilot on one workflow' },
+  { value: 'single', label: 'One workflow, in production' },
+  { value: 'multi', label: 'Several workflows' },
   { value: 'unsure', label: 'Not sure yet' },
 ];
 
 export default function Contact() {
   const content = useSelector(selectContent);
   const dispatch = useDispatch();
-  const [params] = useSearchParams();
 
   const [values, setValues] = useState({
     name: '',
@@ -28,7 +28,7 @@ export default function Contact() {
     company: '',
     phone: '',
     workflow: '',
-    budgetTier: params.get('tier') ?? '',
+    budgetTier: '',
     website: '', // honeypot
   });
   const [errors, setErrors] = useState({});
@@ -69,7 +69,7 @@ export default function Contact() {
         setErrors(err.fields);
         setServerError(err.message);
       } else {
-        setServerError('Something went wrong. Email hello@sakhaai.com and we will pick it up there.');
+        setServerError('Something went wrong. Email hello@asphalix.com and we will pick it up there.');
       }
     }
   }
@@ -138,7 +138,7 @@ export default function Contact() {
 
             <Field label={contact.form.budgetLabel} hint={contact.form.budgetHelp} error={errors.budgetTier}>
               <Select value={values.budgetTier} onChange={set('budgetTier')}>
-                {BUDGET_OPTIONS.map((o) => (
+                {SCOPE_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
                   </option>
@@ -170,7 +170,7 @@ export default function Contact() {
           </form>
 
           <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-            <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-subtle">
+            <p className="font-mono text-2xs font-medium uppercase tracking-[0.14em] text-subtle">
               Or reach us directly
             </p>
             {(contact.alternatives ?? []).map((alt) =>

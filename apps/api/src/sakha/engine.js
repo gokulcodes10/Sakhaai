@@ -58,6 +58,8 @@ export async function runTurn(input) {
     ip: input.ip,
     userAgent: input.userAgent,
     citations: [],
+    // Tickets a tool raised or touched this turn; the panel renders them as cards.
+    tickets: [],
   };
 
   const history = await loadHistory(conversation.id);
@@ -157,10 +159,12 @@ export async function runTurn(input) {
 
   if (!finalContent) {
     finalContent =
-      "I could not get to a confident answer on that one. A founder can — email hello@sakhaai.com and you'll hear back within 24 hours.";
+      "I could not get to a confident answer on that one. A founder can — email hello@asphalix.com and you'll hear back within 24 hours.";
   }
 
   const citations = dedupeCitations(ctx.citations);
+  const tickets = [...new Map(ctx.tickets.map((t) => [t.id, t])).values()];
+  if (tickets.length) toolTrace.push({ name: 'tickets', tickets });
   const latencyMs = Date.now() - startedAt;
 
   const assistantMessage = await prisma.message.create({
@@ -200,11 +204,12 @@ export async function runTurn(input) {
       role: 'assistant',
       content: finalContent,
       citations,
+      tickets,
       createdAt: assistantMessage.createdAt,
     },
     usage,
     latencyMs,
-    toolsUsed: toolTrace.map((t) => t.name),
+    toolsUsed: toolTrace.filter((t) => t.name !== 'tickets').map((t) => t.name),
   };
 }
 

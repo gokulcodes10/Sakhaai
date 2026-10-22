@@ -113,7 +113,7 @@ export async function chatCompletion({
 
   logger.error({ err: lastError }, 'groq call failed after retries');
   throw unavailable(
-    'Sakha is having trouble reaching her language model. Try again in a moment, or email hello@sakhaai.com.'
+    'Sakha is having trouble reaching its language model. Try again in a moment, or email hello@asphalix.com.'
   );
 }
 

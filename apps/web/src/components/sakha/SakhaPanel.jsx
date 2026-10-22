@@ -6,11 +6,13 @@
  *  — the same affordance as a reference sidebar in an IDE — because the brief
  *  is for an intelligence surface that sits alongside the page, not a support
  *  widget that covers it. On a wide screen the page content shifts left rather
- *  than being overlaid, so you can read the pricing table and interrogate it at
- *  the same time.
+ *  than being overlaid, so you can read a page and interrogate it at the same
+ *  time.
  *
  *  Answers carry citations. That is the whole trust argument: Sakha shows you
- *  which page she got it from, and says she does not know when she does not.
+ *  which page it got an answer from, and says it does not know when it does not.
+ *  It is also the support desk's front door: tickets it raises or updates show
+ *  as cards under the answer, and "Talk to a human" is always one click away.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -18,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router';
 import clsx from 'clsx';
 import {
+  askSakha,
   closePanel,
   dismissError,
   loadConversation,
@@ -28,6 +31,7 @@ import {
 } from '../../features/sakha/sakhaSlice.js';
 import { selectContent } from '../../features/content/contentSlice.js';
 import { Button, Spinner } from '../ui/index.jsx';
+import { Emblem } from '../brand/Emblem.jsx';
 
 export default function SakhaPanel() {
   const dispatch = useDispatch();
@@ -107,6 +111,8 @@ export default function SakhaPanel() {
   );
 
   const suggestions = copy.emptyStateSuggestions ?? [];
+  const supportEmail = content?.company?.supportEmail ?? content?.company?.email ?? 'hello@asphalix.com';
+  const askHuman = () => dispatch(askSakha(copy.humanMessage ?? "I'd like to talk to a human, please."));
 
   return (
     <>
@@ -128,7 +134,7 @@ export default function SakhaPanel() {
         )}
         style={{ width: 'min(100vw, var(--panel-width))' }}
         aria-hidden={!open}
-        aria-label="Sakha, the Sakha AI assistant"
+        aria-label="Sakha, the Asphalix assistant"
       >
         <Header
           copy={copy}
@@ -160,9 +166,9 @@ export default function SakhaPanel() {
               <p>{error}</p>
               {errorCode === 'RATE_LIMITED' && (
                 <p className="mt-2 text-xs">
-                  Or email a founder directly —{' '}
-                  <a className="underline" href="mailto:hello@sakhaai.com">
-                    hello@sakhaai.com
+                  Or email the team directly —{' '}
+                  <a className="underline" href={`mailto:${supportEmail}`}>
+                    {supportEmail}
                   </a>
                   .
                 </p>
@@ -187,6 +193,8 @@ export default function SakhaPanel() {
           disabled={available === false}
           placeholder={copy.placeholder ?? 'Ask Sakha…'}
           disclaimer={copy.disclaimer}
+          humanLabel={available === false ? null : (copy.humanLabel ?? 'Talk to a human')}
+          onHuman={askHuman}
         />
       </aside>
     </>
@@ -200,8 +208,11 @@ function Header({ copy, knowledge, onClose, onNew, hasMessages }) {
     <header className="flex items-start gap-3 border-b border-line px-4 py-4">
       <SakhaMark />
       <div className="min-w-0 flex-1">
-        <p className="font-display text-lg font-semibold leading-tight text-ink">
+        <p className="text-lg font-semibold leading-tight tracking-[-0.015em] text-ink">
           {copy.name ?? 'Sakha'}
+          <span className="ml-2 font-mono text-2xs font-medium uppercase tracking-[0.14em] text-subtle">
+            {copy.subtitle ?? 'Asphalix support'}
+          </span>
         </p>
         <p className="text-xs text-subtle">
           {knowledge?.lastUpdatedAt ? (
@@ -210,7 +221,7 @@ function Header({ copy, knowledge, onClose, onNew, hasMessages }) {
               <time dateTime={knowledge.lastUpdatedAt}>{relativeTime(knowledge.lastUpdatedAt)}</time>
             </>
           ) : (
-            <>Sakha means friend</>
+            <>Answers from this site, with sources</>
           )}
         </p>
       </div>
@@ -239,16 +250,14 @@ function Header({ copy, knowledge, onClose, onNew, hasMessages }) {
   );
 }
 
-function SakhaMark({ className }) {
+/** The emblem tile (Identity Kit: avatars and icons use the ink tile). */
+function SakhaMark({ className, size = 22 }) {
   return (
     <div
-      className={clsx(
-        'flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-ink font-display text-lg font-semibold text-accent',
-        className
-      )}
+      className={clsx('flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#14161A]', className)}
       aria-hidden="true"
     >
-      S
+      <Emblem size={size} />
     </div>
   );
 }
@@ -272,12 +281,12 @@ function Welcome({ copy, suggestions, onPick, available }) {
     <div className="animate-fade-up">
       <p className="text-base leading-relaxed text-muted">
         {copy.greeting ??
-          "I'm Sakha. I know this company — the services, the prices, what we will and won't build. Ask me anything, and I'll tell you when I don't know."}
+          "I'm Sakha, Asphalix's assistant. I can answer questions about what we build, help with your project, raise a support ticket, or get you to a human."}
       </p>
 
       {suggestions.length > 0 && (
         <div className="mt-6">
-          <p className="mb-2.5 text-2xs font-semibold uppercase tracking-[0.12em] text-subtle">
+          <p className="mb-2.5 font-mono text-2xs font-medium uppercase tracking-[0.14em] text-subtle">
             Try asking
           </p>
           <ul className="space-y-2">
@@ -317,11 +326,13 @@ function Message({ message, rating, onRate }) {
   return (
     <li className="animate-fade-up">
       <div className="flex gap-2.5">
-        <SakhaMark className="h-7 w-7 rounded text-sm" />
+        <SakhaMark className="h-7 w-7 rounded-sm" size={17} />
         <div className="min-w-0 flex-1">
           <div className="prose-assistant text-sm leading-relaxed text-ink">
             {renderMarkdown(message.content)}
           </div>
+
+          {message.tickets?.length > 0 && <TicketCards tickets={message.tickets} />}
 
           {message.citations?.length > 0 && <Citations citations={message.citations} />}
 
@@ -395,10 +406,32 @@ function Citations({ citations }) {
   );
 }
 
+const STATUS_LABEL = { open: 'Open', pending: 'Waiting on you', resolved: 'Resolved', closed: 'Closed' };
+
+/** Tickets Sakha raised or updated in this answer. */
+function TicketCards({ tickets }) {
+  return (
+    <ul className="mt-3 space-y-2">
+      {tickets.map((t) => {
+        const inner = (
+          <span className="flex items-center gap-3 rounded-md border border-line border-l-[3px] border-l-trust bg-paper px-3 py-2.5 transition-colors hover:border-ink">
+            <span className="font-mono text-xs font-medium text-trust">#{t.number}</span>
+            <span className="min-w-0 flex-1 truncate text-sm text-ink">{t.subject}</span>
+            <span className="shrink-0 font-mono text-2xs uppercase tracking-[0.12em] text-subtle">
+              {STATUS_LABEL[t.status] ?? t.status}
+            </span>
+          </span>
+        );
+        return <li key={t.id}>{t.url ? <Link to={t.url}>{inner}</Link> : inner}</li>;
+      })}
+    </ul>
+  );
+}
+
 function Thinking() {
   return (
     <li className="flex gap-2.5">
-      <SakhaMark className="h-7 w-7 rounded text-sm" />
+      <SakhaMark className="h-7 w-7 rounded-sm" size={17} />
       <div className="flex items-center gap-1 pt-2.5" aria-label="Sakha is thinking">
         {[0, 1, 2].map((i) => (
           <span
@@ -414,7 +447,7 @@ function Thinking() {
 
 // ── Composer ──────────────────────────────────────────────────────────────────
 
-const Composer = function Composer({ value, onChange, onSubmit, pending, disabled, placeholder, disclaimer }) {
+const Composer = function Composer({ value, onChange, onSubmit, pending, disabled, placeholder, disclaimer, humanLabel, onHuman }) {
   const ref = useRef(null);
 
   // Grow with the content up to a ceiling, then scroll.
@@ -470,7 +503,19 @@ const Composer = function Composer({ value, onChange, onSubmit, pending, disable
         </Button>
       </form>
 
-      {disclaimer && <p className="mt-2 px-1 text-2xs leading-snug text-subtle">{disclaimer}</p>}
+      <div className="mt-2 flex items-start gap-3 px-1">
+        {disclaimer && <p className="flex-1 text-2xs leading-snug text-subtle">{disclaimer}</p>}
+        {humanLabel && (
+          <button
+            type="button"
+            onClick={onHuman}
+            disabled={pending}
+            className="ml-auto shrink-0 font-mono text-2xs font-medium uppercase tracking-[0.12em] text-trust transition-colors hover:text-ink disabled:opacity-50"
+          >
+            {humanLabel} →
+          </button>
+        )}
+      </div>
     </div>
   );
 };

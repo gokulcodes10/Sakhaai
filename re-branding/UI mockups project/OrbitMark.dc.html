@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<svg viewBox="0 0 64 64" width="{{ w }}" height="{{ h }}" fill="none" style="display:block">
+  <circle cx="32" cy="32" r="23" stroke="{{ c1 }}" stroke-width="7" stroke-linecap="round" stroke-dasharray="104 41" transform="rotate(-62 32 32)"></circle>
+  <rect x="22" y="22" width="20" height="20" rx="6" fill="{{ c3 }}"></rect>
+</svg>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:200,&quot;height&quot;:200},&quot;c1&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#3A5BD9&quot;,&quot;options&quot;:[&quot;#3A5BD9&quot;,&quot;#18937F&quot;,&quot;#E0603C&quot;,&quot;#7A4FD4&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;c3&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#E0603C&quot;,&quot;options&quot;:[&quot;#3A5BD9&quot;,&quot;#18937F&quot;,&quot;#E0603C&quot;,&quot;#7A4FD4&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;size&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;100%&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, size = p.size ?? '100%';
+    return { w: size, h: size, c1: p.c1 ?? '#3A5BD9', c3: p.c3 ?? '#E0603C' };
+  }
+}
+</script>
+</body>
+</html>

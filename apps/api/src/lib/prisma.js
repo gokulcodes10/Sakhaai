@@ -9,7 +9,7 @@ import logger from './logger.js';
 const globalForPrisma = globalThis;
 
 export const prisma =
-  globalForPrisma.__sakhaPrisma ??
+  globalForPrisma.__asphalixPrisma ??
   new PrismaClient({
     log: config.isDev
       ? [{ emit: 'event', level: 'warn' }, { emit: 'event', level: 'error' }]
@@ -19,7 +19,7 @@ export const prisma =
 prisma.$on?.('warn', (e) => logger.warn({ prisma: e }, 'prisma warning'));
 prisma.$on?.('error', (e) => logger.error({ prisma: e }, 'prisma error'));
 
-if (!config.isProd) globalForPrisma.__sakhaPrisma = prisma;
+if (!config.isProd) globalForPrisma.__asphalixPrisma = prisma;
 
 export async function disconnectPrisma() {
   await prisma.$disconnect();

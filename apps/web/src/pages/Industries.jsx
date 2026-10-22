@@ -71,7 +71,7 @@ export function IndustryDetail() {
             {ind.workflow && (
               <div>
                 <p className="eyebrow mb-3">The workflow</p>
-                <p className="prose-sakha">{ind.workflow}</p>
+                <p className="prose-body">{ind.workflow}</p>
               </div>
             )}
 

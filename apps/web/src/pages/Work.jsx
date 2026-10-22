@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { Navigate, useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import { selectContent } from '../features/content/contentSlice.js';
 import { EmptyState, Section, Stat } from '../components/ui/index.jsx';
@@ -7,10 +9,20 @@ import { CtaBand } from './Services.jsx';
 
 export default function Work() {
   const content = useSelector(selectContent);
-  if (!content) return null;
+  const { slug } = useParams();
+  const published = (content?.work?.caseStudies ?? []).filter((c) => c.published);
+  const target = slug && published.find((c) => c.slug === slug || c.previousSlugs?.includes(slug));
 
+  // /work/:slug (Sakha cites case studies this way) scrolls to that study.
+  useEffect(() => {
+    if (target) document.getElementById(target.slug)?.scrollIntoView({ block: 'start' });
+  }, [target]);
+
+  if (!content) return null;
   const { work } = content;
-  const published = (work.caseStudies ?? []).filter((c) => c.published);
+
+  // Old slugs (e.g. from before the rebrand) redirect to the current one.
+  if (target && target.slug !== slug) return <Navigate to={`/work/${target.slug}`} replace />;
 
   return (
     <>
@@ -26,12 +38,12 @@ export default function Work() {
         ) : (
           <div className="space-y-16">
             {published.map((cs) => (
-              <article key={cs.slug} className="border-t border-line pt-10 first:border-0 first:pt-0">
+              <article key={cs.slug} id={cs.slug} className="scroll-mt-24 border-t border-line pt-10 first:border-0 first:pt-0">
                 <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr]">
                   <div>
                     <div className="flex flex-wrap items-center gap-3">
                       {cs.isDogfood && (
-                        <span className="rounded-full border border-trust/30 bg-trust-soft px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-trust">
+                        <span className="rounded-sm bg-trust-soft px-2 py-1 font-mono text-2xs uppercase tracking-[0.12em] text-trust">
                           Our own operations
                         </span>
                       )}

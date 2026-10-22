@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link, useSearchParams } from 'react-router';
 import clsx from 'clsx';
 import api from '../../lib/api.js';
 import { selectCan } from '../../features/auth/authSlice.js';
@@ -289,11 +290,18 @@ export function Conversations() {
   const [data, setData] = useState(null);
   const [insights, setInsights] = useState(null);
   const [open, setOpen] = useState(null);
+  const [params] = useSearchParams();
+  const openId = params.get('open');
 
   useEffect(() => {
     api.get('/sakha/admin/conversations?limit=40').then(setData).catch(() => {});
     api.get('/sakha/admin/insights').then(setInsights).catch(() => {});
   }, []);
+
+  // Deep link from a ticket: /admin/conversations?open=<id>
+  useEffect(() => {
+    if (openId) api.get(`/sakha/admin/conversations/${openId}`).then((r) => setOpen(r.conversation)).catch(() => {});
+  }, [openId]);
 
   return (
     <AdminPage
@@ -306,7 +314,7 @@ export function Conversations() {
           <Tile label="Leads Sakha captured" value={insights.leadsCaptured} />
           <Tile label="Rated helpful" value={insights.feedback?.up ?? 0} />
           <Tile
-            label="Turns she could not answer"
+            label="Turns Sakha could not answer"
             value={insights.unansweredTurns}
             note="each one is a gap in the knowledge base"
             tone={insights.unansweredTurns > 0 ? 'warning' : 'neutral'}
@@ -342,6 +350,7 @@ export function Conversations() {
                     <span>{c._count.messages} messages</span>
                     {c.pagePath && <span>· from {c.pagePath}</span>}
                     {c._count.leads > 0 && <Badge tone="success">became a lead</Badge>}
+                    {c._count.tickets > 0 && <Badge tone="trust">ticket raised</Badge>}
                   </div>
                 </button>
               </li>
@@ -356,6 +365,19 @@ export function Conversations() {
             ) : (
               <div className="rounded-lg border border-line bg-surface p-5">
                 <h2 className="font-display text-lg font-semibold text-ink">{open.title ?? 'Conversation'}</h2>
+                {open.tickets?.length > 0 && (
+                  <p className="mt-2 flex flex-wrap gap-2">
+                    {open.tickets.map((t) => (
+                      <Link
+                        key={t.id}
+                        to={`/admin/tickets/${t.id}`}
+                        className="rounded-sm border border-trust/30 bg-trust-soft px-2 py-0.5 font-mono text-2xs text-trust"
+                      >
+                        Ticket #{t.number} · {t.status}
+                      </Link>
+                    ))}
+                  </p>
+                )}
                 <ul className="mt-5 space-y-4">
                   {open.messages.map((m) => (
                     <li key={m.id}>
@@ -365,7 +387,7 @@ export function Conversations() {
                       </p>
                       {m.toolCalls?.length > 0 && (
                         <p className="mt-1.5 font-mono text-2xs text-accent">
-                          tools: {m.toolCalls.map((t) => t.name).join(', ')}
+                          tools: {m.toolCalls.filter((t) => t.name !== 'tickets').map((t) => t.name).join(', ')}
                         </p>
                       )}
                     </li>

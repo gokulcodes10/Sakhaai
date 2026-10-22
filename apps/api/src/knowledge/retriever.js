@@ -77,22 +77,25 @@ const STOPWORDS = new Set(
 );
 
 /**
- * Domain synonyms. A visitor asks "how much", the page says "pricing"; they ask
+ * Domain synonyms. A visitor asks "how much", the page says "scope"; they ask
  * "who is the CEO", the page says "Chief Executive Officer". Lexical search has
  * no idea these are related, and this is cheaper and far more predictable than
  * reaching for embeddings to solve a twenty-word vocabulary problem.
  */
 const SYNONYMS = {
-  cost: ['price', 'pricing', 'fee', 'charge'],
-  costs: ['price', 'pricing'],
-  price: ['pricing', 'cost'],
-  pricing: ['price', 'cost'],
-  cheap: ['price', 'pricing'],
-  budget: ['price', 'pricing', 'tier'],
-  ceo: ['chief', 'executive', 'founder', 'gokul'],
+  // No prices are indexed; money questions land on how scope is decided.
+  cost: ['scope', 'memo', 'engagement'],
+  costs: ['scope', 'memo', 'engagement'],
+  price: ['scope', 'memo', 'engagement'],
+  pricing: ['scope', 'memo', 'engagement'],
+  cheap: ['scope', 'memo'],
+  budget: ['scope', 'memo', 'engagement'],
+  support: ['help', 'ticket', 'issue', 'maintenance', 'response'],
+  ticket: ['support', 'issue'],
+  broken: ['support', 'issue', 'ticket'],
+  ceo: ['chief', 'executive', 'founder', 'malarvizhi'],
   cto: ['chief', 'technology', 'founder', 'gokul'],
-  cro: ['chief', 'research', 'sai'],
-  founder: ['team', 'chief', 'gokul', 'malarvizhi', 'sai'],
+  founder: ['team', 'chief', 'gokul', 'malarvizhi'],
   founders: ['team', 'chief'],
   team: ['founder', 'chief', 'people'],
   fast: ['speed', 'week', 'day', 'prototype', 'timeline'],
@@ -108,7 +111,6 @@ const SYNONYMS = {
   own: ['ownership', 'code', 'handover'],
   security: ['audit', 'access', 'pii', 'governance'],
   safe: ['governance', 'audit', 'guardrail', 'autonomy'],
-  support: ['managed', 'maintenance', 'response'],
   whatsapp: ['channel', 'message', 'customer'],
   contact: ['email', 'phone', 'founder', 'touch'],
   hire: ['engagement', 'memo', 'contact'],

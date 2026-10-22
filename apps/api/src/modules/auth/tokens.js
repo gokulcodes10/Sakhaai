@@ -4,9 +4,9 @@ import { randomToken, sha256 } from '../../lib/crypto.js';
 import prisma from '../../lib/prisma.js';
 import { getUserVersion } from '../../lib/redis.js';
 
-const ACCESS_COOKIE = 'sakha_at';
-const REFRESH_COOKIE = 'sakha_rt';
-const VISITOR_COOKIE = 'sakha_vid';
+const ACCESS_COOKIE = 'asphalix_at';
+const REFRESH_COOKIE = 'asphalix_rt';
+const VISITOR_COOKIE = 'asphalix_vid';
 
 export const COOKIES = { ACCESS: ACCESS_COOKIE, REFRESH: REFRESH_COOKIE, VISITOR: VISITOR_COOKIE };
 
@@ -29,15 +29,15 @@ export function signAccessToken({ userId, email, roles, permissions, version = 0
   const token = jwt.sign(
     { sub: userId, email, roles, perms: permissions, ver: version, jti },
     config.auth.accessSecret,
-    { expiresIn: config.auth.accessTtl, issuer: 'sakha-api', audience: 'sakha-web' }
+    { expiresIn: config.auth.accessTtl, issuer: 'asphalix-api', audience: 'asphalix-web' }
   );
   return { token, jti, expiresIn: ttlToSeconds(config.auth.accessTtl) };
 }
 
 export function verifyAccessToken(token) {
   return jwt.verify(token, config.auth.accessSecret, {
-    issuer: 'sakha-api',
-    audience: 'sakha-web',
+    issuer: 'asphalix-api',
+    audience: 'asphalix-web',
   });
 }
 

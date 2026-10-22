@@ -1,5 +1,5 @@
 import express from 'express';
-import { paginationSchema, sakhaFeedbackSchema, sakhaMessageSchema } from '@sakha/shared';
+import { paginationSchema, sakhaFeedbackSchema, sakhaMessageSchema } from '@asphalix/shared';
 import prisma from '../../lib/prisma.js';
 import config from '../../config/index.js';
 import { asyncHandler } from '../../middleware/error.js';
@@ -72,7 +72,7 @@ router.get(
         messages: {
           where: { role: { in: ['user', 'assistant'] } },
           orderBy: { createdAt: 'asc' },
-          select: { id: true, role: true, content: true, citations: true, createdAt: true },
+          select: { id: true, role: true, content: true, citations: true, toolCalls: true, createdAt: true },
         },
       },
     });
@@ -83,7 +83,13 @@ router.get(
     const ownedByVisitor = !conversation.userId && conversation.visitorId === req.visitorId;
     if (!ownedByUser && !ownedByVisitor) throw forbidden('That is not your conversation.');
 
-    return res.json({ conversation });
+    // Tool traces stay server-side; only the ticket cards they produced go back.
+    const messages = conversation.messages.map(({ toolCalls, ...m }) => ({
+      ...m,
+      tickets: Array.isArray(toolCalls) ? (toolCalls.find((t) => t.name === 'tickets')?.tickets ?? []) : [],
+    }));
+
+    return res.json({ conversation: { ...conversation, messages } });
   })
 );
 
@@ -165,7 +171,7 @@ router.get(
           createdAt: true,
           updatedAt: true,
           user: { select: { id: true, name: true, email: true } },
-          _count: { select: { messages: true, leads: true } },
+          _count: { select: { messages: true, leads: true, tickets: true } },
           messages: { orderBy: { createdAt: 'asc' }, take: 1, select: { content: true } },
         },
       }),
@@ -188,6 +194,7 @@ router.get(
         user: { select: { id: true, name: true, email: true } },
         messages: { orderBy: { createdAt: 'asc' } },
         leads: { select: { id: true, name: true, email: true, stage: true } },
+        tickets: { select: { id: true, number: true, subject: true, status: true } },
       },
     });
     if (!conversation) throw notFound('No such conversation.');

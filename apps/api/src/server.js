@@ -39,7 +39,7 @@ async function main() {
         llm: config.groq.configured ? config.groq.model : 'NOT CONFIGURED (set GROQ_API_KEY)',
         embeddings: config.embedding.enabled ? config.embedding.provider : 'lexical only',
       },
-      '▸ Sakha API listening'
+      '▸ Asphalix API listening'
     );
   });
 

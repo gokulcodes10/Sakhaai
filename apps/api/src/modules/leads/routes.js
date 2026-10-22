@@ -1,5 +1,5 @@
 import express from 'express';
-import { leadSchema, leadUpdateSchema, paginationSchema } from '@sakha/shared';
+import { leadSchema, leadUpdateSchema, paginationSchema } from '@asphalix/shared';
 import prisma from '../../lib/prisma.js';
 import logger from '../../lib/logger.js';
 import { asyncHandler } from '../../middleware/error.js';

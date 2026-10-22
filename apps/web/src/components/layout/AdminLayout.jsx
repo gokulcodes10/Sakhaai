@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import clsx from 'clsx';
-import { permissionSatisfies } from '@sakha/shared';
+import { permissionSatisfies } from '@asphalix/shared';
 import { selectUser, signOut } from '../../features/auth/authSlice.js';
 import { toggleTheme, selectTheme } from '../../features/ui/uiSlice.js';
 import SakhaPanel from '../sakha/SakhaPanel.jsx';
+import { Emblem } from '../brand/Emblem.jsx';
 import SakhaLauncher from '../sakha/SakhaLauncher.jsx';
 import { Link } from 'react-router';
 
@@ -36,7 +37,10 @@ const NAV = [
   {
     section: 'Business',
     requires: null,
-    items: [{ to: '/admin/leads', label: 'Leads', requires: 'crm.leads.read' }],
+    items: [
+      { to: '/admin/tickets', label: 'Support', requires: 'support.tickets.read' },
+      { to: '/admin/leads', label: 'Leads', requires: 'crm.leads.read' },
+    ],
   },
   {
     section: 'Administration',
@@ -61,10 +65,8 @@ export default function AdminLayout() {
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-line bg-surface lg:flex">
         <div className="flex h-16 items-center gap-2.5 border-b border-line px-5">
           <Link to="/" className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded bg-ink font-display text-base font-semibold text-accent">
-              S
-            </span>
-            <span className="font-display text-sm font-semibold text-ink">Sakha Admin</span>
+            <Emblem size={26} />
+            <span className="text-sm font-semibold uppercase tracking-[0.2em] text-ink">Admin</span>
           </Link>
         </div>
 

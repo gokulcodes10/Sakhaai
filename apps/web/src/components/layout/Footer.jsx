@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { useSelector } from 'react-redux';
 import { selectContent } from '../../features/content/contentSlice.js';
+import { Lockup } from '../brand/Emblem.jsx';
 
 export default function Footer() {
   const content = useSelector(selectContent);
@@ -13,22 +14,19 @@ export default function Footer() {
       <div className="shell py-16">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_2fr]">
           <div className="max-w-sm">
-            <Link to="/" className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-ink font-display text-lg font-semibold text-accent">
-                S
-              </span>
-              <span className="font-display text-base font-semibold text-ink">Sakha AI</span>
+            <Link to="/" className="inline-flex" aria-label="Asphalix, home">
+              <Lockup size={34} />
             </Link>
 
             <p className="mt-4 text-sm leading-relaxed text-muted">{footer?.blurb}</p>
 
             {company?.tagline && (
-              <p className="mt-5 font-display text-lg font-semibold text-ink">{company.tagline}</p>
+              <p className="mt-5 text-lg font-semibold tracking-[-0.015em] text-ink">{company.tagline}</p>
             )}
 
             <div className="mt-6 space-y-1.5 text-sm">
               {company?.email && (
-                <a href={`mailto:${company.email}`} className="block text-muted transition-colors hover:text-accent">
+                <a href={`mailto:${company.email}`} className="block font-mono text-muted transition-colors hover:text-accent">
                   {company.email}
                 </a>
               )}
@@ -48,7 +46,7 @@ export default function Footer() {
           <div className="grid gap-8 sm:grid-cols-3">
             {(footer?.columns ?? []).map((col) => (
               <div key={col.title}>
-                <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-subtle">
+                <p className="font-mono text-2xs font-medium uppercase tracking-[0.14em] text-subtle">
                   {col.title}
                 </p>
                 <ul className="mt-4 space-y-2.5">
@@ -67,7 +65,7 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-subtle">
-            © {year} {footer?.legal?.copyright ?? 'Sakha InfoTech'}
+            © {year} {footer?.legal?.copyright ?? 'Asphalix (formerly Sakha InfoTech)'}
             {footer?.legal?.registration && <> · {footer.legal.registration}</>}
           </p>
           <div className="flex items-center gap-5">

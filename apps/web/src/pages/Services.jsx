@@ -114,7 +114,7 @@ export function ServiceDetail() {
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr]">
           <div>
-            <p className="prose-sakha">{service.body}</p>
+            <p className="prose-body">{service.body}</p>
 
             <div className="mt-10 grid gap-5 sm:grid-cols-2">
               <FitNote tone="success" label="Good fit when" body={service.goodFitWhen} />

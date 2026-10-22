@@ -2,25 +2,26 @@
   "$schema": "./site-content.schema.json",
   "_meta": {
     "version": 1,
-    "note": "Single source of truth for every word on sakhaai.com. The CMS reads and writes this shape; publishing writes a new ContentRevision row and re-indexes Sakha. Any key prefixed with _ is editorial guidance for admins and is never rendered.",
-    "locale": "en-IN",
-    "currency": "INR"
+    "note": "Single source of truth for every word on asphalix.com. Asphalix does not publish prices: never add a price, rate or range anywhere in this file — Sakha indexes all of it. The CMS reads and writes this shape; publishing writes a new ContentRevision row and re-indexes Sakha. Any key prefixed with _ is editorial guidance for admins and is never rendered.",
+    "locale": "en-IN"
   },
 
   "company": {
-    "brandName": "Sakha AI",
-    "legalName": "Sakha InfoTech",
-    "domain": "sakhaai.com",
+    "brandName": "Asphalix",
+    "legalName": "Asphalix",
+    "formerName": "Sakha AI (Sakha InfoTech)",
+    "domain": "asphalix.com",
     "tagline": "Trust. Grit. Agents that ship.",
-    "originLine": "Made possible by three friends, with trust and grit.",
-    "elevatorPitch": "We build AI agents that do the work your team keeps doing by hand — answering customers, chasing follow-ups, updating your systems — and we put them into production in weeks, with a number attached.",
-    "email": "hello@sakhaai.com",
-    "salesEmail": "malarvizhi@sakhaai.com",
+    "originLine": "Made possible by two friends, with trust and grit.",
+    "elevatorPitch": "We build agentic AI that does the work your team keeps doing by hand — answering customers, chasing follow-ups, updating your systems — on infrastructure you control, in production in weeks, with a number attached.",
+    "email": "hello@asphalix.com",
+    "salesEmail": "malarvizhi@asphalix.com",
+    "supportEmail": "support@asphalix.com",
     "phone": "+91 00000 00000",
     "_phoneNote": "Publish a real founder-reachable number. The blueprint is explicit: published founder contact + fast response is an underrated differentiator against slow agencies.",
     "whatsapp": "+91 00000 00000",
     "address": {
-      "line1": "Sakha InfoTech",
+      "line1": "Asphalix",
       "line2": "",
       "city": "Coimbatore",
       "state": "Tamil Nadu",
@@ -29,7 +30,7 @@
     },
     "responsePromise": "A founder replies to every enquiry within 24 hours. Not an SDR, not a bot.",
     "social": {
-      "linkedin": "https://www.linkedin.com/company/sakha-infotech",
+      "linkedin": "",
       "github": "",
       "x": "",
       "clutch": ""
@@ -40,7 +41,6 @@
     "primary": [
       { "label": "What we build", "href": "/services" },
       { "label": "Industries", "href": "/industries", "children": "@industries" },
-      { "label": "Pricing", "href": "/pricing" },
       { "label": "Work", "href": "/work" },
       { "label": "About", "href": "/about" }
     ],
@@ -53,13 +53,53 @@
 
   "home": {
     "hero": {
-      "eyebrow": "Sakha means friend",
+      "eyebrow": "Asphalēs — Greek for 'not liable to fall'",
       "headline": "Automation that ships. Outcomes you can measure.",
-      "subhead": "Most AI pilots never reach production. We build agents that answer your customers, act inside your systems, and go live in weeks — with the number they moved published on this site.",
-      "primaryCta": { "label": "See our prices", "href": "/pricing" },
-      "secondaryCta": { "label": "Book a 30-minute build memo", "href": "/contact" },
-      "assurance": "Working prototype in 5 days · You own all the code · Fixed, published prices",
+      "subhead": "Most AI pilots never reach production. We build agents that answer your customers, act inside your systems, and go live in weeks — on infrastructure you control, with the number they moved published on this site.",
+      "primaryCta": { "label": "Get a build memo", "href": "/contact" },
+      "secondaryCta": { "label": "Book a 30-minute call", "href": "/contact" },
+      "assurance": "Prototype in 5 days / You own all the code / A written memo before you commit",
       "_note": "Comet Lab test — read this headline aloud. If a buzzword crept in, cut it."
+    },
+
+    "arch": {
+      "_note": "The dark 3D scroll story that opens the home page. Five panels: the hero, then one per step. Keep each headline under ten words.",
+      "hero": {
+        "eyebrow": "Asphalēs — not liable to fall",
+        "headline": "Agents that hold under load.",
+        "subhead": "Asphalix builds agentic AI and self-hosted LLM systems that run inside your perimeter — your data, your models, your keys.",
+        "scrollHint": "Scroll — the arch explains itself ↓"
+      },
+      "steps": [
+        {
+          "label": "01 — Your data",
+          "rail": "Data",
+          "headline": "The first pier: data that never leaves.",
+          "body": "Retrieval runs next to your systems, not ours. Personal data is minimised before a model ever sees it, and every read is logged.",
+          "chips": ["On-prem retrieval", "PII minimised", "Audit trail"]
+        },
+        {
+          "label": "02 — Your models",
+          "rail": "Models",
+          "headline": "The second pier: open-weight models on your hardware.",
+          "body": "We fit the model to the job and run it where you choose — your GPUs, your cloud account, or a hosted API when that is genuinely the better call.",
+          "chips": ["Open weights", "Your GPUs or cloud", "No lock-in"]
+        },
+        {
+          "label": "03 — The keystone",
+          "rail": "Keystone",
+          "headline": "Governance locks it together.",
+          "body": "Human-in-the-loop by default, autonomy earned in stages you control, and an evaluation harness that tells you when something drifts.",
+          "chips": ["Human review queue", "Staged autonomy", "Evals on every release"]
+        },
+        {
+          "label": "04 — In production",
+          "rail": "Ship",
+          "headline": "Five days to a prototype. Weeks to production.",
+          "body": "A running agent on your real data in five days, then exception paths, guardrails and handover. You own the code, the infrastructure and the docs.",
+          "chips": ["Prototype in 5 days", "You own the code", "One agreed metric"]
+        }
+      ]
     },
 
     "trustStrip": {
@@ -69,7 +109,7 @@
         { "icon": "shield", "text": "You own the code, the infra and the docs from day one" },
         { "icon": "gauge", "text": "Every engagement has one metric, agreed before we write code" },
         { "icon": "eye", "text": "Human-in-the-loop by default. You choose the autonomy level" },
-        { "icon": "receipt", "text": "Prices published. No 'book a call to find out'" }
+        { "icon": "receipt", "text": "A written build memo before you commit — including what we would not build" }
       ]
     },
 
@@ -99,7 +139,7 @@
         {
           "day": "Day 0",
           "title": "A call, then a memo",
-          "body": "A founder takes the call — no SDR, no deck. Afterwards you get a written build memo: what we would build, what it should move, what it costs, and what we would not build. Sometimes the memo says wait. We send it anyway."
+          "body": "A founder takes the call — no SDR, no deck. Afterwards you get a written build memo: what we would build, what it should move, what it takes, and what we would not build. Sometimes the memo says wait. We send it anyway."
         },
         {
           "day": "Days 1–2",
@@ -133,11 +173,11 @@
 
     "assistantPitch": {
       "eyebrow": "Case study #1 is this website",
-      "headline": "Meet Sakha. She is running right now, on the right of your screen.",
-      "body": "We would not ask you to deploy an agent we had not deployed on ourselves first. Sakha knows every page, price, service and policy on this site, re-reads them the moment we change anything, and answers your questions using live data instead of a scripted FAQ tree. Ask her something hard.",
+      "headline": "Meet Sakha. It is running right now, on the right of your screen.",
+      "body": "We would not ask you to deploy an agent we had not deployed on ourselves first. Sakha knows every page, service and policy on this site, re-reads them the moment we change anything, answers using live data instead of a scripted FAQ tree — and for clients, raises and tracks support tickets and hands you to a human when it should. Ask it something hard.",
       "cta": { "label": "Open Sakha", "action": "open-assistant" },
       "suggestions": [
-        "What would a WhatsApp agent for my business actually cost?",
+        "What would a WhatsApp agent for my business involve?",
         "What do you refuse to build?",
         "How is this different from hiring an n8n freelancer?",
         "What happens if the agent gets something wrong?"
@@ -148,7 +188,7 @@
       "headline": "Tell us the workflow that keeps breaking.",
       "body": "Thirty minutes, a founder on the call, and a written memo afterwards whether or not you hire us.",
       "primaryCta": { "label": "Get a build memo", "href": "/contact" },
-      "secondaryCta": { "label": "See the prices first", "href": "/pricing" }
+      "secondaryCta": { "label": "Ask Sakha first", "action": "open-assistant" }
     }
   },
 
@@ -165,6 +205,8 @@
     "items": [
       {
         "slug": "customer-response-agents",
+        "tag": "Respond",
+        "hue": "accent",
         "name": "Customer response agents",
         "oneLiner": "Answer every customer in under a minute, on the channel they already use.",
         "icon": "message",
@@ -185,6 +227,8 @@
       },
       {
         "slug": "follow-up-and-revenue-agents",
+        "tag": "Follow up",
+        "hue": "trust",
         "name": "Follow-up and revenue agents",
         "oneLiner": "The second and third chase, done every time, by something that never gets busy.",
         "icon": "trending",
@@ -205,6 +249,8 @@
       },
       {
         "slug": "internal-operations-agents",
+        "tag": "Operate",
+        "hue": "keystone",
         "name": "Internal operations agents",
         "oneLiner": "Give your own team the answer instead of the form.",
         "icon": "building",
@@ -225,6 +271,8 @@
       },
       {
         "slug": "system-integration",
+        "tag": "Connect",
+        "hue": "iris",
         "name": "System integration and data groundwork",
         "oneLiner": "Your agent is only as good as the data it can read.",
         "icon": "plug",
@@ -306,134 +354,6 @@
     ]
   },
 
-  "pricing": {
-    "meta": {
-      "title": "Pricing",
-      "description": "Published price ranges for pilots, single-workflow builds and multi-workflow programmes. No 'book a call to find out'."
-    },
-    "hero": {
-      "eyebrow": "Pricing",
-      "headline": "Here are our prices.",
-      "subhead": "Almost nobody in this industry publishes them. We think that is a tell. These are real ranges — where you land inside one depends on how many systems we have to touch and how clean your data is, and we will tell you which end you are at in the build memo, before you commit.",
-      "_note": "REVIEW THESE NUMBERS BEFORE LAUNCH. They are considered defaults for the Indian SMB market, not a quote from your books. Publishing a price you cannot deliver at is worse than publishing nothing."
-    },
-    "currencyNote": "Prices in Indian Rupees, excluding GST. International engagements are quoted in USD at the equivalent tier.",
-    "tiers": [
-      {
-        "slug": "pilot",
-        "name": "Pilot",
-        "tagline": "Prove it on one workflow, on your real data.",
-        "priceFrom": 150000,
-        "priceTo": 400000,
-        "priceDisplay": "₹1.5L – ₹4L",
-        "duration": "2 to 3 weeks",
-        "featured": false,
-        "bestFor": "You have one painful workflow and you want evidence before you commit budget.",
-        "includes": [
-          "Data audit and written findings",
-          "Working prototype by day 5",
-          "One workflow, one channel, real data",
-          "The metric instrumented and measured",
-          "A written go / no-go recommendation at the end"
-        ],
-        "notIncluded": ["Production hardening", "Ongoing support", "Multi-system integration"],
-        "cta": { "label": "Start with a pilot", "href": "/contact?tier=pilot" }
-      },
-      {
-        "slug": "single-workflow",
-        "name": "Single workflow, in production",
-        "tagline": "One agent, live, with guardrails and your name on the code.",
-        "priceFrom": 500000,
-        "priceTo": 1200000,
-        "priceDisplay": "₹5L – ₹12L",
-        "duration": "4 to 6 weeks",
-        "featured": true,
-        "badge": "Most engagements start here",
-        "bestFor": "You already know which workflow to automate and you want it running properly, not demoed.",
-        "includes": [
-          "Everything in the Pilot",
-          "Production deployment on infrastructure you own",
-          "Integration with your CRM, ERP or helpdesk",
-          "Human-in-the-loop review queue and exception paths",
-          "Audit trail and staged autonomy rollout",
-          "Evaluation harness so you can prove it still works in six months",
-          "Full handover: code, infra, prompts, documentation",
-          "30 days of post-launch support"
-        ],
-        "notIncluded": ["Ongoing managed operation (see below)"],
-        "cta": { "label": "Scope a single workflow", "href": "/contact?tier=single" }
-      },
-      {
-        "slug": "multi-workflow",
-        "name": "Multi-workflow programme",
-        "tagline": "Several agents on one connector layer, built to keep going.",
-        "priceFrom": 1200000,
-        "priceTo": null,
-        "priceDisplay": "From ₹12L",
-        "duration": "8 to 16 weeks",
-        "featured": false,
-        "bestFor": "You want the integration layer built once and three or more agents running on top of it.",
-        "includes": [
-          "Everything in Single workflow, across multiple agents",
-          "Shared connector and identity layer",
-          "Cross-agent orchestration and shared memory",
-          "Role-based access across your team",
-          "Quarterly review against the agreed metrics",
-          "Priority response"
-        ],
-        "notIncluded": [],
-        "cta": { "label": "Talk through a programme", "href": "/contact?tier=multi" }
-      }
-    ],
-    "managed": {
-      "enabled": true,
-      "eyebrow": "After launch",
-      "headline": "Run it yourself, or let us run it.",
-      "body": "You own everything either way — that is not a lever we pull. Managed plans exist because most teams would rather not carry a pager for an agent, not because you would be locked out if you did.",
-      "plans": [
-        {
-          "name": "Self-hosted",
-          "price": "₹0",
-          "priceNote": "You already own it",
-          "includes": ["All code, infra and documentation", "Evaluation harness", "Community support"]
-        },
-        {
-          "name": "Managed",
-          "price": "₹35,000 – ₹1,20,000",
-          "priceNote": "per month, by scale",
-          "includes": [
-            "Monitoring, uptime and incident response",
-            "Model and prompt updates as the landscape moves",
-            "Monthly performance report against your metric",
-            "Prompt and workflow tuning as your business changes"
-          ]
-        }
-      ]
-    },
-    "faq": [
-      {
-        "q": "Why publish prices at all?",
-        "a": "Because it saves us both a call. If ₹5L is not the right order of magnitude for your business, you have found that out in ten seconds instead of after two meetings. It also means we cannot quietly charge the next client more for the same work."
-      },
-      {
-        "q": "What makes a project land at the top of a range?",
-        "a": "Almost always the number of systems involved and the state of the data inside them. A single clean system sits at the bottom. Four systems, one of which is a spreadsheet someone maintains by hand, sits at the top. The data audit in week one tells us which you are, and we tell you before you sign."
-      },
-      {
-        "q": "Do you really hand over all the code?",
-        "a": "Yes, and it is written into the contract by default rather than negotiated. Lock-in is how incumbents defend a position. We do not have one to defend yet, so ownership is the more honest trade — and frankly it makes us build it better."
-      },
-      {
-        "q": "What if the pilot says do not proceed?",
-        "a": "Then it says that, in writing, and we would rather lose the follow-on than sell you a build we do not believe in. It has happened. It will happen again."
-      },
-      {
-        "q": "Do you charge for the first call?",
-        "a": "No. The call and the written build memo afterwards are free, whether or not you hire us."
-      }
-    ]
-  },
-
   "work": {
     "meta": {
       "title": "Work",
@@ -447,18 +367,19 @@
     "_note": "Only case studies with `published: true` are rendered. Never publish one without a real, measured number and the client's written consent to be named. An unpublished placeholder is honest; an invented metric ends the company.",
     "caseStudies": [
       {
-        "slug": "sakha-on-sakhaai",
-        "client": "Sakha InfoTech",
+        "slug": "asphalix-on-asphalix",
+        "previousSlugs": ["sakha-on-sakhaai"],
+        "client": "Asphalix",
         "clientNote": "Ourselves — case study #1",
         "industry": "Professional services",
         "published": true,
         "isDogfood": true,
         "headline": "We put the first agent on our own operations.",
-        "challenge": "We were asking prospects to trust an AI agent with their customer conversations before we had trusted one with ours. So Sakha went on our own site first, wired into our own content, pricing and lead pipeline — with the same guardrails, audit trail and human handover we sell.",
-        "approach": "Sakha reads every page, price and policy on this site through a retrieval layer that re-indexes the moment we publish a change in the CMS, plus a scheduled crawl of our public sources. She can look up live facts, cite the page she got them from, and hand a qualified conversation to a human with the context attached.",
+        "challenge": "We were asking prospects to trust an AI agent with their customer conversations before we had trusted one with ours. So Sakha went on our own site first, wired into our own content, support queue and lead pipeline — with the same guardrails, audit trail and human handover we sell.",
+        "approach": "Sakha reads every page and policy on this site through a retrieval layer that re-indexes the moment we publish a change in the CMS, plus a scheduled crawl of our public sources. It can look up live facts, cite the page it got them from, raise support tickets for clients, and hand a conversation to a human with the context attached.",
         "metrics": [
           { "label": "Knowledge freshness after a CMS publish", "value": "Under 30 seconds", "note": "Measured from publish to first correct answer" },
-          { "label": "Answers with a cited source", "value": "100%", "note": "Sakha is instructed to say she does not know rather than answer uncited" }
+          { "label": "Answers with a cited source", "value": "100%", "note": "Sakha is instructed to say it does not know rather than answer uncited" }
         ],
         "quote": null,
         "_metricsNote": "Add the live numbers once you have a month of traffic: enquiries handled without a human, median response time, share of conversations that became leads."
@@ -474,20 +395,21 @@
   "about": {
     "meta": {
       "title": "About",
-      "description": "Sakha InfoTech — three friends building AI agents that reach production."
+      "description": "Asphalix (formerly Sakha InfoTech) — two friends building AI agents that reach production."
     },
     "hero": {
       "eyebrow": "About",
-      "headline": "Made possible by three friends, with trust and grit.",
+      "headline": "Made possible by two friends, with trust and grit.",
       "subhead": "That sentence is not marketing. It is the entire origin of the company, and it is still how decisions get made here."
     },
     "story": {
-      "headline": "Why 'Sakha'",
+      "headline": "Why 'Asphalix'",
       "body": [
-        "Sakha means friend. Not an assistant, not a servant, not a tool you operate — a friend, which in the older sense means someone who tells you the truth even when a more agreeable answer was available.",
-        "We picked it because the thing we kept noticing about this industry is how much of it is agreeable. Every vendor says yes. Every pilot is a success right up until the point where nobody can say what it changed. Nobody publishes a price, nobody publishes a failure, and the software quietly stops being used about four months after the case study goes out.",
+        "Asphalēs is Greek for 'not liable to fall'. An arch holds because of its keystone: the harder you press, the tighter it locks. That is what we want our agents to be — systems that hold under load, not demos that fall over in month four.",
+        "We started as Sakha AI. Sakha means friend — in the older sense, someone who tells you the truth even when a more agreeable answer was available. The company outgrew the name; our assistant kept it.",
+        "We picked it because the thing we kept noticing about this industry is how much of it is agreeable. Every vendor says yes. Every pilot is a success right up until the point where nobody can say what it changed. Nobody publishes a failure, and the software quietly stops being used about four months after the case study goes out.",
         "So we built the company around the three things we could actually promise on day one, with no funding and no logos: we would be fast, we would be honest about what not to build, and we would go deep in a few places instead of shallow everywhere.",
-        "Trust and grit were the only assets three friends had at the start. They turned out to be the right ones."
+        "Trust and grit were the only assets two friends had at the start. They turned out to be the right ones."
       ]
     },
     "principles": [
@@ -505,46 +427,42 @@
       },
       {
         "title": "We run it on ourselves first",
-        "body": "Sakha, on the right of this page, is our own agent on our own operations. We do not ship a pattern we have not carried."
+        "body": "Sakha, on the right of this page, is our own agent on our own operations and our own support desk. We do not ship a pattern we have not carried."
       },
       {
         "title": "Human in the loop until you say otherwise",
         "body": "Every agent starts supervised and earns its autonomy in stages you control. Nervous is a reasonable way to start."
       }
     ],
+    "foundersDesk": {
+      "eyebrow": "Founders' desk",
+      "headline": "Two founders. Both of them reachable.",
+      "subhead": "There is no account manager between you and the people who run Asphalix. Write to either of us directly — whoever you write to replies."
+    },
     "team": [
       {
         "slug": "gokul-madhesh",
         "name": "Gokul Madhesh",
-        "role": "Chief Executive Officer & Chief Technology Officer",
-        "shortRole": "CEO & CTO",
-        "bio": "Gokul leads the technical direction and takes the first call on every engagement. If you are talking to Sakha AI about architecture, you are talking to him.",
-        "photo": "",
-        "linkedin": "",
-        "email": "gokul@sakhaai.com",
+        "role": "Founder & Chief Technology Officer",
+        "shortRole": "Founder & CTO",
+        "bio": "Gokul founded Asphalix and leads its technical direction — architecture, the build, and the engineering bar every agent has to clear. If you are talking to Asphalix about how something will work, you are talking to him.",
+        "talkTo": ["Architecture and integrations", "Build plans and timelines", "Evaluation, security and hosting"],
+        "photo": "/team/gokul-madhesh.jpg",
+        "linkedin": "https://www.linkedin.com/in/gokul-m-900947255",
+        "email": "gokul@asphalix.com",
         "order": 1
       },
       {
         "slug": "malarvizhi",
-        "name": "Malarvizhi",
-        "role": "Business Development Manager",
-        "shortRole": "Business Development",
-        "bio": "Malarvizhi runs client relationships and the build memo process. She is the reason the follow-up you were promised actually arrives.",
-        "photo": "",
-        "linkedin": "",
-        "email": "malarvizhi@sakhaai.com",
+        "name": "Malarvizhi Madesan",
+        "role": "Co-founder & Chief Executive Officer",
+        "shortRole": "Co-founder & CEO",
+        "bio": "Malarvizhi runs the company — business development, client relationships and day-to-day management. She is the reason the follow-up you were promised actually arrives.",
+        "talkTo": ["New engagements and partnerships", "Contracts and commercials", "How an engagement is going"],
+        "photo": "/team/malarvizhi.jpg",
+        "linkedin": "https://www.linkedin.com/in/malarvizhi-m-879544258",
+        "email": "malarvizhi@asphalix.com",
         "order": 2
-      },
-      {
-        "slug": "sai",
-        "name": "Sai",
-        "role": "Chief Research Officer",
-        "shortRole": "Chief Research Officer",
-        "bio": "Sai owns evaluation and the research agenda — how we prove an agent works, and how we know when it has stopped working.",
-        "photo": "",
-        "linkedin": "",
-        "email": "sai@sakhaai.com",
-        "order": 3
       }
     ],
     "_teamNote": "Add a real photo and LinkedIn URL for each founder before launch. Named, photographed people outperform anonymous logos by a wide margin — buyers are checking whether you exist."
@@ -553,7 +471,7 @@
   "responsibleAi": {
     "meta": {
       "title": "Responsible deployment",
-      "description": "The one-page checklist that goes into every Sakha AI proposal."
+      "description": "The one-page checklist that goes into every Asphalix proposal."
     },
     "hero": {
       "eyebrow": "Responsible deployment",
@@ -588,13 +506,13 @@
     "hero": {
       "eyebrow": "Get in touch",
       "headline": "Tell us the workflow that keeps breaking.",
-      "subhead": "You will get thirty minutes with a founder and, afterwards, a written build memo: what we would build, what it should move, what it costs, and what we would not build."
+      "subhead": "You will get thirty minutes with a founder and, afterwards, a written build memo: what we would build, what it should move, what it takes, and what we would not build."
     },
     "form": {
       "workflowLabel": "Which workflow is costing you the most time right now?",
       "workflowPlaceholder": "For example: our sales desk answers the same 'where is my order' question about 40 times a day by looking it up in Tally, and enquiries after 6pm wait until morning.",
       "workflowHelp": "Be specific. A vague answer gets a vague memo.",
-      "budgetLabel": "Rough budget range",
+      "budgetLabel": "Rough scope",
       "budgetHelp": "Honest answers get honest scoping. 'Not sure yet' is a real option.",
       "submitLabel": "Send it to a founder",
       "successTitle": "That is with us.",
@@ -602,33 +520,36 @@
       "consent": "We use what you send us only to reply to you. We do not sell it, and we do not add you to a mailing list you did not ask for."
     },
     "alternatives": [
-      { "label": "Email a founder directly", "value": "hello@sakhaai.com", "href": "mailto:hello@sakhaai.com" },
+      { "label": "Email a founder directly", "value": "hello@asphalix.com", "href": "mailto:hello@asphalix.com" },
       { "label": "WhatsApp us", "value": "+91 00000 00000", "href": "https://wa.me/910000000000" },
-      { "label": "Ask Sakha first", "value": "She knows our prices and our scope", "action": "open-assistant" }
+      { "label": "Ask Sakha first", "value": "Our assistant knows our services, our process and our support desk", "action": "open-assistant" }
     ]
   },
 
   "assistant": {
     "name": "Sakha",
     "meaning": "friend",
-    "greeting": "I'm Sakha. I know this company — the services, the prices, what we will and won't build. Ask me anything, and I'll tell you when I don't know.",
-    "placeholder": "Ask about pricing, scope, timelines…",
+    "greeting": "I'm Sakha, Asphalix's assistant. I can answer questions about what we build, help with your project, raise a support ticket, or get you to a human. I'll tell you when I don't know.",
+    "subtitle": "Asphalix support",
+    "placeholder": "Ask about scope, timelines, or get help…",
     "openLabel": "Ask Sakha",
     "closeLabel": "Close",
-    "disclaimer": "Sakha can be wrong. Anything about contracts or price needs a founder's confirmation.",
+    "disclaimer": "Sakha can be wrong. Anything about contracts or commercials needs a founder's confirmation.",
     "emptyStateSuggestions": [
       "What does a pilot actually include?",
       "How fast can you go live?",
-      "Do we own the code?",
+      "I need help with one of our agents",
       "What would you refuse to build for us?"
     ],
-    "handoffPrompt": "Want a founder to pick this up? I can pass along what we've discussed.",
-    "unknownAnswer": "I don't have that on hand, and I'd rather say so than guess. A founder can answer it properly — shall I take your email?",
+    "humanLabel": "Talk to a human",
+    "humanMessage": "I'd like to talk to a human, please.",
+    "handoffPrompt": "Want a person to pick this up? I can pass along what we've discussed.",
+    "unknownAnswer": "I don't have that on hand, and I'd rather say so than guess. A person on the team can answer it properly — shall I get them for you?",
     "_promptNote": "The system prompt itself lives in the CMS under Sakha → Settings so it can be tuned without a deploy. This block is only the user-facing copy."
   },
 
   "footer": {
-    "blurb": "Sakha AI builds agents that answer your customers and act inside your systems — in production, in weeks, with your name on the code.",
+    "blurb": "Asphalix builds agents that answer your customers and act inside your systems — in production, in weeks, with your name on the code.",
     "columns": [
       {
         "title": "What we build",
@@ -644,7 +565,6 @@
         "links": [
           { "label": "About", "href": "/about" },
           { "label": "Work", "href": "/work" },
-          { "label": "Pricing", "href": "/pricing" },
           { "label": "Responsible deployment", "href": "/responsible-ai" },
           { "label": "Contact", "href": "/contact" }
         ]
@@ -659,24 +579,24 @@
       }
     ],
     "legal": {
-      "copyright": "Sakha InfoTech",
+      "copyright": "Asphalix (formerly Sakha InfoTech)",
       "links": [
         { "label": "Privacy", "href": "/privacy" },
         { "label": "Terms", "href": "/terms" }
       ],
-      "registration": "Sakha InfoTech · Registered in India",
+      "registration": "Registered in India",
       "_registrationNote": "Add your CIN / GSTIN here once registration completes. Buyers do check."
     }
   },
 
   "seo": {
-    "defaultTitle": "Sakha AI — Automation that ships. Outcomes you can measure.",
-    "titleTemplate": "%s · Sakha AI",
-    "defaultDescription": "Sakha AI builds AI agents that answer your customers and act inside your systems — live in weeks, with published prices and code you own. By Sakha InfoTech.",
-    "ogImage": "/og/sakha-default.png",
+    "defaultTitle": "Asphalix — Agents that hold under load.",
+    "titleTemplate": "%s · Asphalix",
+    "defaultDescription": "Asphalix builds agentic AI that answers your customers and acts inside your systems — live in weeks, on infrastructure you control, with code you own.",
+    "ogImage": "/og/asphalix-default.png",
     "twitterHandle": "",
     "organizationSchema": {
-      "legalName": "Sakha InfoTech",
+      "legalName": "Asphalix",
       "alternateName": "Sakha AI",
       "foundingDate": "2026",
       "sameAs": []

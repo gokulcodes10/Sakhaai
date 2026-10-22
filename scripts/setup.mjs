@@ -36,7 +36,7 @@ function run(cmd, opts = {}) {
 
 const secret = () => crypto.randomBytes(48).toString('base64url');
 
-console.log(`\n${c.bold('Sakha AI')} ${c.dim('— first-run setup')}\n`);
+console.log(`\n${c.bold('Asphalix')} ${c.dim('— first-run setup')}\n`);
 
 const TOTAL = 6;
 

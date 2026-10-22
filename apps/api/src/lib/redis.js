@@ -61,13 +61,13 @@ function build(role) {
 
 const globalForRedis = globalThis;
 
-export const redis = globalForRedis.__sakhaRedis ?? build('main');
+export const redis = globalForRedis.__asphalixRedis ?? build('main');
 /** Separate connection: a subscriber cannot issue normal commands. */
-export const subscriber = globalForRedis.__sakhaRedisSub ?? build('subscriber');
+export const subscriber = globalForRedis.__asphalixRedisSub ?? build('subscriber');
 
 if (!config.isProd) {
-  globalForRedis.__sakhaRedis = redis;
-  globalForRedis.__sakhaRedisSub = subscriber;
+  globalForRedis.__asphalixRedis = redis;
+  globalForRedis.__asphalixRedisSub = subscriber;
 }
 
 /**

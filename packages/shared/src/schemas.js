@@ -115,6 +115,41 @@ export const sakhaFeedbackSchema = z.object({
   comment: z.string().max(1000).optional(),
 });
 
+// ── Support tickets ───────────────────────────────────────────────────────────
+
+export const TICKET_STATUSES = ['open', 'pending', 'resolved', 'closed'];
+export const TICKET_PRIORITIES = ['low', 'normal', 'high', 'urgent'];
+export const TICKET_CATEGORIES = ['question', 'bug', 'change', 'access', 'billing', 'other'];
+
+export const ticketCreateSchema = z.object({
+  subject: z.string().trim().min(3, 'Give the request a short subject').max(200),
+  body: z.string().trim().min(10, 'Add a sentence or two of detail').max(8000),
+  priority: z.enum(TICKET_PRIORITIES).default('normal'),
+  category: z.enum(TICKET_CATEGORIES).optional(),
+});
+
+export const ticketReplySchema = z.object({
+  body: z.string().trim().min(1, 'Write a reply').max(8000),
+  // Staff only; the portal route ignores it.
+  internal: z.boolean().optional().default(false),
+});
+
+export const ticketUpdateSchema = z.object({
+  status: z.enum(TICKET_STATUSES).optional(),
+  priority: z.enum(TICKET_PRIORITIES).optional(),
+  category: z.enum(TICKET_CATEGORIES).nullable().optional(),
+  assigneeId: cuidLike.nullable().optional(),
+});
+
+export const ticketListQuerySchema = z.object({
+  status: z.enum([...TICKET_STATUSES, 'active', 'all']).optional().default('active'),
+  priority: z.enum(TICKET_PRIORITIES).optional(),
+  assignee: z.string().max(40).optional(), // a user id, 'me' or 'none'
+  q: z.string().trim().max(200).optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(25),
+});
+
 // ── CMS ───────────────────────────────────────────────────────────────────────
 
 export const contentBlockSchema = z.object({

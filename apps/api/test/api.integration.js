@@ -2,7 +2,7 @@
  * Integration tests — these run against a real Postgres and Redis.
  *
  *   npm run infra:up && npm run db:deploy && npm run db:seed
- *   npm run test:integration --workspace @sakha/api
+ *   npm run test:integration --workspace @asphalix/api
  *
  * They exercise the paths that unit tests cannot prove: that the auth cookies
  * really work, that a permission grant really takes effect without a re-login,
@@ -69,7 +69,7 @@ async function clearRateLimits() {
   const keys = [];
   let cursor = '0';
   do {
-    const [next, batch] = await redis.scan(cursor, 'MATCH', `${process.env.REDIS_PREFIX ?? 'sakha'}:rate:*`, 'COUNT', 200);
+    const [next, batch] = await redis.scan(cursor, 'MATCH', `${process.env.REDIS_PREFIX ?? 'asphalix'}:rate:*`, 'COUNT', 200);
     cursor = next;
     keys.push(...batch);
   } while (cursor !== '0');
@@ -118,7 +118,9 @@ test('public content is served without auth', async () => {
   const res = await c.fetch('/api/content');
   assert.equal(res.status, 200);
   assert.ok(res.body.content.company.brandName);
-  assert.ok(Array.isArray(res.body.content.pricing.tiers));
+  // Asphalix does not publish prices; the live tree must not carry them.
+  assert.equal(res.body.content.pricing, undefined, 'published content still has a pricing block');
+  assert.ok(!JSON.stringify(res.body.content).includes('₹'), 'published content still has a rupee figure');
 });
 
 test('the CMS refuses anonymous callers', async () => {
@@ -318,4 +320,129 @@ test('logging out clears the session', async () => {
   await c.fetch('/api/auth/logout', { method: 'POST' });
   const after = await c.fetch('/api/auth/me');
   assert.equal(after.body.user, null, 'session survived a logout');
+});
+
+
+// ── Support desk ──────────────────────────────────────────────────────────────
+
+/** Two client organisations with one user each, removed after the suite. */
+async function makeClientUsers() {
+  const argon2 = (await import('argon2')).default;
+  const role = await prisma.role.findUnique({ where: { key: 'client' } });
+  const passwordHash = await argon2.hash('Test-password-123!', { type: argon2.argon2id });
+  const stamp = Date.now();
+  const make = async (tag) => {
+    const account = await prisma.clientAccount.create({ data: { name: `Test ${tag}`, slug: `test-${tag}-${stamp}` } });
+    const user = await prisma.user.create({
+      data: {
+        email: `client-${tag}-${stamp}@example.test`,
+        name: `Client ${tag.toUpperCase()}`,
+        passwordHash,
+        status: 'active',
+        clientAccountId: account.id,
+        roles: { create: [{ roleId: role.id }] },
+      },
+    });
+    return { account, user, creds: { email: user.email, password: 'Test-password-123!' } };
+  };
+  const a = await make('a');
+  const b = await make('b');
+  const cleanup = async () => {
+    await prisma.ticket.deleteMany({ where: { clientAccountId: { in: [a.account.id, b.account.id] } } });
+    await prisma.user.deleteMany({ where: { id: { in: [a.user.id, b.user.id] } } });
+    await prisma.clientAccount.deleteMany({ where: { id: { in: [a.account.id, b.account.id] } } });
+  };
+  return { a, b, cleanup };
+}
+
+test('a client raises, reads and replies to a ticket; another client cannot see it', async () => {
+  const { a, b, cleanup } = await makeClientUsers();
+  try {
+    const ca = makeClient();
+    const cb = makeClient();
+    assert.equal((await ca.fetch('/api/auth/login', { method: 'POST', body: a.creds })).status, 200);
+    assert.equal((await cb.fetch('/api/auth/login', { method: 'POST', body: b.creds })).status, 200);
+
+    const created = await ca.fetch('/api/portal/tickets', {
+      method: 'POST',
+      body: { subject: 'Agent stopped replying', body: 'Since this morning the WhatsApp agent does not answer.', priority: 'high' },
+    });
+    assert.equal(created.status, 201);
+    const id = created.body.ticket.id;
+    assert.ok(created.body.ticket.number > 0);
+
+    const own = await ca.fetch(`/api/portal/tickets/${id}`);
+    assert.equal(own.status, 200);
+
+    const other = await cb.fetch(`/api/portal/tickets/${id}`);
+    assert.equal(other.status, 404, 'a client read another organisation\'s ticket');
+    const otherReply = await cb.fetch(`/api/portal/tickets/${id}/messages`, { method: 'POST', body: { body: 'hi' } });
+    assert.equal(otherReply.status, 404, 'a client replied on another organisation\'s ticket');
+
+    // A client cannot smuggle an internal note in.
+    const reply = await ca.fetch(`/api/portal/tickets/${id}/messages`, {
+      method: 'POST',
+      body: { body: 'Still broken.', internal: true },
+    });
+    assert.equal(reply.status, 201);
+    assert.equal(reply.body.ticket.messages.at(-1).internal, false);
+
+    // Clients cannot reach the staff queue.
+    assert.equal((await ca.fetch('/api/support/tickets')).status, 403);
+  } finally {
+    await cleanup();
+  }
+});
+
+test('staff replies move a ticket to pending, internal notes stay hidden from the client', async () => {
+  const { a, cleanup } = await makeClientUsers();
+  try {
+    const client = makeClient();
+    await client.fetch('/api/auth/login', { method: 'POST', body: a.creds });
+    const { body } = await client.fetch('/api/portal/tickets', {
+      method: 'POST',
+      body: { subject: 'Question about handover docs', body: 'Where do we find the evaluation harness docs?' },
+    });
+    const id = body.ticket.id;
+
+    const staff = makeClient();
+    await staff.fetch('/api/auth/login', { method: 'POST', body: SUPER });
+
+    const queue = await staff.fetch('/api/support/tickets?status=active');
+    assert.equal(queue.status, 200);
+    assert.ok(queue.body.items.some((t) => t.id === id));
+
+    const note = await staff.fetch(`/api/support/tickets/${id}/messages`, {
+      method: 'POST',
+      body: { body: 'Check the handover folder first.', internal: true },
+    });
+    assert.equal(note.status, 201);
+    assert.equal(note.body.ticket.status, 'open', 'an internal note changed the status');
+
+    const reply = await staff.fetch(`/api/support/tickets/${id}/messages`, {
+      method: 'POST',
+      body: { body: 'It is in docs/evals in your repository.' },
+    });
+    assert.equal(reply.body.ticket.status, 'pending');
+
+    const seen = await client.fetch(`/api/portal/tickets/${id}`);
+    assert.equal(seen.body.ticket.messages.length, 1, 'the client saw an internal note');
+    assert.ok(!seen.body.ticket.messages.some((m) => m.internal));
+
+    // A client reply reopens it.
+    const back = await client.fetch(`/api/portal/tickets/${id}/messages`, { method: 'POST', body: { body: 'Found it, thanks.' } });
+    assert.equal(back.body.ticket.status, 'open');
+
+    const resolved = await staff.fetch(`/api/support/tickets/${id}`, { method: 'PATCH', body: { status: 'resolved' } });
+    assert.equal(resolved.status, 200);
+    assert.equal(resolved.body.ticket.status, 'resolved');
+  } finally {
+    await cleanup();
+  }
+});
+
+test('anonymous visitors cannot reach the support queue', async () => {
+  const c = makeClient();
+  const res = await c.fetch('/api/support/tickets');
+  assert.ok(res.status === 401 || res.status === 403, `expected refusal, got ${res.status}`);
 });

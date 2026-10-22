@@ -15,6 +15,73 @@ export default function About() {
       <Seo title={about.meta?.title} description={about.meta?.description} />
       <PageHero eyebrow={about.hero.eyebrow} title={about.hero.headline} subhead={about.hero.subhead} />
 
+      <Section id="founders-desk" tone="surface">
+        <SectionHeading
+          eyebrow={about.foundersDesk?.eyebrow ?? "Founders' desk"}
+          title={about.foundersDesk?.headline ?? 'Two founders. Both of them reachable.'}
+          body={about.foundersDesk?.subhead}
+        />
+        <div className="mt-14 grid gap-8 lg:grid-cols-2">
+          {[...about.team]
+            .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+            .map((person) => (
+              <article
+                key={person.slug}
+                className="flex flex-col overflow-hidden rounded-xl border border-line bg-paper"
+              >
+                {person.photo ? (
+                  <img
+                    src={person.photo}
+                    alt={person.name}
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex aspect-[4/3] w-full items-center justify-center bg-ink font-display text-7xl font-semibold text-accent">
+                    {initials(person.name)}
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col p-8 sm:p-10">
+                  <h3 className="text-3xl sm:text-4xl">{person.name}</h3>
+                  <p className="mt-2 text-lg text-accent">{person.role}</p>
+                  {person.bio && <p className="mt-6 text-lg leading-relaxed text-muted">{person.bio}</p>}
+                  {person.talkTo?.length > 0 && (
+                    <div className="mt-8 border-t border-line pt-7">
+                      <p className="font-mono text-2xs uppercase tracking-wider text-subtle">
+                        Talk to {person.name.split(' ')[0]} about
+                      </p>
+                      <ul className="mt-4 space-y-2.5 text-base text-ink">
+                        {person.talkTo.map((topic) => (
+                          <li key={topic} className="flex gap-3">
+                            <span aria-hidden="true" className="text-accent">—</span>
+                            {topic}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="mt-auto flex flex-wrap gap-x-6 gap-y-3 pt-8 text-base">
+                    {person.email && (
+                      <a href={`mailto:${person.email}`} className="text-ink transition-colors hover:text-accent">
+                        {person.email}
+                      </a>
+                    )}
+                    {person.linkedin && (
+                      <a
+                        href={person.linkedin}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="text-muted transition-colors hover:text-accent"
+                      >
+                        LinkedIn
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
+        </div>
+      </Section>
+
       <Section>
         <div className="grid gap-14 lg:grid-cols-[1fr_1.3fr]">
           <div>
@@ -48,41 +115,6 @@ export default function About() {
             </li>
           ))}
         </ol>
-      </Section>
-
-      <Section>
-        <SectionHeading eyebrow="The team" title="Three people. All of them reachable." />
-        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {[...about.team]
-            .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
-            .map((person) => (
-              <article key={person.slug} className="rounded-lg border border-line bg-surface p-7">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-ink font-display text-xl font-semibold text-accent">
-                  {initials(person.name)}
-                </div>
-                <h3 className="mt-5 text-lg">{person.name}</h3>
-                <p className="mt-1 text-sm text-accent">{person.role}</p>
-                {person.bio && <p className="mt-4 text-sm leading-relaxed text-muted">{person.bio}</p>}
-                <div className="mt-5 flex flex-wrap gap-4 text-sm">
-                  {person.email && (
-                    <a href={`mailto:${person.email}`} className="text-muted transition-colors hover:text-accent">
-                      Email
-                    </a>
-                  )}
-                  {person.linkedin && (
-                    <a
-                      href={person.linkedin}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-muted transition-colors hover:text-accent"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
-        </div>
       </Section>
 
       <CtaBand />

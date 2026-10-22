@@ -50,13 +50,13 @@ test('contentToDocuments flattens the real content tree', async () => {
   const raw = await readFile(new URL('../../../content/site-content.json', import.meta.url), 'utf8');
   const docs = contentToDocuments(JSON.parse(raw));
 
-  assert.ok(docs.length >= 15, `expected many documents, got ${docs.length}`);
+  assert.ok(docs.length >= 12, `expected many documents, got ${docs.length}`);
 
   const keys = docs.map((d) => d.sourceKey);
   assert.ok(keys.includes('company'));
   assert.ok(keys.includes('about'));
-  assert.ok(keys.some((k) => k.startsWith('pricing:')));
   assert.ok(keys.some((k) => k.startsWith('service:')));
+  assert.ok(!keys.some((k) => k.startsWith('pricing:')), 'pricing must never be indexed');
 
   // Every document must have real content, or it will pollute retrieval.
   for (const d of docs) {
@@ -66,6 +66,28 @@ test('contentToDocuments flattens the real content tree', async () => {
 
   // Source keys must be unique — the indexer upserts on (source, sourceKey).
   assert.equal(new Set(keys).size, keys.length, 'duplicate sourceKey found');
+});
+
+test('prices never reach the knowledge base, even if the CMS still has them', () => {
+  const docs = contentToDocuments({
+    pricing: {
+      tiers: [{ slug: 'pilot', name: 'Pilot', priceDisplay: '₹1.5L – ₹4L', tagline: 'x'.repeat(40) }],
+      managed: { enabled: true, headline: 'Managed', plans: [{ name: 'Managed', price: '₹35,000' }] },
+      faq: [{ q: 'Why publish prices?', a: 'Because ₹5L…' }],
+    },
+  });
+  const text = docs.map((d) => `${d.title}\n${d.body}`).join('\n');
+  assert.ok(!docs.some((d) => d.sourceKey.startsWith('pricing')), 'a pricing document was built');
+  assert.ok(!text.includes('₹'), 'a rupee figure leaked into the knowledge base');
+});
+
+test('the shipped content file carries no prices', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const raw = await readFile(new URL('../../../content/site-content.json', import.meta.url), 'utf8');
+  const content = JSON.parse(raw);
+  assert.equal(content.pricing, undefined, 'the pricing block is back');
+  assert.ok(!raw.includes('₹'), 'a rupee figure is in site-content.json');
+  assert.ok(!raw.includes('"/pricing"'), 'something still links to /pricing');
 });
 
 test('unpublished case studies are never indexed', async () => {

@@ -7,7 +7,7 @@ import {
   resetPasswordSchema,
   SYSTEM_ROLES,
   USER_STATUS,
-} from '@sakha/shared';
+} from '@asphalix/shared';
 import prisma from '../../lib/prisma.js';
 import logger from '../../lib/logger.js';
 import config from '../../config/index.js';
@@ -185,7 +185,7 @@ router.post(
     }
 
     if (user.status === USER_STATUS.SUSPENDED) {
-      throw forbidden('That account is suspended. Email hello@sakhaai.com if that is unexpected.');
+      throw forbidden('That account is suspended. Email hello@asphalix.com if that is unexpected.');
     }
 
     // Upgrade the hash if our argon parameters have got stronger since signup.

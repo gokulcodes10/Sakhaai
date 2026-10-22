@@ -97,6 +97,15 @@ export const PERMISSION_CATALOGUE = [
     ],
   },
   {
+    domain: 'support',
+    label: 'Support Desk',
+    description: 'Client tickets and Sakha handoffs to a human.',
+    permissions: [
+      { key: 'support.tickets.read', label: 'View the support queue', description: 'Every ticket, including internal notes and the Sakha conversation behind it.' },
+      { key: 'support.tickets.write', label: 'Work tickets', description: 'Reply to clients, add internal notes, change status, priority and assignee.' },
+    ],
+  },
+  {
     domain: 'portal',
     label: 'Client Portal',
     description: 'What a signed-in client can do.',
@@ -141,6 +150,8 @@ export const DEFAULT_ROLE_PERMISSIONS = {
     'knowledge.read',
     'sakha.chat',
     'sakha.conversations.read',
+    'support.tickets.read',
+    'support.tickets.write',
     'iam.users.read',
     'iam.roles.read',
     'ops.audit.read',
@@ -151,6 +162,7 @@ export const DEFAULT_ROLE_PERMISSIONS = {
     'crm.projects.read',
     'knowledge.read',
     'sakha.chat',
+    'support.tickets.read',
   ],
 
   [SYSTEM_ROLES.CLIENT]: [

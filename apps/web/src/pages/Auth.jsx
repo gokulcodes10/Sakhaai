@@ -5,6 +5,7 @@ import { clearAuthError, selectUser, signIn, signUp } from '../features/auth/aut
 import api, { ApiError } from '../lib/api.js';
 import { Alert, Button, Field, Input } from '../components/ui/index.jsx';
 import Seo from '../components/layout/Seo.jsx';
+import { Emblem } from '../components/brand/Emblem.jsx';
 
 /** Shared two-column shell: form on the left, the argument on the right. */
 function AuthShell({ title, subtitle, children, footer }) {
@@ -20,9 +21,8 @@ function AuthShell({ title, subtitle, children, footer }) {
       </div>
 
       <div className="hidden flex-col justify-center border-l border-line bg-ink px-14 py-16 lg:flex">
-        <p className="text-2xs font-semibold uppercase tracking-[0.14em] text-accent">
-          Sakha means friend
-        </p>
+        <Emblem size={56} />
+        <p className="eyebrow mt-8 text-[#F0845F]">Asphalēs — not liable to fall</p>
         <p className="mt-6 max-w-md font-display text-3xl leading-tight text-paper">
           Trust. Grit. Agents that ship.
         </p>
@@ -63,7 +63,7 @@ export function SignIn() {
       <Seo title="Sign in" noindex />
       <AuthShell
         title="Sign in"
-        subtitle="For clients and the Sakha AI team."
+        subtitle="For Asphalix clients and the Asphalix team."
         footer={
           <>
             No account yet?{' '}

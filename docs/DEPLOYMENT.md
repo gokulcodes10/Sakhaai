@@ -1,12 +1,12 @@
-# Deploying Sakha AI
+# Deploying Asphalix
 
-Everything you need to get sakhaai.com onto a server, in the order it needs doing.
+Everything you need to get asphalix.com onto a server, in the order it needs doing.
 
 ---
 
 ## 0. Before anything else
 
-**The domain is not yours yet.** At the time this was built, `sakhaai.com`
+**The domain is not yours yet.** At the time this was built, `asphalix.com`
 resolved to a Spaceship.com parking page offering it for sale. Register it
 first — the crawler, the canonical URLs, the cookie domain and the TLS
 certificates all assume you own it.
@@ -14,8 +14,8 @@ certificates all assume you own it.
 Once registered, point an A record at your server's IP:
 
 ```
-A     sakhaai.com       -> <server ip>
-A     www.sakhaai.com   -> <server ip>
+A     asphalix.com       -> <server ip>
+A     www.asphalix.com   -> <server ip>
 ```
 
 ---
@@ -31,8 +31,8 @@ knowledge base to grow.
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker "$USER"   # log out and back in
 
-git clone <your repo> /opt/sakha
-cd /opt/sakha
+git clone <your repo> /opt/asphalix
+cd /opt/asphalix
 ```
 
 ---
@@ -47,14 +47,14 @@ Then work through it. The ones that matter:
 
 ```bash
 NODE_ENV=production
-PUBLIC_SITE_URL=https://sakhaai.com
-PUBLIC_API_URL=https://sakhaai.com
-CORS_ORIGINS=https://sakhaai.com,https://www.sakhaai.com
+PUBLIC_SITE_URL=https://asphalix.com
+PUBLIC_API_URL=https://asphalix.com
+CORS_ORIGINS=https://asphalix.com,https://www.asphalix.com
 TRUST_PROXY=true
-COOKIE_DOMAIN=.sakhaai.com
+COOKIE_DOMAIN=.asphalix.com
 
 POSTGRES_PASSWORD=<something long and random>
-DATABASE_URL="postgresql://sakha:<that password>@postgres:5432/sakha?schema=public"
+DATABASE_URL="postgresql://asphalix:<that password>@postgres:5432/asphalix?schema=public"
 REDIS_URL=redis://redis:6379
 
 JWT_ACCESS_SECRET=<48 random bytes>
@@ -88,11 +88,11 @@ chmod 600 .env
 
 ```bash
 sudo apt install certbot
-sudo certbot certonly --standalone -d sakhaai.com -d www.sakhaai.com
+sudo certbot certonly --standalone -d asphalix.com -d www.asphalix.com
 
-sudo mkdir -p /opt/sakha/infra/nginx/certs
-sudo cp /etc/letsencrypt/live/sakhaai.com/fullchain.pem /opt/sakha/infra/nginx/certs/
-sudo cp /etc/letsencrypt/live/sakhaai.com/privkey.pem  /opt/sakha/infra/nginx/certs/
+sudo mkdir -p /opt/asphalix/infra/nginx/certs
+sudo cp /etc/letsencrypt/live/asphalix.com/fullchain.pem /opt/asphalix/infra/nginx/certs/
+sudo cp /etc/letsencrypt/live/asphalix.com/privkey.pem  /opt/asphalix/infra/nginx/certs/
 ```
 
 Renewal, copying the new certs in and reloading Nginx:
@@ -102,7 +102,7 @@ sudo crontab -e
 ```
 
 ```cron
-0 3 * * 1 certbot renew --quiet --pre-hook "docker stop sakha-nginx" --post-hook "cp /etc/letsencrypt/live/sakhaai.com/*.pem /opt/sakha/infra/nginx/certs/ && docker start sakha-nginx"
+0 3 * * 1 certbot renew --quiet --pre-hook "docker stop asphalix-nginx" --post-hook "cp /etc/letsencrypt/live/asphalix.com/*.pem /opt/asphalix/infra/nginx/certs/ && docker start asphalix-nginx"
 ```
 
 ### Self-signed (local testing only)
@@ -142,9 +142,9 @@ overwrites a grant an admin made through the CMS.
 ## 5. Check it
 
 ```bash
-curl -sk https://sakhaai.com/api/health          # {"status":"ok",...}
-curl -sk https://sakhaai.com/api/ready           # database + redis + llm
-curl -sk https://sakhaai.com/api/sakha/status    # is the assistant connected
+curl -sk https://asphalix.com/api/health          # {"status":"ok",...}
+curl -sk https://asphalix.com/api/ready           # database + redis + llm
+curl -sk https://asphalix.com/api/sakha/status    # is the assistant connected
 docker compose logs -f api worker
 ```
 
@@ -181,14 +181,15 @@ Then, in a browser:
 Nothing here is worth more than the database. Back it up before you need to.
 
 ```bash
-# /opt/sakha/backup.sh
+# /opt/asphalix/backup.sh
 #!/usr/bin/env bash
 set -euo pipefail
-DEST=/var/backups/sakha
+DEST=/var/backups/asphalix
 mkdir -p "$DEST"
 STAMP=$(date +%Y%m%d-%H%M)
 
-docker compose exec -T postgres pg_dump -U sakha sakha | gzip > "$DEST/db-$STAMP.sql.gz"
+docker compose exec -T postgres pg_dump -U asphalix asphalix | gzip > "$DEST/db-$STAMP.sql.gz"
+# The uploads volume keeps its pre-rebrand name (see docker-compose.yml).
 tar czf "$DEST/uploads-$STAMP.tar.gz" -C /var/lib/docker/volumes/sakha_uploads/_data .
 
 # Keep 30 days
@@ -196,13 +197,13 @@ find "$DEST" -name '*.gz' -mtime +30 -delete
 ```
 
 ```cron
-0 2 * * * /opt/sakha/backup.sh >> /var/log/sakha-backup.log 2>&1
+0 2 * * * /opt/asphalix/backup.sh >> /var/log/asphalix-backup.log 2>&1
 ```
 
 Restore:
 
 ```bash
-gunzip -c db-20260826-0200.sql.gz | docker compose exec -T postgres psql -U sakha sakha
+gunzip -c db-20260826-0200.sql.gz | docker compose exec -T postgres psql -U asphalix asphalix
 ```
 
 Redis needs no backup — everything in it is a cache, a rate-limit window, a lock
@@ -214,7 +215,7 @@ request, not data.
 ## Updating
 
 ```bash
-cd /opt/sakha
+cd /opt/asphalix
 git pull
 npm run stack:up        # rebuilds changed images and runs migrations
 docker compose exec api node apps/api/prisma/seed.js

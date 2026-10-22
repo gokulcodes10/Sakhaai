@@ -27,7 +27,7 @@ import {
   userCreateSchema,
   userRolesSchema,
   userUpdateSchema,
-} from '@sakha/shared';
+} from '@asphalix/shared';
 import prisma from '../../lib/prisma.js';
 import { asyncHandler } from '../../middleware/error.js';
 import { validate, validateQuery } from '../../middleware/validate.js';

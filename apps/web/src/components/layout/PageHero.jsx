@@ -15,9 +15,9 @@ export default function PageHero({ eyebrow, title, subhead, back, children }) {
             {back.label}
           </Link>
         )}
-        {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
-        <h1 className="max-w-3xl text-4xl sm:text-5xl">{title}</h1>
-        {subhead && <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted">{subhead}</p>}
+        {eyebrow && <p className="eyebrow mb-5">{eyebrow}</p>}
+        <h1 className="max-w-3xl text-4xl leading-none tracking-[-0.035em] sm:text-5xl">{title}</h1>
+        {subhead && <p className="mt-6 max-w-2xl text-xl leading-[1.55] text-muted">{subhead}</p>}
         {children}
       </div>
     </section>

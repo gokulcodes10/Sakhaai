@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { permissionSatisfies } from '@sakha/shared';
+import { permissionSatisfies } from '@asphalix/shared';
 import api from '../../lib/api.js';
 
 export const loadSession = createAsyncThunk('auth/load', async (_arg, { rejectWithValue }) => {

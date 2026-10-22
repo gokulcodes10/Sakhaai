@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>body{margin:0;background:#f4f2ee;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#22262b;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}a{color:#4a6a44;text-decoration:none}a:hover{color:#2f4a2b;text-decoration:underline}input[type=range]{accent-color:#4a6a44}</style></helmet>
+<div style="display:flex;min-height:100vh;align-items:stretch">
+
+<aside style="width:246px;flex:none;background:#1e2420;color:#e7e4dc;display:flex;flex-direction:column;position:sticky;top:0;height:100vh">
+  <div style="padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.09)">
+    <div style="font:600 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;color:#9aa694">POC · DECISION SUPPORT</div>
+    <div style="margin-top:8px;font:600 15px/1.3 'IBM Plex Sans',sans-serif;color:#fff">Posting &amp; Transfer<br>Recommendation</div>
+    <div style="margin-top:6px;font:400 11px/1.4 'IBM Plex Sans',sans-serif;color:#8f9a89">v0.1 · illustrative build</div>
+  </div>
+  <nav style="flex:1;overflow:auto;padding:14px 10px 20px">
+    <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="3">
+      <div style="margin-bottom:16px">
+        <div style="padding:0 8px 7px;font:600 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#7d8878">{{ g.label }}</div>
+        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+          <button onClick="{{ it.onClick }}" style="{{ it.style }}" style-hover="background:rgba(255,255,255,.07)">
+            <span style="flex:1;text-align:left">{{ it.label }}</span>
+            <sc-if value="{{ it.count }}" hint-placeholder-val="{{ true }}"><span style="font:500 10px 'IBM Plex Mono',monospace;color:#9aa694">{{ it.count }}</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </sc-for>
+  </nav>
+  <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,.09);font:400 10.5px/1.5 'IBM Plex Sans',sans-serif;color:#8f9a89">Decision support only. All recommendations require authorised human approval.</div>
+</aside>
+
+<main style="flex:1;min-width:0;display:flex;flex-direction:column">
+  <header style="background:#fff;border-bottom:1px solid #e0ddd6;padding:14px 28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px">
+      <div style="font:600 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;color:#8b8f86">{{ screenKicker }}</div>
+      <h1 style="margin:7px 0 0;font:600 20px/1.2 'IBM Plex Sans',sans-serif">{{ screenTitle }}</h1>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">ROLE</span>
+      <div style="display:flex;gap:3px;background:#f0eee9;border:1px solid #e0ddd6;border-radius:3px;padding:3px">
+        <sc-for list="{{ roleTabs }}" as="r" hint-placeholder-count="3">
+          <button onClick="{{ r.onClick }}" style="{{ r.style }}">{{ r.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding-left:16px;border-left:1px solid #e0ddd6">
+      <div style="width:34px;height:34px;flex:none;border-radius:50%;background:#e8e5dd;border:1px solid #d8d4ca;display:flex;align-items:center;justify-content:center;font:600 11px 'IBM Plex Mono',monospace;color:#6b6f76">{{ userInitials }}</div>
+      <div>
+        <div style="font:500 12.5px/1.2 'IBM Plex Sans',sans-serif">{{ userName }}</div>
+        <div style="font:400 10.5px/1.4 'IBM Plex Mono',monospace;color:#8b8f86">{{ userUnit }}</div>
+      </div>
+    </div>
+  </header>
+
+  <div style="background:#ecefe8;border-bottom:1px solid #dde2d7;padding:9px 28px;display:flex;gap:10px;align-items:baseline">
+    <span style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#4a6a44;flex:none">PERMISSIONS</span>
+    <span style="font:400 11.5px/1.5 'IBM Plex Sans',sans-serif;color:#4b5347">{{ roleNote }}</span>
+  </div>
+
+  <div style="flex:1;padding:26px 28px 60px;max-width:1560px">
+
+  <sc-if value="{{ isSearch }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="01 Candidate pool">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="flex:1;min-width:240px;background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:10px 13px;display:flex;align-items:center;gap:10px">
+        <span style="font:400 12px 'IBM Plex Mono',monospace;color:#a8aca3">⌕</span>
+        <span style="font:400 13px 'IBM Plex Sans',sans-serif;color:#8b8f86">Search by service number, name, arm or station</span>
+      </div>
+      <sc-for list="{{ poolFilters }}" as="f" hint-placeholder-count="4">
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:10px 13px;font:400 12.5px 'IBM Plex Sans',sans-serif;color:#4b5347;display:flex;gap:8px;align-items:center">{{ f.label }}<span style="font:500 10px 'IBM Plex Mono',monospace;color:#8b8f86">{{ f.value }}</span></div>
+      </sc-for>
+    </div>
+    <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:118px 1.6fr 1.2fr 90px 92px 1fr 128px;gap:14px;padding:11px 16px;background:#faf9f6;border-bottom:1px solid #e0ddd6;font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">
+        <div>SVC NO</div><div>NAME &amp; RANK</div><div>ARM / SERVICE</div><div>SERVICE</div><div>MEDICAL</div><div>PRESENT APPOINTMENT</div><div>POSTING DUE</div>
+      </div>
+      <sc-for list="{{ pool }}" as="c" hint-placeholder-count="5">
+        <div onClick="{{ c.onClick }}" style="{{ c.rowStyle }}" style-hover="background:#f7f6f2">
+          <div style="font:500 12px 'IBM Plex Mono',monospace;color:#4b5347">{{ c.svcNo }}</div>
+          <div style="font:500 13px 'IBM Plex Sans',sans-serif">{{ c.name }}</div>
+          <div style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#5b6058">{{ c.arm }}</div>
+          <div style="font:400 12.5px 'IBM Plex Mono',monospace;color:#5b6058">{{ c.service }}</div>
+          <div style="font:500 11px 'IBM Plex Mono',monospace;color:#4b5347">{{ c.medical }}</div>
+          <div style="font:400 12.5px 'IBM Plex Sans',sans-serif;color:#5b6058">{{ c.present }}</div>
+          <div style="font:400 12px 'IBM Plex Mono',monospace;color:#8b8f86">{{ c.due }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:14px 0 0;font:400 11.5px/1.5 'IBM Plex Sans',sans-serif;color:#8b8f86">Synthetic demonstration dataset — 5 of 128 records shown. Selecting a record loads it into the recommendation workflow.</p>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="02 Service record">
+    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:20px 22px">
+          <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start">
+            <div style="flex:1;min-width:220px">
+              <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">{{ cand.svcNo }}</div>
+              <h2 style="margin:6px 0 0;font:600 22px/1.25 'IBM Plex Sans',sans-serif">{{ cand.name }}</h2>
+              <div style="margin-top:5px;font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5b6058">{{ cand.arm }} · {{ cand.seniority }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:auto auto;gap:6px 22px">
+              <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">MEDICAL</span><span style="font:500 12.5px 'IBM Plex Sans',sans-serif">{{ cand.medical }}</span>
+              <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">TENURE</span><span style="font:500 12.5px 'IBM Plex Sans',sans-serif">{{ cand.tenure }}</span>
+              <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">DUE</span><span style="font:500 12.5px 'IBM Plex Sans',sans-serif">{{ cand.due }}</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:15px;border-top:1px solid #eeece6;font:400 13px/1.6 'IBM Plex Sans',sans-serif;color:#4b5347">Present appointment — {{ cand.present }}</div>
+        </div>
+        <sc-for list="{{ cand.blocksLeft }}" as="b" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+            <div style="padding:12px 18px;border-bottom:1px solid #eeece6;display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font:600 12.5px 'IBM Plex Sans',sans-serif">{{ b.title }}</span>
+              <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ b.note }}</span>
+            </div>
+            <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="3">
+              <div style="padding:11px 18px;border-bottom:1px solid #f4f2ec;display:flex;gap:16px;align-items:baseline">
+                <span style="flex:1;font:400 13px/1.4 'IBM Plex Sans',sans-serif">{{ r.t }}</span>
+                <span style="font:400 12px 'IBM Plex Mono',monospace;color:#5b6058;text-align:right">{{ r.d }}</span>
+                <sc-if value="{{ r.tag }}" hint-placeholder-val="{{ true }}"><span style="{{ r.tagStyle }}">{{ r.tag }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+      <div style="width:404px;flex:none;display:flex;flex-direction:column;gap:16px">
+        <sc-for list="{{ cand.blocksRight }}" as="b" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+            <div style="padding:12px 18px;border-bottom:1px solid #eeece6;display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font:600 12.5px 'IBM Plex Sans',sans-serif">{{ b.title }}</span>
+              <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ b.note }}</span>
+            </div>
+            <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="3">
+              <div style="padding:11px 18px;border-bottom:1px solid #f4f2ec">
+                <div style="display:flex;gap:14px;align-items:baseline">
+                  <span style="flex:1;font:400 13px/1.4 'IBM Plex Sans',sans-serif">{{ r.t }}</span>
+                  <span style="font:500 12px 'IBM Plex Mono',monospace;color:#4b5347">{{ r.d }}</span>
+                </div>
+                <sc-if value="{{ r.sub }}" hint-placeholder-val="{{ true }}"><div style="margin-top:3px;font:400 11px 'IBM Plex Mono',monospace;color:#8b8f86">{{ r.sub }}</div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isPostings }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="03 Position library">
+    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:320px;background:#fff;border:1px solid #e0ddd6;border-radius:3px;overflow:hidden">
+        <div style="padding:12px 16px;background:#faf9f6;border-bottom:1px solid #e0ddd6;display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font:600 12.5px 'IBM Plex Sans',sans-serif">Vacancies in the posting cycle</span>
+          <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">6 positions · Apr–Sep 2027</span>
+        </div>
+        <sc-for list="{{ postingList }}" as="p" hint-placeholder-count="6">
+          <div onClick="{{ p.onClick }}" style="{{ p.rowStyle }}" style-hover="background:#f7f6f2">
+            <div style="display:flex;gap:12px;align-items:baseline">
+              <span style="font:500 11.5px 'IBM Plex Mono',monospace;color:#8b8f86;flex:none">{{ p.id }}</span>
+              <span style="flex:1;font:500 13.5px/1.35 'IBM Plex Sans',sans-serif">{{ p.role }}</span>
+              <span style="{{ p.priorityStyle }}">{{ p.priority }}</span>
+            </div>
+            <div style="margin-top:5px;padding-left:52px;font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#5b6058">{{ p.unit }} · {{ p.station }} · {{ p.command }}</div>
+            <div style="margin-top:6px;padding-left:52px;display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ p.tags }}" as="t" hint-placeholder-count="2">
+                <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#5b6058;background:#f0eee9;border:1px solid #e4e1d9;border-radius:2px;padding:3px 6px">{{ t }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="width:470px;flex:none;background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+        <div style="padding:16px 20px;border-bottom:1px solid #eeece6">
+          <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">{{ sel.id }} · REQUIREMENT PROFILE</div>
+          <h3 style="margin:7px 0 0;font:600 17px/1.3 'IBM Plex Sans',sans-serif">{{ sel.role }}</h3>
+          <div style="margin-top:4px;font:400 12.5px/1.5 'IBM Plex Sans',sans-serif;color:#5b6058">{{ sel.unit }} · {{ sel.station }}</div>
+        </div>
+        <sc-for list="{{ sel.requirements }}" as="r" hint-placeholder-count="6">
+          <div style="padding:12px 20px;border-bottom:1px solid #f4f2ec;display:flex;gap:14px;align-items:flex-start">
+            <span style="width:126px;flex:none;font:500 10.5px/1.5 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#8b8f86">{{ r.area }}</span>
+            <span style="flex:1;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif">{{ r.value }}</span>
+            <span style="{{ r.kindStyle }}">{{ r.kind }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:14px 20px;display:flex;gap:8px">
+          <button onClick="{{ onEditRequirement }}" style="{{ editBtnStyle }}">{{ editBtnLabel }}</button>
+          <button onClick="{{ goScreening }}" style="border:1px solid #d8d4ca;background:#fff;color:#4b5347;border-radius:3px;padding:9px 15px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer">Run screening against pool</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isEligibility }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="04 Eligibility screening">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+      <div style="flex:1;min-width:260px;font:400 13px/1.6 'IBM Plex Sans',sans-serif;color:#4b5347">Mandatory conditions are applied as a gate before any suitability scoring. <strong style="font-weight:600">{{ eligCount }} of 6</strong> positions cleared the gate for {{ cand.shortName }}.</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">EXCLUDED OPTIONS</span>
+        <div style="display:flex;gap:3px;background:#f0eee9;border:1px solid #e0ddd6;border-radius:3px;padding:3px">
+          <sc-for list="{{ gateTabs }}" as="t" hint-placeholder-count="2">
+            <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ gateRows }}" as="g" hint-placeholder-count="6">
+        <div style="{{ g.cardStyle }}">
+          <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+            <div style="flex:1;min-width:240px">
+              <div style="display:flex;gap:10px;align-items:baseline">
+                <span style="font:500 11.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ g.id }}</span>
+                <span style="{{ g.titleStyle }}">{{ g.role }}</span>
+              </div>
+              <div style="margin-top:4px;font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#5b6058">{{ g.unit }} · {{ g.station }}</div>
+            </div>
+            <span style="{{ g.verdictStyle }}">{{ g.verdict }}</span>
+          </div>
+          <div style="margin-top:13px;display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ g.rules }}" as="r" hint-placeholder-count="4">
+              <span style="{{ r.style }}">{{ r.mark }} {{ r.label }}</span>
+            </sc-for>
+          </div>
+          <sc-if value="{{ g.failNote }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:12px;padding:10px 13px;background:#faf0ee;border-left:2px solid #8f3a32;font:400 12px/1.55 'IBM Plex Sans',sans-serif;color:#6d3229">{{ g.failNote }}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isResults }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="05 Recommendations">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px">
+      <div style="flex:1;min-width:220px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#4b5347">Top {{ topCount }} of {{ eligCount }} eligible positions for</span>
+        <span style="font:600 13px 'IBM Plex Sans',sans-serif">{{ cand.shortName }}</span>
+        <span style="font:400 11.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ cand.svcNo }}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">LAYOUT</span>
+        <div style="display:flex;gap:3px;background:#f0eee9;border:1px solid #e0ddd6;border-radius:3px;padding:3px">
+          <sc-for list="{{ layoutTabs }}" as="t" hint-placeholder-count="2">
+            <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">INELIGIBLE</span>
+        <div style="display:flex;gap:3px;background:#f0eee9;border:1px solid #e0ddd6;border-radius:3px;padding:3px">
+          <sc-for list="{{ gateTabs }}" as="t" hint-placeholder-count="2">
+            <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ isListLayout }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ ranked }}" as="p" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #e0ddd6;border-left:3px solid {{ p.bandColor }};border-radius:3px;padding:18px 22px">
+            <div style="display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap">
+              <div style="width:44px;flex:none;text-align:center">
+                <div style="font:600 26px/1 'IBM Plex Mono',monospace;color:#22262b">{{ p.rank }}</div>
+                <div style="margin-top:4px;font:500 9.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ p.delta }}</div>
+              </div>
+              <div style="flex:1;min-width:260px">
+                <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">
+                  <span style="font:500 11.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ p.id }}</span>
+                  <span style="font:600 16px/1.3 'IBM Plex Sans',sans-serif">{{ p.role }}</span>
+                </div>
+                <div style="margin-top:5px;font:400 12.5px/1.55 'IBM Plex Sans',sans-serif;color:#5b6058">{{ p.unit }} · {{ p.station }} · {{ p.command }}</div>
+                <div style="margin-top:11px;font:400 13px/1.6 'IBM Plex Sans',sans-serif;color:#3a403a;max-width:760px">{{ p.reason }}</div>
+                <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ p.chips }}" as="c" hint-placeholder-count="4">
+                    <span style="{{ c.style }}">{{ c.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="width:214px;flex:none">
+                <div style="display:flex;align-items:baseline;gap:8px">
+                  <span style="font:600 30px/1 'IBM Plex Mono',monospace;color:{{ p.bandColor }}">{{ p.scoreLabel }}</span>
+                  <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#8b8f86">{{ p.band }}</span>
+                </div>
+                <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">
+                  <sc-for list="{{ p.mini }}" as="m" hint-placeholder-count="4">
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <span style="width:82px;flex:none;font:400 10px 'IBM Plex Mono',monospace;color:#8b8f86;text-align:right">{{ m.label }}</span>
+                      <span style="flex:1;height:5px;background:#eeece6;border-radius:2px;overflow:hidden;display:block"><span style="display:block;height:5px;width:{{ m.pct }}%;background:{{ m.color }}"></span></span>
+                    </div>
+                  </sc-for>
+                </div>
+                <button onClick="{{ p.onOpen }}" style="margin-top:13px;width:100%;border:1px solid #d8d4ca;background:#fff;color:#3a403a;border-radius:3px;padding:8px 12px;font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#f7f6f2">Why this recommendation →</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isBoardLayout }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:14px;align-items:start">
+        <sc-for list="{{ ranked }}" as="p" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #e0ddd6;border-top:3px solid {{ p.bandColor }};border-radius:3px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">RANK {{ p.rank }} · {{ p.delta }}</span>
+              <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#8b8f86">{{ p.band }}</span>
+            </div>
+            <div style="font:600 24px/1 'IBM Plex Mono',monospace;color:{{ p.bandColor }}">{{ p.scoreLabel }}</div>
+            <div>
+              <div style="font:500 11px 'IBM Plex Mono',monospace;color:#8b8f86">{{ p.id }}</div>
+              <div style="margin-top:5px;font:600 14.5px/1.35 'IBM Plex Sans',sans-serif">{{ p.role }}</div>
+              <div style="margin-top:4px;font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#5b6058">{{ p.unit }} · {{ p.station }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <sc-for list="{{ p.mini }}" as="m" hint-placeholder-count="4">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <span style="width:82px;flex:none;font:400 10px 'IBM Plex Mono',monospace;color:#8b8f86;text-align:right">{{ m.label }}</span>
+                  <span style="flex:1;height:5px;background:#eeece6;border-radius:2px;overflow:hidden;display:block"><span style="display:block;height:5px;width:{{ m.pct }}%;background:{{ m.color }}"></span></span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#3a403a">{{ p.reason }}</div>
+            <button onClick="{{ p.onOpen }}" style="margin-top:auto;border:1px solid #d8d4ca;background:#fff;color:#3a403a;border-radius:3px;padding:8px 12px;font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#f7f6f2">Why this recommendation →</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showStruck }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:18px;background:#fbfaf7;border:1px dashed #d8d4ca;border-radius:3px;padding:16px 20px">
+        <div style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#8b8f86">EXCLUDED BY MANDATORY RULE — SHOWN FOR TRACEABILITY</div>
+        <sc-for list="{{ excluded }}" as="x" hint-placeholder-count="2">
+          <div style="margin-top:12px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap">
+            <span style="font:500 11.5px 'IBM Plex Mono',monospace;color:#a8aca3">{{ x.id }}</span>
+            <span style="flex:1;min-width:200px;font:500 13.5px 'IBM Plex Sans',sans-serif;color:#8b8f86;text-decoration:line-through">{{ x.role }} — {{ x.unit }}, {{ x.station }}</span>
+            <span style="font:500 12px 'IBM Plex Mono',monospace;color:#a8aca3;text-decoration:line-through">{{ x.wouldBe }}</span>
+            <span style="font:500 11px 'IBM Plex Mono',monospace;color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5;border-radius:2px;padding:4px 8px">{{ x.failLabel }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button onClick="{{ primaryAction }}" style="border:1px solid #3f5c39;background:#4a6a44;color:#fff;border-radius:3px;padding:11px 18px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#3f5c39">{{ primaryActionLabel }}</button>
+      <button onClick="{{ goScenario }}" style="border:1px solid #d8d4ca;background:#fff;color:#4b5347;border-radius:3px;padding:11px 18px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#f7f6f2">Open what-if</button>
+      <span style="font:400 11.5px/1.5 'IBM Plex Mono',monospace;color:#8b8f86">Scores are illustrative. Methodology pending stakeholder validation.</span>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isExplain }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="06 Recommendation detail">
+    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:340px;display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:20px 22px">
+          <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+            <div style="flex:1;min-width:240px">
+              <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">{{ detail.id }} · RANK {{ detail.rank }}</div>
+              <h2 style="margin:7px 0 0;font:600 20px/1.3 'IBM Plex Sans',sans-serif">{{ detail.role }}</h2>
+              <div style="margin-top:5px;font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#5b6058">{{ detail.unit }} · {{ detail.station }} · {{ detail.command }}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font:600 38px/1 'IBM Plex Mono',monospace;color:{{ detail.bandColor }}">{{ detail.scoreLabel }}</div>
+              <div style="margin-top:5px;font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#8b8f86">{{ detail.band }} SUITABILITY</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:14px 16px;background:#f6f7f3;border-left:2px solid #4a6a44;font:400 13.5px/1.65 'IBM Plex Sans',sans-serif;color:#3a403a">{{ detail.reason }}</div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+          <div style="padding:14px 20px;border-bottom:1px solid #eeece6;display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:600 12.5px 'IBM Plex Sans',sans-serif">Parameter contribution</span>
+            <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">weight × parameter score = points</span>
+          </div>
+          <sc-for list="{{ detail.contributions }}" as="c" hint-placeholder-count="7">
+            <div style="padding:13px 20px;border-bottom:1px solid #f4f2ec;display:flex;gap:14px;align-items:center">
+              <span style="width:172px;flex:none;font:400 12.5px/1.4 'IBM Plex Sans',sans-serif">{{ c.label }}</span>
+              <span style="width:44px;flex:none;font:400 11px 'IBM Plex Mono',monospace;color:#8b8f86;text-align:right">{{ c.weight }}%</span>
+              <span style="flex:1;min-width:90px;height:8px;background:#eeece6;border-radius:2px;overflow:hidden;display:block"><span style="display:block;height:8px;width:{{ c.pct }}%;background:{{ c.color }}"></span></span>
+              <span style="width:46px;flex:none;font:500 12px 'IBM Plex Mono',monospace;text-align:right">{{ c.score }}</span>
+              <span style="width:58px;flex:none;font:500 12px 'IBM Plex Mono',monospace;color:#5b6058;text-align:right">{{ c.pts }} pts</span>
+              <span style="{{ c.matchStyle }}">{{ c.match }}</span>
+            </div>
+          </sc-for>
+          <div style="padding:13px 20px;display:flex;gap:14px;align-items:baseline;background:#faf9f6">
+            <span style="flex:1;font:600 12.5px 'IBM Plex Sans',sans-serif">Weighted suitability</span>
+            <span style="font:600 14px 'IBM Plex Mono',monospace">{{ detail.scoreLabel }}</span>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+          <div style="padding:14px 20px;border-bottom:1px solid #eeece6;font:600 12.5px 'IBM Plex Sans',sans-serif">Rule &amp; factor trace</div>
+          <div style="display:grid;grid-template-columns:96px 1.5fr 1fr 92px;gap:12px;padding:10px 20px;background:#faf9f6;border-bottom:1px solid #eeece6;font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">
+            <div>RULE ID</div><div>CONDITION</div><div>EVIDENCE FROM RECORD</div><div>RESULT</div>
+          </div>
+          <sc-for list="{{ detail.trace }}" as="t" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:96px 1.5fr 1fr 92px;gap:12px;padding:11px 20px;border-bottom:1px solid #f4f2ec;align-items:baseline">
+              <div style="font:400 11px 'IBM Plex Mono',monospace;color:#8b8f86">{{ t.id }}</div>
+              <div style="font:400 12.5px/1.5 'IBM Plex Sans',sans-serif">{{ t.cond }}</div>
+              <div style="font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#5b6058">{{ t.evidence }}</div>
+              <div><span style="{{ t.style }}">{{ t.result }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:392px;flex:none;display:flex;flex-direction:column;gap:16px">
+        <sc-for list="{{ detail.panels }}" as="pn" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+            <div style="padding:12px 18px;border-bottom:1px solid #eeece6;display:flex;gap:10px;align-items:baseline">
+              <span style="width:6px;height:6px;border-radius:50%;background:{{ pn.color }};flex:none;display:block"></span>
+              <span style="flex:1;font:600 12px 'IBM Plex Sans',sans-serif">{{ pn.title }}</span>
+              <span style="font:500 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ pn.count }}</span>
+            </div>
+            <sc-for list="{{ pn.rows }}" as="r" hint-placeholder-count="3">
+              <div style="padding:11px 18px;border-bottom:1px solid #f4f2ec">
+                <div style="font:500 12.5px/1.4 'IBM Plex Sans',sans-serif">{{ r.t }}</div>
+                <div style="margin-top:3px;font:400 11.5px/1.55 'IBM Plex Sans',sans-serif;color:#6b6f76">{{ r.d }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:16px 18px">
+          <div style="font:600 12px 'IBM Plex Sans',sans-serif">Reviewer action</div>
+          <div style="margin-top:9px;font:400 11.5px/1.6 'IBM Plex Sans',sans-serif;color:#6b6f76">{{ reviewerNote }}</div>
+          <div style="margin-top:13px;display:flex;flex-direction:column;gap:7px">
+            <button onClick="{{ primaryAction }}" style="border:1px solid #3f5c39;background:#4a6a44;color:#fff;border-radius:3px;padding:10px 14px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#3f5c39">{{ primaryActionLabel }}</button>
+            <button onClick="{{ noop }}" style="border:1px solid #d8d4ca;background:#fff;color:#4b5347;border-radius:3px;padding:10px 14px;font:500 12.5px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#f7f6f2">Return with observations</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="07 Comparison matrix">
+    <div style="font:400 13px/1.6 'IBM Plex Sans',sans-serif;color:#4b5347;margin-bottom:16px;max-width:820px">Candidate record read against each eligible position, parameter by parameter. Cell values are the parameter score before weighting; the shading indicates match strength.</div>
+    <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;overflow:auto">
+      <div style="{{ compareHeadStyle }}">
+        <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">PARAMETER</div>
+        <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">CANDIDATE EVIDENCE</div>
+        <sc-for list="{{ compareCols }}" as="c" hint-placeholder-count="4">
+          <div>
+            <div style="font:500 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ c.id }}</div>
+            <div style="margin-top:4px;font:600 12px/1.35 'IBM Plex Sans',sans-serif">{{ c.role }}</div>
+            <div style="margin-top:3px;font:400 11px/1.4 'IBM Plex Sans',sans-serif;color:#6b6f76">{{ c.station }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-for list="{{ compareRows }}" as="row" hint-placeholder-count="7">
+        <div style="{{ row.style }}">
+          <div>
+            <div style="font:500 12.5px/1.4 'IBM Plex Sans',sans-serif">{{ row.label }}</div>
+            <div style="margin-top:3px;font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">weight {{ row.weight }}%</div>
+          </div>
+          <div style="font:400 12px/1.55 'IBM Plex Sans',sans-serif;color:#5b6058">{{ row.evidence }}</div>
+          <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="4">
+            <div style="{{ cell.style }}">
+              <span style="font:600 13px 'IBM Plex Mono',monospace">{{ cell.score }}</span>
+              <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.06em;opacity:.72">{{ cell.match }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+      <div style="{{ compareFootStyle }}">
+        <div style="font:600 12.5px 'IBM Plex Sans',sans-serif">Weighted suitability</div>
+        <div></div>
+        <sc-for list="{{ compareTotals }}" as="t" hint-placeholder-count="4">
+          <div style="font:600 15px 'IBM Plex Mono',monospace;color:{{ t.color }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isScenario }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="08 What-if">
+    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      <div style="width:430px;flex:none;display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+          <div style="padding:14px 18px;border-bottom:1px solid #eeece6">
+            <div style="font:600 12.5px 'IBM Plex Sans',sans-serif">Change an input</div>
+            <div style="margin-top:4px;font:400 11.5px/1.55 'IBM Plex Sans',sans-serif;color:#6b6f76">Each switch alters the record or the vacancy, and the ranking on the right recalculates immediately.</div>
+          </div>
+          <sc-for list="{{ scenarioToggles }}" as="s" hint-placeholder-count="4">
+            <div onClick="{{ s.onClick }}" style="{{ s.rowStyle }}" style-hover="background:#f7f6f2">
+              <div style="flex:1">
+                <div style="font:500 12.5px/1.4 'IBM Plex Sans',sans-serif">{{ s.label }}</div>
+                <div style="margin-top:3px;font:400 11.5px/1.55 'IBM Plex Sans',sans-serif;color:#6b6f76">{{ s.desc }}</div>
+              </div>
+              <span style="{{ s.switchStyle }}"><span style="{{ s.knobStyle }}"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:16px 18px">
+          <div style="font:600 12.5px 'IBM Plex Sans',sans-serif">Effect on the recommendation set</div>
+          <sc-for list="{{ scenarioEffects }}" as="e" hint-placeholder-count="2">
+            <div style="margin-top:11px;padding-left:11px;border-left:2px solid {{ e.color }};font:400 12.5px/1.6 'IBM Plex Sans',sans-serif;color:#3a403a">{{ e.text }}</div>
+          </sc-for>
+          <button onClick="{{ resetScenario }}" style="margin-top:15px;border:1px solid #d8d4ca;background:#fff;color:#4b5347;border-radius:3px;padding:9px 14px;font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#f7f6f2">Reset to record as held</button>
+        </div>
+      </div>
+      <div style="flex:1;min-width:320px;background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+        <div style="padding:14px 20px;border-bottom:1px solid #eeece6;display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font:600 12.5px 'IBM Plex Sans',sans-serif">Recalculated ranking</span>
+          <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">baseline → current</span>
+        </div>
+        <sc-for list="{{ scenarioRanked }}" as="p" hint-placeholder-count="4">
+          <div style="padding:14px 20px;border-bottom:1px solid #f4f2ec;display:flex;gap:16px;align-items:center">
+            <span style="width:26px;flex:none;font:600 17px 'IBM Plex Mono',monospace;text-align:center">{{ p.rank }}</span>
+            <span style="{{ p.deltaStyle }}">{{ p.delta }}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font:500 13px/1.35 'IBM Plex Sans',sans-serif">{{ p.role }}</div>
+              <div style="margin-top:3px;font:400 11.5px 'IBM Plex Sans',sans-serif;color:#6b6f76">{{ p.unit }} · {{ p.station }}</div>
+            </div>
+            <span style="width:120px;flex:none;height:6px;background:#eeece6;border-radius:2px;overflow:hidden;display:block"><span style="display:block;height:6px;width:{{ p.pct }}%;background:{{ p.bandColor }}"></span></span>
+            <span style="width:96px;flex:none;text-align:right;font:600 14px 'IBM Plex Mono',monospace;color:{{ p.bandColor }}">{{ p.scoreLabel }}<span style="font:400 11px 'IBM Plex Mono',monospace;color:#8b8f86"> {{ p.diff }}</span></span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ scenarioExcludedShown }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ scenarioExcluded }}" as="x" hint-placeholder-count="2">
+            <div style="padding:12px 20px;border-bottom:1px solid #f4f2ec;display:flex;gap:14px;align-items:baseline;background:#fbfaf7">
+              <span style="width:26px;flex:none;text-align:center;font:500 12px 'IBM Plex Mono',monospace;color:#a8aca3">—</span>
+              <span style="flex:1;font:500 12.5px 'IBM Plex Sans',sans-serif;color:#8b8f86;text-decoration:line-through">{{ x.role }} — {{ x.station }}</span>
+              <span style="font:500 10.5px 'IBM Plex Mono',monospace;color:#8f3a32">{{ x.failLabel }}</span>
+            </div>
+          </sc-for>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isRules }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="09 Parameters and weights">
+    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:340px;background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+        <div style="padding:14px 20px;border-bottom:1px solid #eeece6;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px">
+          <span style="font:600 12.5px 'IBM Plex Sans',sans-serif">Suitability parameters</span>
+          <span style="{{ weightSumStyle }}">TOTAL {{ weightSum }}%</span>
+        </div>
+        <sc-for list="{{ weightRows }}" as="w" hint-placeholder-count="7">
+          <div style="padding:14px 20px;border-bottom:1px solid #f4f2ec">
+            <div style="display:flex;gap:14px;align-items:baseline">
+              <span style="flex:1;font:500 13px 'IBM Plex Sans',sans-serif">{{ w.label }}</span>
+              <span style="font:400 11px 'IBM Plex Mono',monospace;color:#8b8f86">{{ w.sub }}</span>
+              <span style="width:52px;text-align:right;font:600 13px 'IBM Plex Mono',monospace">{{ w.weight }}%</span>
+            </div>
+            <input type="range" min="0" max="40" step="1" value="{{ w.weight }}" onChange="{{ w.onInput }}" disabled="{{ w.disabled }}" style="width:100%;margin-top:10px;display:block">
+          </div>
+        </sc-for>
+        <div style="padding:14px 20px;display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <button onClick="{{ resetWeights }}" style="border:1px solid #d8d4ca;background:#fff;color:#4b5347;border-radius:3px;padding:9px 14px;font:500 12px 'IBM Plex Sans',sans-serif;cursor:pointer" style-hover="background:#f7f6f2">Restore approved baseline</button>
+          <span style="font:400 11.5px/1.5 'IBM Plex Mono',monospace;color:#8b8f86">{{ weightsHint }}</span>
+        </div>
+      </div>
+      <div style="width:430px;flex:none;display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+          <div style="padding:14px 18px;border-bottom:1px solid #eeece6;font:600 12.5px 'IBM Plex Sans',sans-serif">Mandatory rule set</div>
+          <sc-for list="{{ hardRuleLibrary }}" as="r" hint-placeholder-count="5">
+            <div style="padding:12px 18px;border-bottom:1px solid #f4f2ec;display:flex;gap:12px;align-items:baseline">
+              <span style="width:70px;flex:none;font:400 11px 'IBM Plex Mono',monospace;color:#8b8f86">{{ r.id }}</span>
+              <span style="flex:1;font:400 12.5px/1.5 'IBM Plex Sans',sans-serif">{{ r.text }}</span>
+              <span style="{{ r.style }}">{{ r.mode }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:16px 18px">
+          <div style="font:600 12.5px 'IBM Plex Sans',sans-serif">Live effect of current weights</div>
+          <sc-for list="{{ weightPreview }}" as="p" hint-placeholder-count="4">
+            <div style="margin-top:11px;display:flex;gap:12px;align-items:center">
+              <span style="flex:1;min-width:0;font:400 12.5px/1.4 'IBM Plex Sans',sans-serif">{{ p.role }}</span>
+              <span style="width:86px;flex:none;height:6px;background:#eeece6;border-radius:2px;overflow:hidden;display:block"><span style="display:block;height:6px;width:{{ p.pct }}%;background:{{ p.bandColor }}"></span></span>
+              <span style="width:78px;flex:none;text-align:right;font:600 12.5px 'IBM Plex Mono',monospace">{{ p.scoreLabel }}<span style="font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86"> {{ p.diff }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="10 Executive summary">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:14px">
+      <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+        <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;padding:18px 20px">
+          <div style="font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#8b8f86">{{ k.label }}</div>
+          <div style="margin-top:11px;font:600 30px/1 'IBM Plex Mono',monospace">{{ k.value }}</div>
+          <div style="margin-top:7px;font:400 11.5px/1.5 'IBM Plex Sans',sans-serif;color:#6b6f76">{{ k.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:340px;background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+        <div style="padding:14px 20px;border-bottom:1px solid #eeece6;font:600 12.5px 'IBM Plex Sans',sans-serif">Positions in this cycle</div>
+        <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 118px 92px;gap:14px;padding:10px 20px;background:#faf9f6;border-bottom:1px solid #eeece6;font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">
+          <div>ID</div><div>POSITION</div><div>STATION</div><div>STATUS</div><div>TOP SCORE</div>
+        </div>
+        <sc-for list="{{ cycleRows }}" as="r" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 118px 92px;gap:14px;padding:12px 20px;border-bottom:1px solid #f4f2ec;align-items:baseline">
+            <div style="font:500 11.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ r.id }}</div>
+            <div style="font:500 12.5px/1.4 'IBM Plex Sans',sans-serif">{{ r.role }}</div>
+            <div style="font:400 12px 'IBM Plex Sans',sans-serif;color:#5b6058">{{ r.station }}</div>
+            <div><span style="{{ r.statusStyle }}">{{ r.status }}</span></div>
+            <div style="font:600 12.5px 'IBM Plex Mono',monospace;color:{{ r.scoreColor }}">{{ r.score }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="width:392px;flex:none;background:#fff;border:1px solid #e0ddd6;border-radius:3px">
+        <div style="padding:14px 18px;border-bottom:1px solid #eeece6;font:600 12.5px 'IBM Plex Sans',sans-serif">Awaiting your action</div>
+        <sc-for list="{{ actionQueue }}" as="a" hint-placeholder-count="3">
+          <div style="padding:13px 18px;border-bottom:1px solid #f4f2ec">
+            <div style="display:flex;gap:12px;align-items:baseline">
+              <span style="flex:1;font:500 12.5px/1.4 'IBM Plex Sans',sans-serif">{{ a.title }}</span>
+              <span style="font:400 10.5px 'IBM Plex Mono',monospace;color:#8b8f86">{{ a.age }}</span>
+            </div>
+            <div style="margin-top:4px;font:400 11.5px/1.55 'IBM Plex Sans',sans-serif;color:#6b6f76">{{ a.detail }}</div>
+          </div>
+        </sc-for>
+        <div style="padding:14px 18px;font:400 11.5px/1.6 'IBM Plex Sans',sans-serif;color:#8b8f86">Every recommendation in this queue carries a full factor trace and is recorded in the decision log on approval.</div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isAudit }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="11 Decision log">
+    <div style="font:400 13px/1.6 'IBM Plex Sans',sans-serif;color:#4b5347;margin-bottom:16px;max-width:820px">Every screening run, weight change, recommendation and approval is written to an append-only log with the parameter set in force at that moment.</div>
+    <div style="background:#fff;border:1px solid #e0ddd6;border-radius:3px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:158px 168px 200px 1fr 118px;gap:14px;padding:11px 18px;background:#faf9f6;border-bottom:1px solid #e0ddd6;font:600 9.5px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#8b8f86">
+        <div>TIMESTAMP</div><div>ACTOR</div><div>ACTION</div><div>OBJECT</div><div>REFERENCE</div>
+      </div>
+      <sc-for list="{{ auditRows }}" as="a" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:158px 168px 200px 1fr 118px;gap:14px;padding:12px 18px;border-bottom:1px solid #f4f2ec;align-items:baseline">
+          <div style="font:400 11.5px 'IBM Plex Mono',monospace;color:#5b6058">{{ a.ts }}</div>
+          <div style="font:400 12px/1.45 'IBM Plex Sans',sans-serif">{{ a.actor }}</div>
+          <div style="font:500 12px 'IBM Plex Sans',sans-serif;color:{{ a.color }}">{{ a.action }}</div>
+          <div style="font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#5b6058">{{ a.object }}</div>
+          <div style="font:400 11px 'IBM Plex Mono',monospace;color:#8b8f86">{{ a.ref }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  </div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scoreDisplay&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;percentage&quot;,&quot;band&quot;],&quot;default&quot;:&quot;percentage&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Presentation&quot;},&quot;defaultRole&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Staff Officer&quot;,&quot;Approving Authority&quot;,&quot;Rules Administrator&quot;],&quot;default&quot;:&quot;Staff Officer&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+class Component extends DCLogic {
+  params = [
+    { key: 'qual', label: 'Qualification & Training', short: 'Qual/Trg', weight: 20, sub: 'quals · courses · validity' },
+    { key: 'exp', label: 'Relevant Experience', short: 'Experience', weight: 20, sub: 'duration · role · recency' },
+    { key: 'terrain', label: 'Terrain Exposure', short: 'Terrain', weight: 15, sub: 'type · duration · recency' },
+    { key: 'region', label: 'Regional Familiarity', short: 'Region', weight: 15, sub: 'previous service in region' },
+    { key: 'ops', label: 'Operational / Task Exposure', short: 'Ops/Task', weight: 15, sub: 'nature · relevance' },
+    { key: 'tenure', label: 'Tenure & Posting History', short: 'Tenure', weight: 10, sub: 'peace/field cycle' },
+    { key: 'need', label: 'Organizational Need', short: 'Org need', weight: 5, sub: 'vacancy · priority' }
+  ];
+
+  postings = [
+    { id: 'P-114', role: 'SO-1 (Communications)', unit: 'HQ 15 Corps', station: 'Srinagar', command: 'Northern Command', priority: 'Priority 1', terrainClass: 'HA',
+      tags: ['High Altitude', 'Field tenure', 'Tele Engg mandatory'],
+      sub: { qual: 92, exp: 90, terrain: 95, region: 94, ops: 88, tenure: 80, need: 90 },
+      hard: [ {id:'HR-01', label:'Rank Lt Col', cond:'Substantive rank Lt Col or equivalent', ev:'Lt Col (TS), 19 yrs 4 mths', pass:true},
+              {id:'HR-04', label:'Tele Engg Course', cond:'Tele Engineering Course held and valid', ev:'Tele Engg Course, MCTE 2013 — Grade A', pass:true, dep:'tele'},
+              {id:'HR-07', label:'SHAPE-1', cond:'Medical category SHAPE-1 for high altitude', ev:'SHAPE-1, reviewed Jan 2026', pass:true},
+              {id:'HR-11', label:'HA exposure', cond:'Prior high-altitude service of 1 yr or more', ev:'3 yrs 1 mth (15 Corps, 2018-21)', pass:true} ],
+      reason: 'Holds the mandatory Tele Engineering qualification and returns to a formation he has already served in. Three years of high-altitude service and two years of counter-insurgency exposure in the same sector align closely with the appointment; only the peace-field cycle counts marginally against.',
+      strong: [ ['Tele Engg Course, Grade A (2013)','Mandatory qualification; graded in the top band'], ['High-altitude service 3 yrs 1 mth','Requirement is 1 yr; last exposure 2021'], ['Northern Command 5 yrs 2 mths','Includes 3 yrs in this formation'] ],
+      partial: [ ['Electronic warfare task exposure','Relevant but the appointment is communications-led'], ['Instructional tenure 1 yr 10 mths','Not a requirement for this post'] ],
+      gaps: [ ['Cyber Security Course not held','Preferred, not mandatory for this appointment'] ],
+      constraints: [ ['Peace tenure completes Mar 2027','Move date must follow the approved cycle'], ['Priority 1 vacancy','Formation has flagged the post as critical'] ] },
+    { id: 'P-131', role: 'Commanding Officer', unit: '42 Signal Regiment', station: 'Tezpur', command: 'Eastern Command', priority: 'Priority 1', terrainClass: 'MTN',
+      tags: ['Mountain', 'Command appointment', 'Sr Cmd Course mandatory'],
+      sub: { qual: 88, exp: 86, terrain: 72, region: 66, ops: 82, tenure: 92, need: 95 },
+      hard: [ {id:'HR-01', label:'Rank Lt Col', cond:'Substantive rank Lt Col for command', ev:'Lt Col (TS), 19 yrs 4 mths', pass:true},
+              {id:'HR-02', label:'Sr Command Course', cond:'Senior Command Course held', ev:'Senior Command Course, AWC 2024 — Grade B', pass:true},
+              {id:'HR-07', label:'SHAPE-1', cond:'Medical category SHAPE-1', ev:'SHAPE-1, reviewed Jan 2026', pass:true},
+              {id:'HR-09', label:'Command eligibility', cond:'Not previously held unit command', ev:'No prior unit command on record', pass:true} ],
+      reason: 'Command appointment for which the candidate is due and qualified. Prior service as Adjutant in the same regiment and four years of mountain terrain exposure support the move; regional familiarity is dated and vacancy priority is the strongest single factor.',
+      strong: [ ['Senior Command Course (2024)','Mandatory for command; completed most recently'], ['Due for command tenure','Peace tenure completes within the cycle'], ['Adjutant, 27 Signal Regiment','Regimental staff experience in the same terrain'] ],
+      partial: [ ['Mountain service 4 yrs','Last exposure 2018 — recency reduces the score'], ['Eastern Command 2 yrs','Familiarity is limited relative to Northern'] ],
+      gaps: [ ['No recent service in the region','Nine years since last Eastern Command tenure'] ],
+      constraints: [ ['Command vacancy dated Jul 2027','Fixed by the unit handing-over date'] ] },
+    { id: 'P-207', role: 'Instructor Class A (Comn)', unit: 'Military College of Telecom Engg', station: 'Mhow', command: 'ARTRAC', priority: 'Priority 2', terrainClass: 'PL',
+      tags: ['Plains', 'Instructional grading', 'Tele Engg mandatory'],
+      sub: { qual: 95, exp: 84, terrain: 40, region: 55, ops: 60, tenure: 70, need: 72 },
+      hard: [ {id:'HR-01', label:'Rank Lt Col', cond:'Rank Lt Col or equivalent', ev:'Lt Col (TS), 19 yrs 4 mths', pass:true},
+              {id:'HR-04', label:'Tele Engg Course', cond:'Tele Engineering Course held and valid', ev:'Tele Engg Course, MCTE 2013 — Grade A', pass:true, dep:'tele'},
+              {id:'HR-05', label:'Instructional grading', cond:'Prior instructional tenure with grading', ev:'Instructor Class B, MCTE 2015-17', pass:true} ],
+      reason: 'Strongest academic and training profile of the set — M.Tech in communication systems plus a distinguished Tele Engg grading and a prior instructional tenure at the same institution. Terrain and operational factors carry little weight for an instructional post, which is why the total sits below the field appointments.',
+      strong: [ ['M.Tech Communication Systems','Directly relevant to the syllabus held'], ['Tele Engg Course Grade A','Highest graded course on the record'], ['Instructor Class B at MCTE','Prior tenure at the same institution'] ],
+      partial: [ ['Electronic Warfare Course (2019)','Adjacent to part of the syllabus'] ],
+      gaps: [ ['No recent field or terrain exposure required','Parameter scores low but is of low relevance here'] ],
+      constraints: [ ['Second instructional tenure','Subject to the approved instructional-tenure rule'] ] },
+    { id: 'P-088', role: 'GSO-1 (Ops & Plans)', unit: 'HQ Southern Command', station: 'Pune', command: 'Southern Command', priority: 'Priority 2', terrainClass: 'PL',
+      tags: ['Plains', 'Staff appointment', 'JC Course mandatory'],
+      sub: { qual: 70, exp: 74, terrain: 45, region: 78, ops: 70, tenure: 60, need: 65 },
+      hard: [ {id:'HR-01', label:'Rank Lt Col', cond:'Rank Lt Col or equivalent', ev:'Lt Col (TS), 19 yrs 4 mths', pass:true},
+              {id:'HR-03', label:'JC Course', cond:'Junior Command Course held', ev:'Junior Command Course, Mhow 2016 — B+', pass:true},
+              {id:'HR-07', label:'SHAPE-1', cond:'Medical category SHAPE-1', ev:'SHAPE-1, reviewed Jan 2026', pass:true} ],
+      reason: 'All mandatory conditions are met and six years of prior Southern Command service give good regional familiarity, but the appointment calls for general operations and plans staff experience rather than the communications and electronic warfare stream the record shows.',
+      strong: [ ['Southern Command 6 yrs 1 mth','Longest regional tenure on the record'] ],
+      partial: [ ['Communication staff appointments','Staff experience is relevant but not ops-and-plans'], ['CI operations 2 yrs 1 mth','Operational exposure applicable to plans work'] ],
+      gaps: [ ['No ops and plans staff tenure','Preferred experience not evidenced'], ['Second consecutive peace station','Counts against the posting cycle'] ],
+      constraints: [ ['Peace-to-peace move','Permitted but ranked lower by the tenure rule'] ] },
+    { id: 'P-155', role: 'SO-1 (Cyber Operations)', unit: 'Army Cyber Group', station: 'New Delhi', command: 'Integrated HQ', priority: 'Priority 1', terrainClass: 'PL',
+      tags: ['Plains', 'Cyber Security Course mandatory'],
+      sub: { qual: 84, exp: 80, terrain: 42, region: 70, ops: 78, tenure: 62, need: 92 },
+      hard: [ {id:'HR-01', label:'Rank Lt Col', cond:'Rank Lt Col or equivalent', ev:'Lt Col (TS), 19 yrs 4 mths', pass:true},
+              {id:'HR-06', label:'Cyber Security Course', cond:'Cyber Security Course held and valid', ev:'Not held on record', pass:false, dep:'cyber'},
+              {id:'HR-07', label:'SHAPE-1', cond:'Medical category SHAPE-1', ev:'SHAPE-1, reviewed Jan 2026', pass:true} ],
+      reason: 'Technical profile and electronic warfare exposure fit the appointment well, and organizational need is high. The mandatory Cyber Security Course is not held, so the option is gated out before scoring.',
+      strong: [ ['M.Tech Communication Systems','Technical base relevant to the role'], ['Electronic Warfare Course (2019)','Closest adjacent qualification held'] ],
+      partial: [ ['EW task force 3 yrs','Operationally adjacent to cyber tasks'] ],
+      gaps: [ ['Cyber Security Course not held','Mandatory condition — gates the option out'] ],
+      constraints: [ ['Course available Oct 2026','Eligibility can be reconsidered after completion'] ] },
+    { id: 'P-176', role: 'SO-1 (Electronic Warfare)', unit: 'HQ 33 Armoured Div', station: 'Suratgarh', command: 'South Western Command', priority: 'Priority 3', terrainClass: 'DES',
+      tags: ['Desert', 'Desert exposure mandatory'],
+      sub: { qual: 86, exp: 82, terrain: 30, region: 48, ops: 80, tenure: 74, need: 60 },
+      hard: [ {id:'HR-01', label:'Rank Lt Col', cond:'Rank Lt Col or equivalent', ev:'Lt Col (TS), 19 yrs 4 mths', pass:true},
+              {id:'HR-08', label:'EW Course', cond:'Electronic Warfare Course held', ev:'EW Course, MCTE 2019 — Grade A', pass:true},
+              {id:'HR-12', label:'Desert exposure', cond:'Prior desert-sector service of 1 yr or more', ev:'Nil desert service on record', pass:false} ],
+      reason: 'Electronic warfare qualification and task experience match the appointment, but the mandatory desert-sector exposure condition is not satisfied on the record.',
+      strong: [ ['EW Course Grade A (2019)','Mandatory qualification for the post'], ['EW task force 3 yrs','Directly relevant task experience'] ],
+      partial: [ ['Armoured formation exposure','No prior tenure with armoured formations'] ],
+      gaps: [ ['Nil desert terrain service','Mandatory condition not met'] ],
+      constraints: [ ['Priority 3 vacancy','Lower organizational priority this cycle'] ] }
+  ];
+
+  cand = {
+    svcNo: 'IC-58421Y', name: 'Lt Col A. R. Raghavan', shortName: 'Lt Col Raghavan',
+    arm: 'Corps of Signals', seniority: '19 yrs 4 mths service', medical: 'SHAPE-1',
+    tenure: '2 yrs 8 mths (peace)', due: 'Mar 2027',
+    present: 'GSO-2 (Communications), HQ 21 Sub Area, Bareilly'
+  };
+
+  state = {
+    screen: 'results', role: null, layout: 'list', gate: 'hide',
+    selPosting: 'P-114', detail: 'P-114',
+    weights: { qual: 20, exp: 20, terrain: 15, region: 15, ops: 15, tenure: 10, need: 5 },
+    scenario: { cyber: false, tele: true, staleHA: false, surge: false }
+  };
+
+  baseWeights = { qual: 20, exp: 20, terrain: 15, region: 15, ops: 15, tenure: 10, need: 5 };
+  baseScenario = { cyber: false, tele: true, staleHA: false, surge: false };
+
+  screens = {
+    search: ['Prepare · step 01', 'Candidate pool'],
+    profile: ['Prepare · step 01', 'Service record'],
+    postings: ['Prepare · step 02', 'Position library & requirement profile'],
+    eligibility: ['Assess · step 03', 'Eligibility screening'],
+    results: ['Assess · steps 04–07', 'Recommended postings'],
+    explain: ['Assess · step 08', 'Recommendation detail'],
+    compare: ['Assess · step 08', 'Candidate ↔ position comparison'],
+    scenario: ['Assess · step 09', 'What-if recalculation'],
+    rules: ['Govern', 'Parameters, weights & rules'],
+    dashboard: ['Govern', 'Executive summary'],
+    audit: ['Govern', 'Decision log']
+  };
+
+  roles = {
+    'Staff Officer': { user: ['Maj S. Iyer', 'MS Branch · Posting Cell'], initials: 'SI',
+      note: 'Full workflow access. May load records, run screening, adjust what-if inputs and submit a recommendation for approval. Parameters and mandatory rules are read-only.',
+      nav: ['search','profile','postings','eligibility','results','explain','compare','scenario','rules','dashboard','audit'],
+      action: 'Submit top 4 for approval', reviewer: 'Submitting forwards the ranked set with its full factor trace to the approving authority. Nothing is posted automatically.' },
+    'Approving Authority': { user: ['Col V. Menon', 'HQ · Approving Authority'], initials: 'VM',
+      note: 'Review and decision access. May approve, return or record a different selection with reasons. Cannot alter records, parameters or weights.',
+      nav: ['profile','eligibility','results','explain','compare','dashboard','audit'],
+      action: 'Approve recommendation', reviewer: 'Approval records your decision, the ranked set and the parameter version in force against your identity in the decision log.' },
+    'Rules Administrator': { user: ['Lt Col R. Sahni', 'Systems · Rules Custodian'], initials: 'RS',
+      note: 'Configuration access. May maintain parameters, weights, mandatory rules and position requirement profiles. Cannot submit or approve recommendations.',
+      nav: ['postings','rules','dashboard','audit'],
+      action: 'Publish parameter version', reviewer: 'Publishing creates a new parameter version. Recommendations already submitted retain the version they were scored under.' }
+  };
+
+  band(v) {
+    if (v >= 85) return ['HIGH', '#4a6a44'];
+    if (v >= 70) return ['MODERATE', '#8a6318'];
+    return ['LOW', '#6b6f76'];
+  }
+  matchOf(v) { return v >= 85 ? ['Strong', '#4a6a44'] : v >= 65 ? ['Partial', '#8a6318'] : ['Gap', '#8f3a32']; }
+
+  effSub(p, sc) {
+    const s = Object.assign({}, p.sub);
+    if (sc.staleHA && p.terrainClass === 'HA') s.terrain = Math.max(35, s.terrain - 24);
+    if (sc.surge && p.id === 'P-131') s.need = 100;
+    return s;
+  }
+  passes(p, sc) {
+    return p.hard.filter(function (h) {
+      if (h.dep === 'cyber') return !sc.cyber;
+      if (h.dep === 'tele') return !sc.tele;
+      return !h.pass;
+    });
+  }
+  compute(weights, sc) {
+    const self = this;
+    const total = this.params.reduce(function (a, p) { return a + (weights[p.key] || 0); }, 0) || 1;
+    const rows = this.postings.map(function (p) {
+      const s = self.effSub(p, sc);
+      const score = Math.round(self.params.reduce(function (a, prm) { return a + (weights[prm.key] || 0) * s[prm.key]; }, 0) / total);
+      return { p: p, sub: s, score: score, fails: self.passes(p, sc) };
+    });
+    const eligible = rows.filter(function (r) { return r.fails.length === 0; }).sort(function (a, b) { return b.score - a.score; });
+    eligible.forEach(function (r, i) { r.rank = i + 1; });
+    return { eligible: eligible, excluded: rows.filter(function (r) { return r.fails.length > 0; }), all: rows };
+  }
+
+  scoreText(v) {
+    const mode = this.props.scoreDisplay || 'percentage';
+    if (mode === 'band') return this.band(v)[0].charAt(0) + this.band(v)[0].slice(1).toLowerCase();
+    return v + '%';
+  }
+
+  go = (s) => () => this.setState({ screen: s });
+  setRole = (r) => () => {
+    const nav = this.roles[r].nav;
+    this.setState((st) => ({ role: r, screen: nav.indexOf(st.screen) >= 0 ? st.screen : nav[nav.indexOf('results') >= 0 ? nav.indexOf('results') : 0] }));
+  };
+
+  renderVals() {
+    const self = this;
+    const st = Object.assign({}, this.state);
+    if (!st.role) st.role = this.props.defaultRole || 'Staff Officer';
+    const role = this.roles[st.role] || this.roles['Staff Officer'];
+    if (role.nav.indexOf(st.screen) < 0) st.screen = role.nav[0];
+    const scr = this.screens[st.screen] || this.screens.results;
+    const res = this.compute(st.weights, st.scenario);
+    const baseRes = this.compute(this.baseWeights, this.baseScenario);
+    const baseRank = {}; baseRes.eligible.forEach(function (r) { baseRank[r.p.id] = r.rank; });
+    const baseScore = {}; baseRes.all.forEach(function (r) { baseScore[r.p.id] = r.score; });
+
+    const navLabels = { search: 'Candidate pool', profile: 'Service record', postings: 'Position library', eligibility: 'Eligibility screening', results: 'Recommendations', explain: 'Recommendation detail', compare: 'Comparison matrix', scenario: 'What-if', rules: 'Parameters & weights', dashboard: 'Executive summary', audit: 'Decision log' };
+    const groupOf = { search: 'Prepare', profile: 'Prepare', postings: 'Prepare', eligibility: 'Assess', results: 'Assess', explain: 'Assess', compare: 'Assess', scenario: 'Assess', rules: 'Govern', dashboard: 'Govern', audit: 'Govern' };
+    const counts = { results: res.eligible.length, eligibility: res.eligible.length + '/6', postings: 6, search: 128 };
+    const navGroups = ['Prepare', 'Assess', 'Govern'].map(function (g) {
+      return { label: g, items: role.nav.filter(function (k) { return groupOf[k] === g; }).map(function (k) {
+        const on = st.screen === k;
+        return { label: navLabels[k], count: counts[k] ? String(counts[k]) : '', onClick: self.go(k),
+          style: 'width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px;border:0;border-radius:3px;cursor:pointer;font:' + (on ? '600' : '400') + ' 12.5px "IBM Plex Sans",sans-serif;background:' + (on ? '#4a6a44' : 'transparent') + ';color:' + (on ? '#fff' : '#d6d2c8') + ';text-align:left;margin-bottom:2px' };
+      }) };
+    }).filter(function (g) { return g.items.length; });
+
+    const tab = (on) => 'border:0;border-radius:2px;padding:6px 11px;cursor:pointer;font:' + (on ? '600' : '400') + ' 11.5px "IBM Plex Sans",sans-serif;background:' + (on ? '#fff' : 'transparent') + ';color:' + (on ? '#22262b' : '#7d8278') + ';box-shadow:' + (on ? '0 1px 2px rgba(0,0,0,.08)' : 'none');
+
+    const chipS = (c, bg, bd) => 'font:500 10.5px "IBM Plex Mono",monospace;letter-spacing:.04em;color:' + c + ';background:' + bg + ';border:1px solid ' + bd + ';border-radius:2px;padding:4px 7px';
+    const strongChip = chipS('#3f5c39', '#eef2ea', '#dbe3d6');
+    const partialChip = chipS('#7a5715', '#f8f2e6', '#eae0cb');
+    const gapChip = chipS('#8f3a32', '#faf0ee', '#ecd9d5');
+
+    const mini = (r) => self.params.slice(0, 5).map(function (prm) {
+      const v = r.sub[prm.key]; const m = self.matchOf(v);
+      return { label: prm.short, pct: v, color: m[1] };
+    });
+
+    const ranked = res.eligible.slice(0, 4).map(function (r) {
+      const b = self.band(r.score); const prev = baseRank[r.p.id];
+      const delta = prev == null ? 'NEW' : prev === r.rank ? 'no change' : (prev > r.rank ? '▲ ' : '▼ ') + Math.abs(prev - r.rank);
+      const top = self.params.slice().sort(function (a, b2) { return (st.weights[b2.key] * r.sub[b2.key]) - (st.weights[a.key] * r.sub[a.key]); }).slice(0, 3);
+      return { id: r.p.id, role: r.p.role, unit: r.p.unit, station: r.p.station, command: r.p.command, rank: r.rank,
+        scoreLabel: self.scoreText(r.score), band: b[0], bandColor: b[1], delta: delta, reason: r.p.reason,
+        mini: mini(r), onOpen: function () { self.setState({ detail: r.p.id, screen: 'explain' }); },
+        chips: top.map(function (prm) { const m = self.matchOf(r.sub[prm.key]); return { label: prm.short + ' ' + r.sub[prm.key], style: m[0] === 'Strong' ? strongChip : m[0] === 'Partial' ? partialChip : gapChip }; }) };
+    });
+
+    const excluded = res.excluded.map(function (r) {
+      return { id: r.p.id, role: r.p.role, unit: r.p.unit, station: r.p.station,
+        wouldBe: 'would score ' + self.scoreText(r.score), failLabel: r.fails[0].label + ' not met' };
+    });
+
+    const detailRow = res.eligible.concat(res.excluded).find(function (r) { return r.p.id === st.detail; }) || res.eligible[0];
+    const dB = this.band(detailRow.score);
+    const wTotal = this.params.reduce(function (a, p) { return a + st.weights[p.key]; }, 0) || 1;
+    const panel = (title, color, rows) => ({ title: title, color: color, count: String(rows.length), rows: rows.map(function (x) { return { t: x[0], d: x[1] }; }) });
+    const detail = {
+      id: detailRow.p.id, role: detailRow.p.role, unit: detailRow.p.unit, station: detailRow.p.station, command: detailRow.p.command,
+      rank: detailRow.rank || '—', scoreLabel: this.scoreText(detailRow.score), band: dB[0], bandColor: dB[1], reason: detailRow.p.reason,
+      contributions: this.params.map(function (prm) {
+        const v = detailRow.sub[prm.key]; const m = self.matchOf(v);
+        return { label: prm.label, weight: st.weights[prm.key], score: v, pct: v,
+          pts: (st.weights[prm.key] * v / wTotal).toFixed(1), color: m[1], match: m[0],
+          matchStyle: 'width:56px;flex:none;text-align:right;font:500 10.5px "IBM Plex Mono",monospace;color:' + m[1] };
+      }),
+      trace: detailRow.p.hard.map(function (h) {
+        const failed = detailRow.fails.some(function (f) { return f.id === h.id; });
+        return { id: h.id, cond: h.cond, evidence: failed && h.dep === 'tele' ? 'Course record marked lapsed (what-if)' : failed && h.dep === 'cyber' ? h.ev : h.ev,
+          result: failed ? 'FAIL' : 'PASS',
+          style: 'font:600 10px "IBM Plex Mono",monospace;letter-spacing:.08em;padding:4px 7px;border-radius:2px;' + (failed ? 'color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5' : 'color:#3f5c39;background:#eef2ea;border:1px solid #dbe3d6') };
+      }),
+      panels: [ panel('Strong matches', '#4a6a44', detailRow.p.strong), panel('Partial matches', '#8a6318', detailRow.p.partial),
+                panel('Gaps', '#8f3a32', detailRow.p.gaps), panel('Constraints & review points', '#6b6f76', detailRow.p.constraints) ]
+    };
+
+    const cols = res.eligible.slice(0, 4);
+    const grid = 'display:grid;grid-template-columns:206px 232px repeat(' + Math.max(cols.length, 1) + ',minmax(122px,1fr));gap:12px;';
+    const evidence = { qual: 'M.Tech Comn Systems; Tele Engg (A), EW (A), Sr Cmd (B)', exp: 'Comn staff 11 yrs 2 mths; sub-unit cmd 4 yrs 6 mths', terrain: 'High Altitude 3 yrs 1 mth (2021); Mountain 4 yrs (2018)', region: 'Northern 5 yrs 2 mths; Southern 6 yrs 1 mth; Eastern 2 yrs', ops: 'CI ops 2 yrs 1 mth; EW task force 3 yrs', tenure: '2 yrs 8 mths peace tenure; due Mar 2027', need: 'Assessed per vacancy priority in this cycle' };
+
+    const scenRanked = res.eligible.map(function (r) {
+      const b = self.band(r.score); const prev = baseRank[r.p.id];
+      const diffV = r.score - (baseScore[r.p.id] || r.score);
+      const delta = prev == null ? 'NEW' : prev === r.rank ? '—' : (prev > r.rank ? '▲' + (prev - r.rank) : '▼' + (r.rank - prev));
+      return { rank: r.rank, role: r.p.role, unit: r.p.unit, station: r.p.station, pct: r.score, scoreLabel: self.scoreText(r.score),
+        bandColor: b[1], delta: delta, diff: diffV === 0 ? '' : (diffV > 0 ? '+' + diffV : String(diffV)),
+        deltaStyle: 'width:44px;flex:none;text-align:center;font:600 11px "IBM Plex Mono",monospace;color:' + (delta === '—' ? '#a8aca3' : delta.indexOf('▲') === 0 || delta === 'NEW' ? '#4a6a44' : '#8f3a32') };
+    });
+
+    const sc = st.scenario;
+    const effects = [];
+    if (sc.cyber) effects.push({ color: '#4a6a44', text: 'P-155 SO-1 (Cyber Operations) clears the mandatory rule HR-06 and enters the ranking — organizational need for that post is high.' });
+    if (!sc.tele) effects.push({ color: '#8f3a32', text: 'P-114 and P-207 both carry Tele Engg as a mandatory condition and are gated out. The recommendation set falls to two field options.' });
+    if (sc.staleHA) effects.push({ color: '#8a6318', text: 'High-altitude exposure now sits outside the 5-year recency window; the terrain parameter for P-114 drops and its lead narrows.' });
+    if (sc.surge) effects.push({ color: '#4a6a44', text: 'Raising vacancy priority for 42 Signal Regiment lifts organizational need to 100 — visible but small at the 5% weight now in force.' });
+    if (!effects.length) effects.push({ color: '#d8d4ca', text: 'No changes applied. The ranking shown is the baseline computed from the record as held.' });
+
+    const swOn = (on) => 'width:38px;height:21px;flex:none;border-radius:11px;display:block;position:relative;background:' + (on ? '#4a6a44' : '#dcd8ce') + ';transition:background .15s';
+    const knob = (on) => 'position:absolute;top:3px;left:' + (on ? '20px' : '3px') + ';width:15px;height:15px;border-radius:50%;background:#fff;display:block;transition:left .15s';
+    const toggleDefs = [
+      ['cyber', 'Candidate completes Cyber Security Course', 'Scenario 2 in reverse — a mandatory gap is closed and a gated option returns.', false],
+      ['tele', 'Tele Engineering Course marked lapsed', 'Scenario 2 — a mandatory qualification falls out of validity.', true],
+      ['staleHA', 'High-altitude exposure ages past 5 years', 'Scenario 1 — recency reduces the terrain parameter.', false],
+      ['surge', 'Vacancy priority raised for 42 Signal Regiment', 'Scenario 4 — the position requirement changes, not the record.', false]
+    ];
+    const scenarioToggles = toggleDefs.map(function (d) {
+      const on = d[3] ? !st.scenario[d[0]] : st.scenario[d[0]];
+      return { label: d[1], desc: d[2], onClick: function () { self.setState(function (s) { const n = Object.assign({}, s.scenario); n[d[0]] = !n[d[0]]; return { scenario: n }; }); },
+        rowStyle: 'padding:13px 18px;border-bottom:1px solid #f4f2ec;display:flex;gap:14px;align-items:center;cursor:pointer',
+        switchStyle: swOn(on), knobStyle: knob(on) };
+    });
+
+    const canEditRules = st.role === 'Rules Administrator';
+    const weightRows = this.params.map(function (prm) {
+      return { label: prm.label, sub: prm.sub, weight: st.weights[prm.key], disabled: !canEditRules,
+        onInput: function (e) { const v = parseInt(e.target.value, 10); self.setState(function (s) { const w = Object.assign({}, s.weights); w[prm.key] = v; return { weights: w }; }); } };
+    });
+    const hardRuleLibrary = [
+      { id: 'HR-01', text: 'Rank / designation must match the post', mode: 'GATE' },
+      { id: 'HR-02', text: 'Senior Command Course mandatory for command appointments', mode: 'GATE' },
+      { id: 'HR-04', text: 'Tele Engineering Course mandatory for designated technical posts', mode: 'GATE' },
+      { id: 'HR-06', text: 'Cyber Security Course mandatory for cyber appointments', mode: 'GATE' },
+      { id: 'HR-07', text: 'Medical category SHAPE-1 for high altitude and field posts', mode: 'GATE' },
+      { id: 'HR-11', text: 'Minimum prior terrain exposure where the post specifies it', mode: 'GATE' },
+      { id: 'SR-03', text: 'Consecutive peace tenure reduces the tenure parameter', mode: 'SOFT' },
+      { id: 'SR-05', text: 'Terrain exposure older than 5 years is discounted', mode: 'SOFT' }
+    ].map(function (r) {
+      return Object.assign({}, r, { style: 'font:600 9.5px "IBM Plex Mono",monospace;letter-spacing:.08em;padding:4px 7px;border-radius:2px;' + (r.mode === 'GATE' ? 'color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5' : 'color:#7a5715;background:#f8f2e6;border:1px solid #eae0cb') });
+    });
+
+    const selP = this.postings.find(function (p) { return p.id === st.selPosting; }) || this.postings[0];
+    const reqKind = (k) => 'font:600 9.5px "IBM Plex Mono",monospace;letter-spacing:.08em;flex:none;padding:4px 7px;border-radius:2px;' + (k === 'MANDATORY' ? 'color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5' : 'color:#5b6058;background:#f2f0ea;border:1px solid #e4e1d9');
+    const reqData = {
+      'P-114': [['Position','SO-1 (Communications), Lt Col','MANDATORY'],['Location','Srinagar · Northern Command','MANDATORY'],['Qualification','Engineering degree in electronics or communication','PREFERRED'],['Training','Tele Engineering Course, held and valid','MANDATORY'],['Experience','8 yrs or more on communication staff appointments','MANDATORY'],['Terrain','High altitude, 1 yr or more','MANDATORY'],['Regional','Prior Northern Command service','PREFERRED'],['Operational','Counter-insurgency staff exposure','PREFERRED'],['Medical','SHAPE-1','MANDATORY'],['Tenure','Field tenure due as per cycle','MANDATORY'],['Org need','Priority 1 · vacancy from Apr 2027','—']],
+      'P-131': [['Position','Commanding Officer, Lt Col','MANDATORY'],['Location','Tezpur · Eastern Command','MANDATORY'],['Training','Senior Command Course','MANDATORY'],['Experience','Sub-unit command tenure','MANDATORY'],['Terrain','Mountain exposure','PREFERRED'],['Regional','Prior Eastern Command service','PREFERRED'],['Medical','SHAPE-1','MANDATORY'],['Tenure','Due for command tenure','MANDATORY'],['Org need','Priority 1 · handover Jul 2027','—']],
+      'P-207': [['Position','Instructor Class A (Comn), Lt Col','MANDATORY'],['Location','Mhow · ARTRAC','MANDATORY'],['Qualification','Post-graduate qualification in communication systems','PREFERRED'],['Training','Tele Engineering Course','MANDATORY'],['Experience','Prior instructional tenure with grading','MANDATORY'],['Medical','SHAPE-2 or better','MANDATORY'],['Org need','Priority 2 · vacancy from Jun 2027','—']],
+      'P-088': [['Position','GSO-1 (Ops & Plans), Lt Col','MANDATORY'],['Location','Pune · Southern Command','MANDATORY'],['Training','Junior Command Course','MANDATORY'],['Experience','Ops and plans staff tenure','PREFERRED'],['Regional','Prior Southern Command service','PREFERRED'],['Medical','SHAPE-1','MANDATORY'],['Org need','Priority 2 · vacancy from Sep 2027','—']],
+      'P-155': [['Position','SO-1 (Cyber Operations), Lt Col','MANDATORY'],['Location','New Delhi · Integrated HQ','MANDATORY'],['Training','Cyber Security Course, held and valid','MANDATORY'],['Qualification','Technical degree in computing or communication','PREFERRED'],['Experience','Electronic warfare or cyber task exposure','PREFERRED'],['Medical','SHAPE-1','MANDATORY'],['Org need','Priority 1 · vacancy from Apr 2027','—']],
+      'P-176': [['Position','SO-1 (Electronic Warfare), Lt Col','MANDATORY'],['Location','Suratgarh · South Western Command','MANDATORY'],['Training','Electronic Warfare Course','MANDATORY'],['Terrain','Desert sector service, 1 yr or more','MANDATORY'],['Experience','EW task force tenure','PREFERRED'],['Medical','SHAPE-1','MANDATORY'],['Org need','Priority 3 · vacancy from Aug 2027','—']]
+    };
+
+    const tagStyle = (kind) => kind === 'Not held' ? gapChip : chipS('#3f5c39', '#eef2ea', '#dbe3d6');
+
+    return {
+      navGroups: navGroups,
+      screenKicker: scr[0], screenTitle: scr[1],
+      roleTabs: Object.keys(this.roles).map(function (r) { return { label: r, onClick: self.setRole(r), style: tab(st.role === r) }; }),
+      roleNote: role.note, userName: role.user[0], userUnit: role.user[1], userInitials: role.initials,
+      isSearch: st.screen === 'search', isProfile: st.screen === 'profile', isPostings: st.screen === 'postings',
+      isEligibility: st.screen === 'eligibility', isResults: st.screen === 'results', isExplain: st.screen === 'explain',
+      isCompare: st.screen === 'compare', isScenario: st.screen === 'scenario', isRules: st.screen === 'rules',
+      isDashboard: st.screen === 'dashboard', isAudit: st.screen === 'audit',
+
+      cand: Object.assign({}, this.cand, {
+        blocksLeft: [
+          { title: 'Courses & training', note: '5 records', rows: [
+            { t: 'Tele Engineering Course · MCTE Mhow', d: '2013 · Grade A', tag: st.scenario.tele ? 'Valid' : 'Lapsed', tagStyle: st.scenario.tele ? tagStyle('v') : gapChip },
+            { t: 'Junior Command Course · Mhow', d: '2016 · Grade B+', tag: 'Valid', tagStyle: tagStyle('v') },
+            { t: 'Electronic Warfare Course · MCTE Mhow', d: '2019 · Grade A', tag: 'Valid', tagStyle: tagStyle('v') },
+            { t: 'Senior Command Course · AWC Mhow', d: '2024 · Grade B', tag: 'Valid', tagStyle: tagStyle('v') },
+            { t: 'Cyber Security Course', d: '—', tag: st.scenario.cyber ? 'Valid' : 'Not held', tagStyle: st.scenario.cyber ? tagStyle('v') : tagStyle('Not held') }
+          ] },
+          { title: 'Qualifications', note: '2 records', rows: [
+            { t: 'B.E. Electronics & Communication', d: '2006 · First class', tag: '', tagStyle: '' },
+            { t: 'M.Tech Communication Systems', d: '2014 · Army-sponsored', tag: '', tagStyle: '' }
+          ] },
+          { title: 'Posting history', note: '4 of 9 shown', rows: [
+            { t: 'GSO-2 (Comn), HQ 21 Sub Area, Bareilly', d: '2024 – present · Plains', tag: '', tagStyle: '' },
+            { t: 'SO-2 (EW), HQ 15 Corps, Srinagar', d: '2018 – 2021 · High Altitude', tag: '', tagStyle: '' },
+            { t: 'Instructor Class B, MCTE Mhow', d: '2015 – 2017 · Plains', tag: '', tagStyle: '' },
+            { t: 'Adjutant, 27 Signal Regiment, Tezpur', d: '2012 – 2015 · Mountain', tag: '', tagStyle: '' }
+          ] }
+        ],
+        blocksRight: [
+          { title: 'Terrain exposure', note: 'duration · last served', rows: [
+            { t: 'High Altitude', d: '3 yrs 1 mth', sub: st.scenario.staleHA ? 'Last served 2019 — outside recency window' : 'Last served 2021' },
+            { t: 'Mountain', d: '4 yrs 0 mths', sub: 'Last served 2018' },
+            { t: 'Plains', d: '8 yrs 4 mths', sub: 'Current' },
+            { t: 'Desert', d: 'Nil', sub: 'No recorded service' }
+          ] },
+          { title: 'Regional experience', note: 'by command', rows: [
+            { t: 'Southern Command', d: '6 yrs 1 mth', sub: '' },
+            { t: 'Northern Command', d: '5 yrs 2 mths', sub: 'Includes 3 yrs with 15 Corps' },
+            { t: 'Central Command', d: '4 yrs 3 mths', sub: 'Current' },
+            { t: 'Eastern Command', d: '2 yrs 0 mths', sub: '' }
+          ] },
+          { title: 'Operational & task exposure', note: '3 records', rows: [
+            { t: 'Counter-insurgency operations, Northern sector', d: '2 yrs 1 mth', sub: '' },
+            { t: 'Electronic warfare task force', d: '3 yrs 0 mths', sub: '' },
+            { t: 'Aid to civil authority, flood relief', d: '6 mths', sub: '' }
+          ] },
+          { title: 'Experience summary', note: 'aggregated', rows: [
+            { t: 'Communication staff appointments', d: '11 yrs 2 mths', sub: '' },
+            { t: 'Sub-unit command', d: '4 yrs 6 mths', sub: '' },
+            { t: 'Instructional', d: '1 yr 10 mths', sub: '' }
+          ] }
+        ]
+      }),
+
+      pool: [
+        ['IC-58421Y', 'Lt Col A. R. Raghavan', 'Corps of Signals', '19 yrs', 'SHAPE-1', 'GSO-2 (Comn), HQ 21 Sub Area', 'Mar 2027'],
+        ['IC-59107K', 'Lt Col S. Mehra', 'Corps of Engineers', '18 yrs', 'SHAPE-1', 'SO-1 (Wks), HQ 12 Corps', 'Jun 2027'],
+        ['IC-63482M', 'Maj V. Krishnan', 'Corps of Signals', '13 yrs', 'SHAPE-1', 'Adjutant, 27 Signal Regt', 'Nov 2026'],
+        ['IC-57019P', 'Lt Col P. Bhattacharya', 'Regiment of Artillery', '20 yrs', 'SHAPE-2 (P2)', 'SO-1 (Arty), HQ 2 Corps', 'Feb 2027'],
+        ['IC-64550T', 'Maj D. Nair', 'Corps of Signals', '12 yrs', 'SHAPE-1', 'Instructor Cl B, MCTE Mhow', 'Aug 2027']
+      ].map(function (c, i) {
+        return { svcNo: c[0], name: c[1], arm: c[2], service: c[3], medical: c[4], present: c[5], due: c[6],
+          onClick: self.go('profile'),
+          rowStyle: 'display:grid;grid-template-columns:118px 1.6fr 1.2fr 90px 92px 1fr 128px;gap:14px;padding:13px 16px;border-bottom:1px solid #f4f2ec;cursor:pointer;align-items:baseline;' + (i === 0 ? 'background:#f6f7f3;box-shadow:inset 2px 0 0 #4a6a44' : '') };
+      }),
+      poolFilters: [{ label: 'Rank', value: 'LT COL / MAJ' }, { label: 'Arm', value: 'SIGNALS' }, { label: 'Due within', value: '12 MTHS' }, { label: 'Medical', value: 'ANY' }],
+
+      postingList: this.postings.map(function (p) {
+        const on = p.id === st.selPosting;
+        return { id: p.id, role: p.role, unit: p.unit, station: p.station, command: p.command, tags: p.tags, priority: p.priority,
+          onClick: function () { self.setState({ selPosting: p.id }); },
+          priorityStyle: 'font:600 9.5px "IBM Plex Mono",monospace;letter-spacing:.08em;padding:4px 7px;border-radius:2px;flex:none;' + (p.priority === 'Priority 1' ? 'color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5' : 'color:#5b6058;background:#f2f0ea;border:1px solid #e4e1d9'),
+          rowStyle: 'padding:14px 16px;border-bottom:1px solid #f4f2ec;cursor:pointer;' + (on ? 'background:#f6f7f3;box-shadow:inset 2px 0 0 #4a6a44' : '') };
+      }),
+      sel: { id: selP.id, role: selP.role, unit: selP.unit, station: selP.station,
+        requirements: (reqData[selP.id] || []).map(function (r) { return { area: r[0], value: r[1], kind: r[2], kindStyle: reqKind(r[2]) }; }) },
+      onEditRequirement: function () { self.setState({ screen: canEditRules ? 'rules' : 'eligibility' }); },
+      editBtnLabel: canEditRules ? 'Edit requirement profile' : 'Requirement profile is read-only',
+      editBtnStyle: canEditRules ? 'border:1px solid #3f5c39;background:#4a6a44;color:#fff;border-radius:3px;padding:9px 15px;font:500 12.5px "IBM Plex Sans",sans-serif;cursor:pointer' : 'border:1px dashed #d8d4ca;background:#fbfaf7;color:#8b8f86;border-radius:3px;padding:9px 15px;font:500 12.5px "IBM Plex Sans",sans-serif;cursor:not-allowed',
+      goScreening: this.go('eligibility'), goScenario: this.go('scenario'),
+
+      eligCount: res.eligible.length,
+      gateTabs: [['hide', 'Hide'], ['show', 'Show struck']].map(function (g) { return { label: g[1], onClick: function () { self.setState({ gate: g[0] }); }, style: tab(st.gate === g[0]) }; }),
+      layoutTabs: [['list', 'Ranked list'], ['board', 'Card board']].map(function (l) { return { label: l[1], onClick: function () { self.setState({ layout: l[0] }); }, style: tab(st.layout === l[0]) }; }),
+      isListLayout: st.layout === 'list', isBoardLayout: st.layout === 'board',
+      showStruck: st.gate === 'show' && excluded.length > 0,
+
+      gateRows: res.all.filter(function (r) { return st.gate === 'show' || r.fails.length === 0; }).map(function (r) {
+        const ok = r.fails.length === 0;
+        return { id: r.p.id, role: r.p.role, unit: r.p.unit, station: r.p.station,
+          cardStyle: 'background:' + (ok ? '#fff' : '#fbfaf7') + ';border:1px ' + (ok ? 'solid #e0ddd6' : 'dashed #d8d4ca') + ';border-radius:3px;padding:17px 20px',
+          titleStyle: 'font:600 15px/1.3 "IBM Plex Sans",sans-serif;' + (ok ? '' : 'color:#8b8f86;text-decoration:line-through'),
+          verdict: ok ? 'ELIGIBLE · PROCEEDS TO SCORING' : 'NOT ELIGIBLE · GATED OUT',
+          verdictStyle: 'font:600 10px "IBM Plex Mono",monospace;letter-spacing:.1em;padding:6px 9px;border-radius:2px;flex:none;' + (ok ? 'color:#3f5c39;background:#eef2ea;border:1px solid #dbe3d6' : 'color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5'),
+          rules: r.p.hard.map(function (h) {
+            const failed = r.fails.some(function (f) { return f.id === h.id; });
+            return { label: h.id + ' ' + h.label, mark: failed ? '✕' : '✓',
+              style: 'font:500 11px "IBM Plex Mono",monospace;padding:5px 8px;border-radius:2px;' + (failed ? 'color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5' : 'color:#3f5c39;background:#eef2ea;border:1px solid #dbe3d6') };
+          }),
+          failNote: ok ? '' : r.fails.map(function (f) { return f.id + ' — ' + f.cond + '. Record shows: ' + f.ev + '.'; }).join(' ') };
+      }),
+
+      ranked: ranked, excluded: excluded, topCount: Math.min(4, res.eligible.length),
+      primaryActionLabel: role.action, primaryAction: this.go('audit'), noop: function () {}, reviewerNote: role.reviewer,
+
+      detail: detail,
+
+      compareHeadStyle: grid + 'padding:12px 18px;background:#faf9f6;border-bottom:1px solid #e0ddd6;align-items:end;min-width:900px',
+      compareFootStyle: grid + 'padding:14px 18px;background:#faf9f6;border-top:1px solid #e0ddd6;align-items:baseline;min-width:900px',
+      compareCols: cols.map(function (r) { return { id: r.p.id, role: r.p.role, station: r.p.station }; }),
+      compareRows: this.params.map(function (prm, i) {
+        return { label: prm.label, weight: st.weights[prm.key], evidence: evidence[prm.key],
+          style: grid + 'padding:13px 18px;border-bottom:1px solid #f4f2ec;align-items:center;min-width:900px;' + (i % 2 ? 'background:#fcfbf9' : ''),
+          cells: cols.map(function (r) {
+            const v = r.sub[prm.key]; const m = self.matchOf(v);
+            const bg = m[0] === 'Strong' ? '#eef2ea' : m[0] === 'Partial' ? '#f8f2e6' : '#faf0ee';
+            return { score: v, match: m[0].toUpperCase(), style: 'display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:2px;background:' + bg + ';color:' + m[1] };
+          }) };
+      }),
+      compareTotals: cols.map(function (r) { return { label: self.scoreText(r.score), color: self.band(r.score)[1] }; }),
+
+      scenarioToggles: scenarioToggles, scenarioEffects: effects, scenarioRanked: scenRanked,
+      scenarioExcluded: res.excluded.map(function (r) { return { role: r.p.role, station: r.p.station, failLabel: r.fails[0].label + ' not met' }; }),
+      scenarioExcludedShown: res.excluded.length > 0,
+      resetScenario: function () { self.setState({ scenario: Object.assign({}, self.baseScenario) }); },
+
+      weightRows: weightRows, weightSum: wTotal,
+      weightSumStyle: 'font:600 10px "IBM Plex Mono",monospace;letter-spacing:.1em;padding:5px 8px;border-radius:2px;' + (wTotal === 100 ? 'color:#3f5c39;background:#eef2ea;border:1px solid #dbe3d6' : 'color:#7a5715;background:#f8f2e6;border:1px solid #eae0cb'),
+      weightsHint: canEditRules ? (wTotal === 100 ? 'Weights are normalised before scoring.' : 'Total is not 100% — weights are normalised before scoring.') : 'Sign in as Rules Administrator to change weights.',
+      resetWeights: function () { self.setState({ weights: Object.assign({}, self.baseWeights) }); },
+      hardRuleLibrary: hardRuleLibrary,
+      weightPreview: res.eligible.slice(0, 4).map(function (r) {
+        const diffV = r.score - (baseScore[r.p.id] || r.score);
+        return { role: r.p.role + ' · ' + r.p.station, pct: r.score, scoreLabel: self.scoreText(r.score), bandColor: self.band(r.score)[1], diff: diffV === 0 ? '' : (diffV > 0 ? '+' + diffV : String(diffV)) };
+      }),
+
+      kpis: [
+        { label: 'POSITIONS IN CYCLE', value: '6', note: 'Apr – Sep 2027 · 2 flagged Priority 1' },
+        { label: 'RECORDS IN POOL', value: '128', note: 'Corps of Signals, Lt Col and Maj' },
+        { label: 'AWAITING APPROVAL', value: '4', note: 'Ranked sets submitted with factor trace' },
+        { label: 'RULES IN FORCE', value: '37', note: 'Parameter version 0.1 · 6 mandatory' }
+      ],
+      cycleRows: this.postings.map(function (p) {
+        const r = res.all.find(function (x) { return x.p.id === p.id; });
+        const ok = r.fails.length === 0;
+        const status = !ok ? 'No eligible match' : r.rank === 1 ? 'Recommended' : r.rank <= 4 ? 'Under review' : 'Screened';
+        return { id: p.id, role: p.role, station: p.station, score: ok ? self.scoreText(r.score) : '—',
+          scoreColor: ok ? self.band(r.score)[1] : '#a8aca3', status: status,
+          statusStyle: 'font:600 9.5px "IBM Plex Mono",monospace;letter-spacing:.08em;padding:4px 7px;border-radius:2px;' + (status === 'Recommended' ? 'color:#3f5c39;background:#eef2ea;border:1px solid #dbe3d6' : status === 'No eligible match' ? 'color:#8f3a32;background:#faf0ee;border:1px solid #ecd9d5' : 'color:#5b6058;background:#f2f0ea;border:1px solid #e4e1d9') };
+      }),
+      actionQueue: [
+        { title: 'P-114 SO-1 (Comn), HQ 15 Corps', age: '2 days', detail: 'Ranked set of 4 submitted by the MS Branch posting cell. Leading option is at ' + (ranked[0] ? ranked[0].scoreLabel : '—') + ' suitability.' },
+        { title: 'P-131 Commanding Officer, 42 Signal Regt', age: '4 days', detail: 'Command appointment — two candidates within 3 points of each other.' },
+        { title: 'P-155 SO-1 (Cyber Operations)', age: '6 days', detail: 'No eligible candidate in the current pool; mandatory course rule HR-06 gates all four shortlisted records.' }
+      ],
+      auditRows: [
+        ['08 Sep 2026 · 11:42', 'Maj S. Iyer', 'Recommendation submitted', 'IC-58421Y → ranked set of 4 (P-114 first)', 'REC-2026-0413'],
+        ['08 Sep 2026 · 11:38', 'Maj S. Iyer', 'What-if run', 'Terrain recency toggled; P-114 lead narrowed by 6 points', 'WIF-2026-0871'],
+        ['08 Sep 2026 · 11:20', 'System', 'Screening executed', 'IC-58421Y against 6 positions · 4 eligible, 2 gated', 'SCR-2026-2290'],
+        ['08 Sep 2026 · 10:55', 'Lt Col R. Sahni', 'Parameter version published', 'v0.1 · weights 20/20/15/15/15/10/5', 'PAR-2026-0007'],
+        ['07 Sep 2026 · 17:10', 'Lt Col R. Sahni', 'Mandatory rule added', 'HR-12 desert-sector exposure for P-176', 'RUL-2026-0044'],
+        ['07 Sep 2026 · 16:02', 'Col V. Menon', 'Recommendation returned', 'REC-2026-0408 returned with observations on tenure', 'REC-2026-0408'],
+        ['07 Sep 2026 · 09:31', 'Col V. Menon', 'Recommendation approved', 'REC-2026-0402 · P-207 Instructor Cl A, MCTE', 'REC-2026-0402'],
+        ['06 Sep 2026 · 15:44', 'System', 'Record synchronised', 'IC-58421Y course and medical attributes refreshed', 'SYN-2026-1188']
+      ].map(function (a) {
+        return { ts: a[0], actor: a[1], action: a[2], object: a[3], ref: a[4],
+          color: a[2].indexOf('approved') >= 0 ? '#3f5c39' : a[2].indexOf('returned') >= 0 ? '#8f3a32' : '#22262b' };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const THEME_KEY = 'sakha-theme';
+const THEME_KEY = 'asphalix-theme'; // index.html migrates the old 'sakha-theme' key
 
 const readTheme = () => {
   try {

@@ -22,6 +22,7 @@ import leadRoutes from './modules/leads/routes.js';
 import iamRoutes from './modules/roles/routes.js';
 import knowledgeRoutes from './modules/knowledge/routes.js';
 import portalRoutes from './modules/portal/routes.js';
+import supportRoutes from './modules/tickets/routes.js';
 import mediaRoutes from './modules/media/routes.js';
 import auditRoutes from './modules/audit/routes.js';
 import opsRoutes from './modules/ops/routes.js';
@@ -100,7 +101,7 @@ export function createApp() {
 
   /** Liveness: is the process up? Never touches a dependency. */
   app.get('/api/health', (_req, res) =>
-    res.json({ status: 'ok', service: 'sakha-api', uptime: Math.floor(process.uptime()) })
+    res.json({ status: 'ok', service: 'asphalix-api', uptime: Math.floor(process.uptime()) })
   );
 
   /**
@@ -144,6 +145,7 @@ export function createApp() {
   app.use('/api/iam', iamRoutes);
   app.use('/api/knowledge', knowledgeRoutes);
   app.use('/api/portal', portalRoutes);
+  app.use('/api/support', supportRoutes);
   app.use('/api/media', mediaRoutes);
   app.use('/api/audit', auditRoutes);
   app.use('/api/ops', opsRoutes);

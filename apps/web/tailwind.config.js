@@ -27,13 +27,16 @@ export default {
           DEFAULT: 'rgb(var(--trust) / <alpha-value>)',
           soft: 'rgb(var(--trust-soft) / <alpha-value>)',
         },
+        keystone: 'rgb(var(--keystone) / <alpha-value>)',
+        iris: 'rgb(var(--iris) / <alpha-value>)',
         danger: 'rgb(var(--danger) / <alpha-value>)',
         success: 'rgb(var(--success) / <alpha-value>)',
         warning: 'rgb(var(--warning) / <alpha-value>)',
       },
       fontFamily: {
-        display: ['Fraunces', 'Georgia', 'Cambria', 'serif'],
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        // One family; headings differ by weight 600 and negative tracking.
+        display: ['Archivo', 'system-ui', 'sans-serif'],
+        sans: ['Archivo', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       fontSize: {
@@ -54,6 +57,7 @@ export default {
       spacing: {
         18: '4.5rem',
         22: '5.5rem',
+        26: '6.5rem',
         30: '7.5rem',
       },
       maxWidth: {
@@ -61,11 +65,11 @@ export default {
         shell: '78rem',
       },
       borderRadius: {
-        sm: '0.25rem',
-        DEFAULT: '0.5rem',
-        md: '0.625rem',
-        lg: '0.875rem',
-        xl: '1.25rem',
+        sm: '0.3125rem', // 5px badges, chips
+        DEFAULT: '0.4375rem', // 7px buttons
+        md: '0.5625rem', // 9px list items
+        lg: '0.875rem', // 14px cards
+        xl: '1.75rem', // 28px hero panel
       },
       boxShadow: {
         subtle: '0 1px 2px rgb(var(--shadow) / 0.05), 0 1px 3px rgb(var(--shadow) / 0.04)',

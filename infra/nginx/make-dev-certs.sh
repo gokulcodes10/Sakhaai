@@ -8,8 +8,8 @@ mkdir -p "$DIR"
 openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
   -keyout "$DIR/privkey.pem" \
   -out "$DIR/fullchain.pem" \
-  -subj "/C=IN/ST=Tamil Nadu/L=Coimbatore/O=Sakha InfoTech/CN=sakhaai.com" \
-  -addext "subjectAltName=DNS:sakhaai.com,DNS:www.sakhaai.com,DNS:localhost,IP:127.0.0.1" \
+  -subj "/C=IN/ST=Tamil Nadu/L=Coimbatore/O=Asphalix/CN=asphalix.com" \
+  -addext "subjectAltName=DNS:asphalix.com,DNS:www.asphalix.com,DNS:localhost,IP:127.0.0.1" \
   2>/dev/null
 
 chmod 600 "$DIR/privkey.pem"

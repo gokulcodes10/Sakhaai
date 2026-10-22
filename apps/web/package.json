@@ -1,5 +1,5 @@
 {
-  "name": "@sakha/web",
+  "name": "@asphalix/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,13 +11,14 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
-    "@sakha/shared": "*",
+    "@asphalix/shared": "*",
     "clsx": "^2.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
-    "zod": "^3.24.1",
-    "react-router": "^7.18.2"
+    "react-router": "^7.18.2",
+    "three": "0.160.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

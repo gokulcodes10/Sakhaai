@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router';
 import clsx from 'clsx';
 import api from '../../lib/api.js';
 import { selectUser } from '../../features/auth/authSlice.js';
-import { openPanel } from '../../features/sakha/sakhaSlice.js';
+import { askSakha, openPanel } from '../../features/sakha/sakhaSlice.js';
 import { Alert, Badge, Button, EmptyState, Section, Skeleton, Stat } from '../../components/ui/index.jsx';
 import Seo from '../../components/layout/Seo.jsx';
 import PageHero from '../../components/layout/PageHero.jsx';
@@ -28,6 +29,26 @@ export default function Portal() {
         title={`Hello, ${user?.name?.split(' ')[0] ?? 'there'}.`}
         subhead={data?.account ? data.account.name : 'Your projects, documents and the metric each agent is measured against.'}
       />
+
+      {data && (
+        <div className="border-b border-line bg-surface">
+          <div className="shell flex flex-wrap items-center gap-x-8 gap-y-3 py-5 text-sm">
+            <Link to="/portal/tickets" className="flex items-center gap-2.5 font-medium text-ink hover:text-accent">
+              <span className="h-2 w-2 rounded-[2px] bg-trust" aria-hidden="true" />
+              Support tickets
+              <span className="font-mono text-xs text-subtle">{data.counts?.openTickets ?? 0} open</span>
+            </Link>
+            <span className="font-mono text-xs text-subtle">{data.counts?.documents ?? 0} documents</span>
+            <button
+              type="button"
+              onClick={() => dispatch(askSakha('I need help with something on our account.'))}
+              className="ml-auto font-medium text-trust hover:text-ink"
+            >
+              Ask Sakha for help →
+            </button>
+          </div>
+        </div>
+      )}
 
       <Section>
         {error ? (
@@ -98,13 +119,14 @@ export default function Portal() {
               </article>
             ))}
 
-            <div className="rounded-lg bg-ink p-7 text-paper">
-              <p className="font-display text-xl font-semibold">Sakha knows your account too.</p>
-              <p className="mt-2 max-w-prose text-paper/70">
-                Signed in, she can answer questions about your own projects — status, autonomy level,
-                the metric we agreed — not just the public site.
+            <div className="rounded-lg bg-[#14161A] p-7 text-[#F5F4F1]">
+              <p className="text-xl font-semibold tracking-[-0.015em]">Sakha knows your account too.</p>
+              <p className="mt-2 max-w-prose text-[#B4B8BD]">
+                Signed in, it can answer questions about your own projects — status, autonomy level,
+                the metric we agreed — raise and follow up support tickets, and get a person on the
+                team when you need one.
               </p>
-              <Button variant="accent" className="mt-5" onClick={() => dispatch(openPanel())}>
+              <Button variant="bare" className="mt-5 bg-[#F5F4F1] text-[#14161A] hover:bg-white" onClick={() => dispatch(openPanel())}>
                 Ask Sakha
               </Button>
             </div>

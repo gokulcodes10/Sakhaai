@@ -1,6 +1,6 @@
-# Sakha AI
+# Asphalix
 
-The website, CMS and intelligence engine for **sakhaai.com** — built by **Sakha InfoTech**.
+The website, CMS and intelligence engine for **asphalix.com** — built by **Asphalix** (formerly Sakha AI / Sakha InfoTech).
 
 > **Trust. Grit. Agents that ship.**
 
@@ -212,7 +212,7 @@ npm run knowledge:reindex            # rebuild everything except the crawl
 npm run knowledge:reindex -- crawl   # include the public-web crawl
 
 npm test                             # unit tests
-npm run test:integration --workspace @sakha/api   # against a real DB
+npm run test:integration --workspace @asphalix/api   # against a real DB
 npm run lint
 
 npm run infra:up         # postgres + redis

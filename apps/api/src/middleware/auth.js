@@ -1,4 +1,4 @@
-import { permissionSatisfies, permissionSatisfiesAll, permissionSatisfiesAny } from '@sakha/shared';
+import { permissionSatisfies, permissionSatisfiesAll, permissionSatisfiesAny } from '@asphalix/shared';
 import { forbidden, unauthorized } from '../lib/errors.js';
 import { getUserVersion, isTokenRevoked } from '../lib/redis.js';
 import { COOKIES, verifyAccessToken } from '../modules/auth/tokens.js';

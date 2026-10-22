@@ -42,7 +42,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 
   REDIS_URL: z.string().min(1).default('redis://localhost:6379'),
-  REDIS_PREFIX: z.string().default('sakha'),
+  REDIS_PREFIX: z.string().default('asphalix'),
   CACHE_TTL_SECONDS: int(300),
 
   JWT_ACCESS_SECRET: z.string().min(16, 'JWT_ACCESS_SECRET must be at least 16 characters'),
@@ -81,7 +81,7 @@ const envSchema = z.object({
   KNOWLEDGE_CRAWL_URLS: list([]),
   KNOWLEDGE_CRAWL_MAX_PAGES: int(40),
   KNOWLEDGE_CRAWL_TIMEOUT_MS: int(15000),
-  KNOWLEDGE_CRAWL_USER_AGENT: z.string().default('SakhaBot/1.0 (+https://sakhaai.com/bot)'),
+  KNOWLEDGE_CRAWL_USER_AGENT: z.string().default('AsphalixBot/1.0 (+https://asphalix.com/bot)'),
   KNOWLEDGE_DOCS_DIR: z.string().default('content/knowledge'),
   KNOWLEDGE_CHUNK_TOKENS: int(350),
   KNOWLEDGE_CHUNK_OVERLAP: int(60),
@@ -96,8 +96,9 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional().default(''),
   SMTP_PASSWORD: z.string().optional().default(''),
   SMTP_SECURE: bool(false),
-  MAIL_FROM: z.string().default('Sakha AI <hello@sakhaai.com>'),
+  MAIL_FROM: z.string().default('Asphalix <hello@asphalix.com>'),
   LEADS_NOTIFY_TO: z.string().optional().default(''),
+  SUPPORT_NOTIFY_TO: z.string().optional().default(''),
 
   UPLOAD_DIR: z.string().default('apps/api/uploads'),
   UPLOAD_MAX_BYTES: int(8388608),
@@ -220,6 +221,7 @@ export const config = {
     secure: env.SMTP_SECURE,
     from: env.MAIL_FROM,
     leadsNotifyTo: env.LEADS_NOTIFY_TO,
+    supportNotifyTo: env.SUPPORT_NOTIFY_TO,
     get enabled() {
       return Boolean(this.host && this.user);
     },

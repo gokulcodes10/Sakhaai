@@ -15,7 +15,7 @@ import prisma, { disconnectPrisma } from '../lib/prisma.js';
 import { JOBS, QUEUE_NAMES, installSchedules, closeQueues } from './queue.js';
 import { runIndex } from '../knowledge/indexer.js';
 import { ensureSearchInfrastructure } from '../knowledge/searchSetup.js';
-import { sendLeadNotification, sendPasswordReset, sendWelcome } from '../lib/mailer.js';
+import { sendLeadNotification, sendPasswordReset, sendTicketEmail, sendWelcome } from '../lib/mailer.js';
 import { getSetting } from '../modules/ops/settings.js';
 
 const workerOpts = {
@@ -54,6 +54,8 @@ async function main() {
           return sendWelcome(job.data.userId);
         case JOBS.PASSWORD_RESET:
           return sendPasswordReset(job.data.userId, job.data.token);
+        case JOBS.TICKET_EVENT:
+          return sendTicketEmail(job.data);
         default:
           throw new Error(`Unknown mail job: ${job.name}`);
       }
@@ -94,7 +96,7 @@ async function main() {
     );
   }
 
-  logger.info({ queues: Object.values(QUEUE_NAMES) }, '▸ Sakha worker running');
+  logger.info({ queues: Object.values(QUEUE_NAMES) }, '▸ Asphalix worker running');
 
   // Warm the knowledge base on first boot so the assistant is useful the moment
   // the site comes up, rather than after the first scheduled run.

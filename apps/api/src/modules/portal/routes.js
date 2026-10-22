@@ -8,8 +8,17 @@ import express from 'express';
 import prisma from '../../lib/prisma.js';
 import { asyncHandler } from '../../middleware/error.js';
 import { requirePermission } from '../../middleware/auth.js';
-import { forbidden, notFound } from '../../lib/errors.js';
+import { badRequest, forbidden, notFound } from '../../lib/errors.js';
 import { audit } from '../../lib/audit.js';
+import { validate } from '../../middleware/validate.js';
+import { ticketCreateSchema, ticketReplySchema } from '@asphalix/shared';
+import {
+  addTicketMessage,
+  createTicket,
+  getClientTicket,
+  ticketSummarySelect,
+  updateTicket,
+} from '../tickets/service.js';
 
 const router = express.Router();
 
@@ -20,7 +29,7 @@ async function ownAccountId(req) {
     select: { clientAccountId: true },
   });
   if (!user?.clientAccountId) {
-    throw forbidden('This account is not linked to a client organisation yet. Email hello@sakhaai.com.');
+    throw forbidden('This account is not linked to a client organisation yet. Email hello@asphalix.com.');
   }
   return user.clientAccountId;
 }
@@ -42,7 +51,7 @@ router.get(
         include: { updates: { orderBy: { createdAt: 'desc' }, take: 3 } },
       }),
       prisma.document.count({ where: { clientAccountId: accountId } }),
-      prisma.ticket.count({ where: { clientAccountId: accountId, status: 'open' } }),
+      prisma.ticket.count({ where: { clientAccountId: accountId, status: { in: ['open', 'pending'] } } }),
     ]);
 
     return res.json({ account, projects, counts: { documents, openTickets } });
@@ -89,39 +98,72 @@ router.get(
     const accountId = await ownAccountId(req);
     const tickets = await prisma.ticket.findMany({
       where: { clientAccountId: accountId },
-      orderBy: { createdAt: 'desc' },
-      include: { raisedBy: { select: { id: true, name: true } } },
+      orderBy: { lastActivityAt: 'desc' },
+      select: {
+        ...ticketSummarySelect,
+        raisedBy: { select: { id: true, name: true } },
+        _count: { select: { messages: { where: { internal: false } } } },
+      },
     });
     return res.json({ tickets });
+  })
+);
+
+router.get(
+  '/tickets/:id',
+  requirePermission('portal.access'),
+  asyncHandler(async (req, res) => {
+    const accountId = await ownAccountId(req);
+    const ticket = await getClientTicket(req.params.id, accountId);
+    if (!ticket) throw notFound('No such ticket.');
+    return res.json({ ticket });
   })
 );
 
 router.post(
   '/tickets',
   requirePermission('portal.tickets.write'),
+  validate(ticketCreateSchema),
   asyncHandler(async (req, res) => {
     const accountId = await ownAccountId(req);
-    const subject = String(req.body?.subject ?? '').trim().slice(0, 200);
-    const body = String(req.body?.body ?? '').trim().slice(0, 8000);
-
-    if (subject.length < 3 || body.length < 10) {
-      return res.status(400).json({
-        error: { code: 'BAD_REQUEST', message: 'Give the request a subject and a sentence or two of detail.' },
-      });
-    }
-
-    const ticket = await prisma.ticket.create({
-      data: {
-        clientAccountId: accountId,
-        raisedById: req.auth.userId,
-        subject,
-        body,
-        priority: ['low', 'normal', 'high'].includes(req.body?.priority) ? req.body.priority : 'normal',
-      },
+    const ticket = await createTicket({
+      clientAccountId: accountId,
+      raisedById: req.auth.userId,
+      ...req.body,
+      source: 'portal',
     });
-
     audit(req, { action: 'portal.ticket.create', entity: 'Ticket', entityId: ticket.id });
     return res.status(201).json({ ok: true, ticket });
+  })
+);
+
+router.post(
+  '/tickets/:id/messages',
+  requirePermission('portal.tickets.write'),
+  validate(ticketReplySchema),
+  asyncHandler(async (req, res) => {
+    const accountId = await ownAccountId(req);
+    const own = await getClientTicket(req.params.id, accountId);
+    if (!own) throw notFound('No such ticket.');
+    if (own.status === 'closed') throw badRequest('That ticket is closed. Raise a new one and mention its number.');
+
+    // `internal` is a staff-only flag; a client message is never internal.
+    await addTicketMessage({ ticketId: own.id, authorType: 'client', authorId: req.auth.userId, body: req.body.body });
+    audit(req, { action: 'portal.ticket.reply', entity: 'Ticket', entityId: own.id });
+    return res.status(201).json({ ticket: await getClientTicket(own.id, accountId) });
+  })
+);
+
+router.post(
+  '/tickets/:id/close',
+  requirePermission('portal.tickets.write'),
+  asyncHandler(async (req, res) => {
+    const accountId = await ownAccountId(req);
+    const own = await getClientTicket(req.params.id, accountId);
+    if (!own) throw notFound('No such ticket.');
+    if (own.status !== 'closed') await updateTicket(own.id, { status: 'closed' }, { silent: true });
+    audit(req, { action: 'portal.ticket.close', entity: 'Ticket', entityId: own.id });
+    return res.json({ ticket: await getClientTicket(own.id, accountId) });
   })
 );
 

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    body { margin: 0; background: #14161A; }
+    a { color: #6E8AF0; text-decoration: none; }
+    a:hover { color: #9FB2FF; }
+  </style>
+</helmet>
+
+<div style="font-family:Archivo,Helvetica,sans-serif;color:#F5F4F1;background:#14161A;text-wrap:pretty;-webkit-font-smoothing:antialiased">
+
+  <header style="position:fixed;top:0;left:0;right:0;z-index:40;background:rgba(20,22,26,0.62);backdrop-filter:blur(12px);border-bottom:1px solid rgba(245,244,241,0.08)">
+    <div style="max-width:1248px;margin:0 auto;padding:0 28px;height:66px;display:flex;align-items:center;gap:28px">
+      <a href="#" style="display:flex;align-items:center;gap:12px;flex:none;color:#F5F4F1">
+        <dc-import name="Emblem" style="width:30px;height:30px;flex:none" hint-size="30px,30px"></dc-import>
+        <span style="font-size:15px;font-weight:600;letter-spacing:0.24em">ASPHALIX</span>
+      </a>
+      <nav style="display:flex;gap:2px;flex:1;flex-wrap:wrap;min-width:0">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+          <a href="#" style="padding:8px 12px;font-size:14px;font-weight:500;color:#B4B8BD;border-radius:6px;white-space:nowrap" style-hover="color:#F5F4F1;background:rgba(245,244,241,0.06)">{{ n }}</a>
+        </sc-for>
+      </nav>
+      <a href="#" style="flex:none;height:36px;padding:0 16px;display:flex;align-items:center;background:#F5F4F1;color:#14161A;font-size:14px;font-weight:500;border-radius:6px" style-hover="background:#fff;color:#14161A">Get a build memo</a>
+    </div>
+  </header>
+
+  <section data-arch-track="1" ref="{{ trackRef }}" style="position:relative">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden">
+      <x-import component-from-global-scope="arch-scene" from="./arch-scene.js" particles="{{ particles }}" motion-level="{{ motion }}" style="position:absolute;inset:0;width:100%;height:100%" hint-size="100%,100%"></x-import>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:34vh;background:linear-gradient(to top,#14161A 12%,rgba(20,22,26,0));pointer-events:none"></div>
+      <div style="position:absolute;right:28px;top:50%;transform:translateY(-50%);display:grid;gap:14px;z-index:3">
+        <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.14em;color:{{ r.text }}">{{ r.label }}</span>
+            <span style="height:3px;width:{{ r.w }};background:{{ r.bar }};border-radius:2px"></span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="position:relative;margin-top:-100vh;z-index:2">
+
+      <div style="min-height:100vh;max-width:1248px;margin:0 auto;padding:0 28px 13vh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end">
+        <div style="max-width:600px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#B4B8BD">
+            <span style="width:22px;height:2px;background:#E0603C"></span>
+            <span>ASPHALĒS — NOT LIABLE TO FALL</span>
+          </div>
+          <h1 style="font-size:clamp(42px,6vw,80px);font-weight:600;letter-spacing:-0.04em;line-height:0.98;margin:0;text-wrap:balance">Agents that hold under load.</h1>
+          <p style="font-size:clamp(17px,1.6vw,20px);line-height:1.55;color:#C9CCD0;margin:24px 0 0;max-width:520px">Asphalix builds agentic AI and self-hosted LLM systems that run inside your perimeter — your data, your models, your keys.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px">
+            <a href="#" style="height:50px;padding:0 24px;display:flex;align-items:center;background:#3A5BD9;color:#fff;font-size:16px;font-weight:500;border-radius:7px" style-hover="background:#4A6BE9;color:#fff">See our prices</a>
+            <a href="#" style="height:50px;padding:0 24px;display:flex;align-items:center;border:1px solid rgba(245,244,241,0.24);color:#F5F4F1;font-size:16px;font-weight:500;border-radius:7px" style-hover="border-color:#F5F4F1;color:#F5F4F1">Book a build memo</a>
+          </div>
+          <div style="margin-top:40px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.16em;color:#8A8F94">SCROLL — THE ARCH EXPLAINS ITSELF ↓</div>
+        </div>
+      </div>
+
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+        <div style="min-height:100vh;max-width:1248px;margin:0 auto;padding:0 28px 13vh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="max-width:540px">
+            <div style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.16em;color:{{ s.ink }}">
+              <span style="width:12px;height:12px;border-radius:3px;background:{{ s.hex }}"></span>
+              <span>{{ s.kicker }}</span>
+            </div>
+            <h2 style="font-size:clamp(32px,4vw,52px);font-weight:600;letter-spacing:-0.03em;line-height:1.05;margin:20px 0 0;text-wrap:balance">{{ s.title }}</h2>
+            <p style="font-size:18px;line-height:1.6;color:#C9CCD0;margin:20px 0 0">{{ s.body }}</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:22px">
+              <sc-for list="{{ s.chips }}" as="c" hint-placeholder-count="3">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#DADDE0;border:1px solid rgba(245,244,241,0.16);background:rgba(20,22,26,0.6);padding:6px 10px;border-radius:5px">{{ c }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+
+      <div style="min-height:100vh;max-width:1248px;margin:0 auto;padding:0 28px 13vh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end">
+        <div style="max-width:560px">
+          <div style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.16em;color:#B7A2F0">
+            <span style="width:12px;height:12px;border-radius:3px;background:#7A4FD4"></span>
+            <span>04 — IN PRODUCTION</span>
+          </div>
+          <h2 style="font-size:clamp(32px,4vw,52px);font-weight:600;letter-spacing:-0.03em;line-height:1.05;margin:20px 0 0;text-wrap:balance">Five days to a prototype. Weeks to production.</h2>
+          <p style="font-size:18px;line-height:1.6;color:#C9CCD0;margin:20px 0 0">Work flows through the span, never around it. A running agent on your real data by day five, staged from supervised to autonomous, with the code handed over.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px">
+            <a href="#" style="height:50px;padding:0 24px;display:flex;align-items:center;background:#F5F4F1;color:#14161A;font-size:16px;font-weight:500;border-radius:7px" style-hover="background:#fff;color:#14161A">Get a build memo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F5F4F1;color:#14161A">
+    <div style="max-width:1248px;margin:0 auto;padding:104px 28px">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:48px">
+        <div style="max-width:620px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#3A5BD9;margin-bottom:16px">WHAT WE BUILD</div>
+          <h2 style="font-size:clamp(32px,3.6vw,46px);font-weight:600;letter-spacing:-0.03em;line-height:1.08;margin:0">Four things. We do them properly.</h2>
+        </div>
+        <a href="#" style="font-size:15px;font-weight:500;color:#3A5BD9">See how each one works →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px">
+        <sc-for list="{{ services }}" as="s" hint-placeholder-count="4">
+          <a href="#" style="display:flex;flex-direction:column;background:#fff;border:1px solid #E2E0DB;border-radius:14px;overflow:hidden;color:#14161A" style-hover="border-color:#14161A;color:#14161A">
+            <div style="height:6px;background:{{ s.hex }}"></div>
+            <div style="padding:24px 22px;display:flex;flex-direction:column;flex:1">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.14em;color:{{ s.hex }}">{{ s.tag }}</span>
+              <h3 style="font-size:20px;font-weight:600;letter-spacing:-0.015em;line-height:1.2;margin:14px 0 0">{{ s.name }}</h3>
+              <p style="font-size:15px;line-height:1.55;color:#4A4E54;margin:10px 0 0;flex:1">{{ s.oneLiner }}</p>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:#F5F4F1;color:#14161A;border-top:1px solid #E2E0DB">
+    <div style="max-width:1248px;margin:0 auto;padding:36px 28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <dc-import name="Emblem" style="width:28px;height:28px;flex:none" hint-size="28px,28px"></dc-import>
+        <span style="font-size:15px;font-weight:600;letter-spacing:0.24em">ASPHALIX</span>
+      </div>
+      <span style="font-size:13px;color:#6A6F76">© 2026 Asphalix · hello@asphalix.com · Coimbatore, India</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;particles&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;3D scene&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Full&quot;,&quot;Calm&quot;],&quot;default&quot;:&quot;Full&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;3D scene&quot;}}">
+class Component extends DCLogic {
+  state = { step: 0 };
+  trackRef = React.createRef();
+  componentDidMount() {
+    this.onScroll = () => {
+      const el = this.trackRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const range = r.height - window.innerHeight;
+      const p = range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 0;
+      const s = Math.round(p * 4);
+      if (s !== this.state.step) this.setState({ step: s });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true, capture: true });
+    this.onScroll();
+  }
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll, { capture: true });
+  }
+  renderVals() {
+    const step = this.state.step;
+    const railDef = [
+      ['ARCH', '#F5F4F1'], ['DATA', '#3A5BD9'], ['MODELS', '#18937F'], ['KEYSTONE', '#E0603C'], ['SHIP', '#7A4FD4'],
+    ];
+    return {
+      trackRef: this.trackRef,
+      particles: this.props.particles ?? true,
+      motion: this.props.motion ?? 'Full',
+      nav: ['What we build', 'Industries', 'Pricing', 'Work', 'About'],
+      rail: railDef.map(([label, hex], i) => ({
+        label,
+        text: i === step ? '#F5F4F1' : '#5A5F66',
+        bar: i === step ? hex : '#3A3D44',
+        w: i === step ? '28px' : '12px',
+      })),
+      steps: [
+        { hex: '#3A5BD9', ink: '#9FB2FF', kicker: '01 — YOUR DATA', title: 'The first pier: data that never leaves.', body: 'Retrieval runs on your own Postgres, inside your network. Identifiers stay out of model calls, and every read is logged.', chips: ['On-prem retrieval', 'PII minimised', 'Audit trail'] },
+        { hex: '#18937F', ink: '#5CC4AE', kicker: '02 — YOUR MODELS', title: 'The second pier: open-weight models on your hardware.', body: 'Self-hosted LLMs sized to the job — from an 8B on a single GPU to a mixture-of-experts cluster. No per-token bill, no vendor holding your weights.', chips: ['Self-hosted LLMs', 'Air-gap ready', 'No egress'] },
+        { hex: '#E0603C', ink: '#F0845F', kicker: '03 — THE KEYSTONE', title: 'Governance locks it together.', body: 'Guardrails, role-scoped tools and a human review queue. Like a keystone, it tightens the harder the system is pushed.', chips: ['Human in the loop', 'Role-scoped tools', 'Staged autonomy'] },
+      ],
+      services: [
+        { hex: '#3A5BD9', tag: 'RESPOND', name: 'Customer response agents', oneLiner: 'Answer every customer in under a minute, on the channel they already use.' },
+        { hex: '#18937F', tag: 'FOLLOW UP', name: 'Follow-up and revenue agents', oneLiner: 'The second and third chase, done every time, by something that never gets busy.' },
+        { hex: '#E0603C', tag: 'OPERATE', name: 'Internal operations agents', oneLiner: 'Give your own team the answer instead of the form.' },
+        { hex: '#7A4FD4', tag: 'CONNECT', name: 'System integration and data groundwork', oneLiner: 'Your agent is only as good as the data it can read.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

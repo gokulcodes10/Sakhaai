@@ -13,7 +13,7 @@
  * roles or grants calls — so a revoked permission stops working immediately.
  */
 
-import { ANONYMOUS_PERMISSIONS, ROLE_RANK, SYSTEM_ROLES } from '@sakha/shared';
+import { ANONYMOUS_PERMISSIONS, ROLE_RANK, SYSTEM_ROLES } from '@asphalix/shared';
 import prisma from '../../lib/prisma.js';
 import { k, redis, redisReady } from '../../lib/redis.js';
 

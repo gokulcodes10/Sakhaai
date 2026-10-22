@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Route, Routes } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
 import SiteLayout from './components/layout/SiteLayout.jsx';
@@ -13,16 +13,16 @@ import { Spinner } from './components/ui/index.jsx';
 import Home from './pages/Home.jsx';
 import { Services, ServiceDetail } from './pages/Services.jsx';
 import { Industries, IndustryDetail } from './pages/Industries.jsx';
-import Pricing from './pages/Pricing.jsx';
 import Work from './pages/Work.jsx';
 import About from './pages/About.jsx';
 import ResponsibleAi from './pages/ResponsibleAi.jsx';
 import Contact from './pages/Contact.jsx';
 import { ForgotPassword, ResetPassword, SignIn, SignUp } from './pages/Auth.jsx';
 import Portal from './pages/portal/Portal.jsx';
+import { TicketDetail as PortalTicket, Tickets as PortalTickets } from './pages/portal/Tickets.jsx';
 import NotFound from './pages/NotFound.jsx';
 
-// The admin is lazy-loaded. A visitor reading the pricing page should never
+// The admin is lazy-loaded. A visitor reading the services page should never
 // download the CMS, the permission grant UI, or the knowledge-base tooling.
 const AdminLayout = lazy(() => import('./components/layout/AdminLayout.jsx'));
 const Dashboard = lazy(() => import('./pages/admin/Dashboard.jsx'));
@@ -30,6 +30,8 @@ const ContentEditor = lazy(() => import('./pages/admin/ContentEditor.jsx'));
 const People = lazy(() => import('./pages/admin/People.jsx'));
 const Knowledge = lazy(() => import('./pages/admin/Knowledge.jsx'));
 const Leads = lazy(() => import('./pages/admin/Leads.jsx'));
+const AdminTickets = lazy(() => import('./pages/admin/Tickets.jsx'));
+const AdminTicket = lazy(() => import('./pages/admin/Tickets.jsx').then((m) => ({ default: m.TicketDetail })));
 const Audit = lazy(() => import('./pages/admin/Misc.jsx').then((m) => ({ default: m.Audit })));
 const Conversations = lazy(() => import('./pages/admin/Misc.jsx').then((m) => ({ default: m.Conversations })));
 const Media = lazy(() => import('./pages/admin/Misc.jsx').then((m) => ({ default: m.Media })));
@@ -91,8 +93,10 @@ export default function App() {
         <Route path="services/:slug" element={<ServiceDetail />} />
         <Route path="industries" element={<Industries />} />
         <Route path="industries/:slug" element={<IndustryDetail />} />
-        <Route path="pricing" element={<Pricing />} />
+        {/* Prices are no longer published; old links land on the contact form. */}
+        <Route path="pricing" element={<Navigate to="/contact" replace />} />
         <Route path="work" element={<Work />} />
+        <Route path="work/:slug" element={<Work />} />
         <Route path="about" element={<About />} />
         <Route path="responsible-ai" element={<ResponsibleAi />} />
         <Route path="contact" element={<Contact />} />
@@ -105,6 +109,8 @@ export default function App() {
             </RequireAuth>
           }
         />
+        <Route path="portal/tickets" element={<RequireAuth><PortalTickets /></RequireAuth>} />
+        <Route path="portal/tickets/:id" element={<RequireAuth><PortalTicket /></RequireAuth>} />
 
         <Route path="*" element={<NotFound />} />
       </Route>
@@ -126,6 +132,8 @@ export default function App() {
         <Route path="knowledge" element={<RequirePermission permission="knowledge.read"><Knowledge /></RequirePermission>} />
         <Route path="conversations" element={<RequirePermission permission="sakha.conversations.read"><Conversations /></RequirePermission>} />
         <Route path="sakha-settings" element={<RequirePermission permission="sakha.settings.write"><SakhaSettings /></RequirePermission>} />
+        <Route path="tickets" element={<RequirePermission permission="support.tickets.read"><AdminTickets /></RequirePermission>} />
+        <Route path="tickets/:id" element={<RequirePermission permission="support.tickets.read"><AdminTicket /></RequirePermission>} />
         <Route path="leads" element={<RequirePermission permission="crm.leads.read"><Leads /></RequirePermission>} />
         <Route path="people" element={<RequirePermission permission="iam.users.read"><People /></RequirePermission>} />
         <Route path="roles" element={<RequirePermission permission="iam.roles.read"><Roles /></RequirePermission>} />

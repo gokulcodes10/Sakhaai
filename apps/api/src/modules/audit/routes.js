@@ -1,5 +1,5 @@
 import express from 'express';
-import { paginationSchema } from '@sakha/shared';
+import { paginationSchema } from '@asphalix/shared';
 import prisma from '../../lib/prisma.js';
 import { asyncHandler } from '../../middleware/error.js';
 import { validateQuery } from '../../middleware/validate.js';

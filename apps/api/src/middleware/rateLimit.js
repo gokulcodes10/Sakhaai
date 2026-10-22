@@ -86,7 +86,7 @@ export const sakhaLimiter = rateLimit({
   max: (req) => (req.auth?.isAuthenticated ? config.rateLimit.sakhaUser : config.rateLimit.sakhaAnon),
   key: (req) => (req.auth?.userId ? `u:${req.auth.userId}` : `v:${req.visitorId ?? req.ip}`),
   message:
-    "You've reached the limit for now. Sign in for a higher allowance, or email a founder directly — hello@sakhaai.com.",
+    "You've reached the limit for now. Sign in for a higher allowance, or email a founder directly — hello@asphalix.com.",
 });
 
 /** Contact form. Tight, because this one reaches a human inbox. */

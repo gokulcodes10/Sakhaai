@@ -276,7 +276,7 @@ async function collectDbDocuments() {
   const services = (content?.services?.items ?? []).length;
 
   const body = [
-    '# Live facts about Sakha AI',
+    '# Live facts about Asphalix',
     'These are read from the database at index time, not written by hand.',
     '',
     `- Services offered: ${services}`,
@@ -287,7 +287,7 @@ async function collectDbDocuments() {
     `- Knowledge refresh cadence: every ${config.knowledge.refreshHours} hour(s), plus an immediate rebuild whenever content is published`,
   ].join('\n');
 
-  return [{ sourceKey: 'live-facts', title: 'Live facts about Sakha AI', body, sourceUrl: null }];
+  return [{ sourceKey: 'live-facts', title: 'Live facts about Asphalix', body, sourceUrl: null }];
 }
 
 /** Allowlisted public URLs. */

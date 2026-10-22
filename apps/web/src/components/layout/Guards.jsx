@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router';
 import { useSelector } from 'react-redux';
-import { permissionSatisfies } from '@sakha/shared';
+import { permissionSatisfies } from '@asphalix/shared';
 import { selectAuthReady, selectUser } from '../../features/auth/authSlice.js';
 import { Spinner } from '../ui/index.jsx';
 

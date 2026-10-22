@@ -13,8 +13,8 @@ export default function NotFound() {
           <p className="font-mono text-sm text-subtle">404</p>
           <h1 className="mt-4 text-3xl">That page does not exist.</h1>
           <p className="mt-4 leading-relaxed text-muted">
-            It may have moved, or it may never have existed. Sakha knows the whole site — she can
-            probably point you at the right one.
+            It may have moved, or it may never have existed. Sakha, our assistant, knows the whole site
+            and can probably point you at the right one.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button to="/" variant="accent">Back to the homepage</Button>

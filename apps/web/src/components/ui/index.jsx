@@ -7,24 +7,42 @@ import { forwardRef } from 'react';
 import { Link } from 'react-router';
 import clsx from 'clsx';
 
+// ── Hues ──────────────────────────────────────────────────────────────────────
+// The four brand hues each carry a fixed meaning (Identity Kit v2). Class names
+// are spelled out in full so Tailwind's scanner keeps them.
+
+export const HUES = {
+  accent: { text: 'text-accent', bg: 'bg-accent', border: 'border-accent' },
+  trust: { text: 'text-trust', bg: 'bg-trust', border: 'border-trust' },
+  keystone: { text: 'text-keystone', bg: 'bg-keystone', border: 'border-keystone' },
+  iris: { text: 'text-iris', bg: 'bg-iris', border: 'border-iris' },
+};
+
+/** Mono section label with the 22×2 lead-in bar, coloured by hue. */
+export function Eyebrow({ hue = 'keystone', className, children }) {
+  return <p className={clsx('eyebrow', HUES[hue]?.text, className)}>{children}</p>;
+}
+
 // ── Button ────────────────────────────────────────────────────────────────────
 
 const BUTTON_VARIANTS = {
   primary:
-    'bg-ink text-paper hover:bg-ink/90 active:bg-ink disabled:bg-ink/40 shadow-subtle',
+    'bg-ink text-paper hover:bg-ink/85 active:bg-ink disabled:bg-ink/40',
   accent:
-    'bg-accent text-accent-ink hover:bg-accent/90 active:bg-accent disabled:bg-accent/40 shadow-subtle',
+    'bg-accent text-accent-ink hover:bg-accent/85 active:bg-accent disabled:bg-accent/40',
   outline:
-    'border border-line bg-surface text-ink hover:bg-raised hover:border-muted/40 disabled:opacity-50',
+    'border border-line bg-surface text-ink hover:border-ink disabled:opacity-50',
   ghost: 'text-muted hover:text-ink hover:bg-raised disabled:opacity-50',
   danger: 'bg-danger text-white hover:bg-danger/90 disabled:bg-danger/40',
   trust: 'bg-trust text-white hover:bg-trust/90 disabled:bg-trust/40',
+  // No colours: the caller supplies them (e.g. fixed-dark bands that ignore the theme).
+  bare: 'disabled:opacity-50',
 };
 
 const BUTTON_SIZES = {
-  sm: 'h-8 px-3 text-sm gap-1.5 rounded',
-  md: 'h-10 px-4 text-sm gap-2 rounded-md',
-  lg: 'h-12 px-6 text-base gap-2 rounded-md',
+  sm: 'h-9 px-3.5 text-sm gap-1.5 rounded-sm',
+  md: 'h-11 px-4 text-sm gap-2 rounded',
+  lg: 'h-[50px] px-6 text-base gap-2 rounded',
 };
 
 export const Button = forwardRef(function Button(
@@ -158,9 +176,22 @@ export function Checkbox({ label, description, className, ...props }) {
 
 // ── Surfaces ──────────────────────────────────────────────────────────────────
 
-export function Card({ className, children, as: Tag = 'div', ...props }) {
+/**
+ * `hue` adds the 6px colour bar across the top; `inverted` is the dark
+ * "recommended" card that sits in a row of light ones.
+ */
+export function Card({ className, children, hue, inverted, as: Tag = 'div', ...props }) {
   return (
-    <Tag className={clsx('card p-6', className)} {...props}>
+    <Tag
+      className={clsx(
+        'card relative overflow-hidden p-6',
+        inverted && 'border-ink bg-ink text-paper',
+        hue && 'pt-8',
+        className
+      )}
+      {...props}
+    >
+      {hue && <span aria-hidden="true" className={clsx('absolute inset-x-0 top-0 h-1.5', HUES[hue]?.bg)} />}
       {children}
     </Tag>
   );
@@ -171,6 +202,8 @@ export function Badge({ tone = 'neutral', className, children }) {
     neutral: 'bg-raised text-muted border-line',
     accent: 'bg-accent-soft text-accent border-accent/20',
     trust: 'bg-trust-soft text-trust border-trust/20',
+    keystone: 'bg-keystone/10 text-keystone border-keystone/20',
+    iris: 'bg-iris/10 text-iris border-iris/20',
     success: 'bg-success/10 text-success border-success/20',
     danger: 'bg-danger/10 text-danger border-danger/20',
     warning: 'bg-warning/10 text-warning border-warning/20',
@@ -178,7 +211,7 @@ export function Badge({ tone = 'neutral', className, children }) {
   return (
     <span
       className={clsx(
-        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-2xs font-semibold uppercase tracking-wide',
+        'inline-flex items-center gap-1 rounded-sm border px-2 py-0.5 font-mono text-2xs font-medium uppercase tracking-[0.12em]',
         tones[tone],
         className
       )}
@@ -198,13 +231,13 @@ export function Section({ className, children, tone = 'paper', id }) {
     trust: 'bg-trust text-white',
   };
   return (
-    <section id={id} className={clsx('py-18 sm:py-22', tones[tone], className)}>
+    <section id={id} className={clsx('py-18 sm:py-26', tones[tone], className)}>
       <div className="shell">{children}</div>
     </section>
   );
 }
 
-export function SectionHeading({ eyebrow, title, body, align = 'left', className }) {
+export function SectionHeading({ eyebrow, hue = 'keystone', title, body, align = 'left', className }) {
   return (
     <div
       className={clsx(
@@ -213,8 +246,8 @@ export function SectionHeading({ eyebrow, title, body, align = 'left', className
         className
       )}
     >
-      {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-      {title && <h2 className="text-3xl sm:text-4xl">{title}</h2>}
+      {eyebrow && <Eyebrow hue={hue} className="mb-4">{eyebrow}</Eyebrow>}
+      {title && <h2 className="text-3xl leading-[1.08] sm:text-[2.875rem]">{title}</h2>}
       {body && <p className="mt-5 text-lg leading-relaxed text-muted">{body}</p>}
     </div>
   );
@@ -255,8 +288,8 @@ export function Skeleton({ className }) {
 /** Small labelled statistic, used on case studies and the admin dashboard. */
 export function Stat({ label, value, note, tone = 'accent' }) {
   return (
-    <div className="border-l-2 pl-4" style={{ borderColor: `rgb(var(--${tone}))` }}>
-      <p className="font-display text-3xl font-semibold leading-none text-ink">{value}</p>
+    <div className="border-l-[3px] pl-4" style={{ borderColor: `rgb(var(--${tone}))` }}>
+      <p className="font-display text-[2.125rem] font-semibold leading-none tracking-[-0.025em] text-ink">{value}</p>
       <p className="mt-2 text-sm font-medium text-ink">{label}</p>
       {note && <p className="mt-1 text-xs text-subtle">{note}</p>}
     </div>

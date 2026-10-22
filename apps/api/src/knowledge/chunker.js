@@ -135,7 +135,7 @@ function tailOf(text, chars) {
  * Flatten the site content tree into readable documents.
  *
  * This is the piece that lets Sakha answer "what does a pilot include?" from
- * the same JSON the pricing page renders — one source of truth, so the page and
+ * the same JSON the site renders — one source of truth, so the page and
  * the assistant can never disagree.
  */
 export function contentToDocuments(content) {
@@ -147,8 +147,8 @@ export function contentToDocuments(content) {
 
   const c = content ?? {};
 
-  add('company', 'Sakha AI — company overview', [
-    `# Sakha AI (${c.company?.legalName ?? 'Sakha InfoTech'})`,
+  add('company', `${c.company?.brandName ?? 'Asphalix'} — company overview`, [
+    `# ${c.company?.brandName ?? 'Asphalix'} (${c.company?.legalName ?? 'Asphalix'})`,
     c.company?.tagline && `Tagline: ${c.company.tagline}`,
     c.company?.elevatorPitch,
     c.company?.originLine && `Origin: ${c.company.originLine}`,
@@ -194,31 +194,8 @@ export function contentToDocuments(content) {
     ], { sourceUrl: '/services' });
   }
 
-  for (const t of c.pricing?.tiers ?? []) {
-    add(`pricing:${t.slug}`, `Pricing — ${t.name}`, [
-      `# ${t.name} — ${t.priceDisplay ?? ''}`,
-      t.tagline,
-      t.duration && `Typical duration: ${t.duration}`,
-      t.bestFor && `Best for: ${t.bestFor}`,
-      t.includes?.length && `## Includes\n${t.includes.map((i) => `- ${i}`).join('\n')}`,
-      t.notIncluded?.length && `## Not included\n${t.notIncluded.map((i) => `- ${i}`).join('\n')}`,
-    ], { sourceUrl: '/pricing' });
-  }
-
-  if (c.pricing?.managed?.enabled) {
-    add('pricing:managed', 'Pricing — after launch, managed plans', [
-      `# ${c.pricing.managed.headline ?? 'Managed plans'}`,
-      c.pricing.managed.body,
-      ...(c.pricing.managed.plans ?? []).map(
-        (p) => `## ${p.name} — ${p.price} ${p.priceNote ?? ''}\n${(p.includes ?? []).map((i) => `- ${i}`).join('\n')}`
-      ),
-    ], { sourceUrl: '/pricing' });
-  }
-
-  if (c.pricing?.faq?.length) {
-    add('pricing:faq', 'Pricing — frequently asked questions',
-      c.pricing.faq.map((f) => `## ${f.q}\n${f.a}`), { sourceUrl: '/pricing' });
-  }
+  // Prices are deliberately not indexed: Asphalix does not publish them, and
+  // Sakha must not be able to quote one. See the "Prices — never" prompt rule.
 
   for (const i of c.industries?.items ?? []) {
     if (i.published === false) continue;
@@ -243,7 +220,7 @@ export function contentToDocuments(content) {
     ], { sourceUrl: `/work/${cs.slug}` });
   }
 
-  add('about', 'About Sakha AI', [
+  add('about', `About ${c.company?.brandName ?? 'Asphalix'}`, [
     `# ${c.about?.hero?.headline ?? 'About'}`,
     c.about?.hero?.subhead,
     c.about?.story?.headline && `## ${c.about.story.headline}`,
@@ -253,7 +230,7 @@ export function contentToDocuments(content) {
     c.about?.team?.length &&
       // Both the full title and the short form ("CEO & CTO") go in, because a
       // visitor asks "who is the CEO" and the page says "Chief Executive Officer".
-      `## The team\n${c.about.team
+      `## Founders' desk — the team\n${c.about.team
         .map((t) => `- ${t.name} — ${t.role}${t.shortRole && t.shortRole !== t.role ? ` (${t.shortRole})` : ''}. ${t.bio ?? ''} Contact: ${t.email ?? ''}`)
         .join('\n')}`,
   ], { sourceUrl: '/about' });

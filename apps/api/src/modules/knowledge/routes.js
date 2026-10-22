@@ -1,5 +1,5 @@
 import express from 'express';
-import { crawlSourceSchema, knowledgeDocSchema, knowledgeSettingsSchema, paginationSchema } from '@sakha/shared';
+import { crawlSourceSchema, knowledgeDocSchema, knowledgeSettingsSchema, paginationSchema } from '@asphalix/shared';
 import prisma from '../../lib/prisma.js';
 import config from '../../config/index.js';
 import { asyncHandler } from '../../middleware/error.js';

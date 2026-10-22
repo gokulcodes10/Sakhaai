@@ -3,7 +3,7 @@
  *  Seed / reconcile.
  * ─────────────────────────────────────────────────────────────────────────────
  *  Idempotent by design — safe to run on every deploy. It reconciles the
- *  permission catalogue and the system roles from @sakha/shared into the
+ *  permission catalogue and the system roles from @asphalix/shared into the
  *  database, then ensures the founding accounts exist.
  *
  *  It never overwrites a permission grant an admin has made through the CMS.
@@ -17,7 +17,7 @@ import {
   PERMISSION_CATALOGUE,
   SYSTEM_ROLES,
   ROLE_RANK,
-} from '@sakha/shared';
+} from '@asphalix/shared';
 import { PrismaClient } from '@prisma/client';
 import argon2 from 'argon2';
 import { readFile } from 'node:fs/promises';
@@ -217,7 +217,7 @@ async function seedCrawlSources() {
 }
 
 async function main() {
-  console.log('\n▸ Seeding Sakha\n');
+  console.log('\n▸ Seeding Asphalix\n');
 
   await seedPermissions();
   const roles = await seedRoles();
@@ -226,7 +226,7 @@ async function main() {
     email: process.env.SEED_SUPERADMIN_EMAIL,
     password: process.env.SEED_SUPERADMIN_PASSWORD,
     name: 'Gokul Madhesh',
-    title: 'Chief Executive Officer & Chief Technology Officer',
+    title: 'Founder & Chief Technology Officer',
     roleKey: SYSTEM_ROLES.SUPER_ADMIN,
     roles,
   });
@@ -234,17 +234,8 @@ async function main() {
   await ensureUser({
     email: process.env.SEED_ADMIN_BD_EMAIL,
     password: process.env.SEED_ADMIN_BD_PASSWORD,
-    name: 'Malarvizhi',
-    title: 'Business Development Manager',
-    roleKey: SYSTEM_ROLES.ADMIN,
-    roles,
-  });
-
-  await ensureUser({
-    email: process.env.SEED_ADMIN_RESEARCH_EMAIL,
-    password: process.env.SEED_ADMIN_RESEARCH_PASSWORD,
-    name: 'Sai',
-    title: 'Chief Research Officer',
+    name: 'Malarvizhi Madesan',
+    title: 'Co-founder & Chief Executive Officer',
     roleKey: SYSTEM_ROLES.ADMIN,
     roles,
   });
@@ -256,7 +247,7 @@ async function main() {
   console.log('\n✓ Seed complete.\n');
   console.log('  Sign in at /signin with the SEED_* credentials in your .env.');
   console.log('  Change those passwords before this touches the internet.\n');
-  console.log('  Note: the two admins have NO CMS access yet — that is deliberate.');
+  console.log('  Note: the admin account has NO CMS access yet — that is deliberate.');
   console.log('  Grant it from Admin → People & Access as the super admin.\n');
 }
 
