@@ -1,8 +1,10 @@
+import { Link } from 'react-router';
 import { useSelector } from 'react-redux';
 import { selectContent } from '../features/content/contentSlice.js';
 import { Section, SectionHeading } from '../components/ui/index.jsx';
 import Seo from '../components/layout/Seo.jsx';
 import PageHero from '../components/layout/PageHero.jsx';
+import Lifecycle from '../components/about/Lifecycle.jsx';
 import { CtaBand } from './Services.jsx';
 
 export default function About() {
@@ -41,9 +43,28 @@ export default function About() {
                   </div>
                 )}
                 <div className="flex flex-1 flex-col p-8 sm:p-10">
-                  <h3 className="text-3xl sm:text-4xl">{person.name}</h3>
+                  <h3 className="text-3xl sm:text-4xl">
+                    <Link to={`/about/${person.slug}`} className="transition-colors hover:text-accent">
+                      {person.name}
+                    </Link>
+                  </h3>
                   <p className="mt-2 text-lg text-accent">{person.role}</p>
                   {person.bio && <p className="mt-6 text-lg leading-relaxed text-muted">{person.bio}</p>}
+                  {person.record?.lifecycle?.length > 0 && (
+                    <div className="mt-8 border-t border-line pt-7">
+                      <p className="mb-5 font-mono text-2xs uppercase tracking-wider text-subtle">
+                        {person.record.headline ?? 'Engineering record'}
+                      </p>
+                      <Lifecycle stages={person.record.lifecycle} sources={person.record.sources} compact />
+                      <Link
+                        to={`/about/${person.slug}`}
+                        className="mt-5 inline-flex items-center gap-1.5 text-base font-medium text-ink transition-colors hover:text-accent"
+                      >
+                        See the evidence, projects and reference
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                    </div>
+                  )}
                   {person.talkTo?.length > 0 && (
                     <div className="mt-8 border-t border-line pt-7">
                       <p className="font-mono text-2xs uppercase tracking-wider text-subtle">

@@ -235,6 +235,31 @@ export function contentToDocuments(content) {
         .join('\n')}`,
   ], { sourceUrl: '/about' });
 
+  // A founder's engineering record gets its own document, so "who builds your
+  // agents?" or "has your team done on-premise LLMs?" retrieves the evidence
+  // and links to the profile page rather than the About page in general.
+  for (const t of (c.about?.team ?? []).filter((m) => m.record)) {
+    const r = t.record;
+    const src = (s) => r.sources?.[s] ?? s;
+    add(`person:${t.slug}`, `${t.name} — ${t.role}: engineering record`, [
+      `# ${t.name}, ${t.role}`,
+      r.summary,
+      r.lifecycle?.length &&
+        `## Plan to production, stage by stage\n${r.lifecycle
+          .map((s) => `### ${s.label}\n${s.summary}\n${(s.evidence ?? []).map((e) => `- ${e.text} (Source: ${src(e.source)})`).join('\n')}`)
+          .join('\n\n')}`,
+      r.projects?.length &&
+        `## Projects\n${r.projects.map((p) => `- ${p.name} (${p.kind}): ${p.body}${p.stack?.length ? ` Stack: ${p.stack.join(', ')}.` : ''}`).join('\n')}`,
+      r.timeline?.length &&
+        `## Experience and education\n${r.timeline.map((e) => `- ${e.period}: ${e.title}, ${e.org}. ${e.body ?? ''}`).join('\n')}`,
+      r.skills?.length && `## Skills\n${r.skills.map((g) => `- ${g.group}: ${g.items.join(', ')}`).join('\n')}`,
+      r.reference?.quotes?.length &&
+        `## Reference\n${r.reference.name}, ${r.reference.title}, wrote on ${r.reference.date}:\n${r.reference.quotes.map((q) => `> ${q}`).join('\n')}`,
+      t.linkedin && `LinkedIn: ${t.linkedin}`,
+      t.github && `GitHub: ${t.github}`,
+    ], { sourceUrl: `/about/${t.slug}` });
+  }
+
   add('responsible-ai', 'Responsible deployment checklist and autonomy levels', [
     `# ${c.responsibleAi?.hero?.headline ?? 'Responsible deployment'}`,
     c.responsibleAi?.hero?.subhead,

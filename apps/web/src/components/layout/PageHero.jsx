@@ -7,7 +7,7 @@ export default function PageHero({ eyebrow, title, subhead, back, children }) {
         {back && (
           <Link
             to={back.href}
-            className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent"
+            className="mb-6 flex w-fit items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent"
           >
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M16 10H4M9 5l-5 5 5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />

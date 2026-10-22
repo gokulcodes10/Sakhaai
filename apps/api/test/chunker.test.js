@@ -56,6 +56,10 @@ test('contentToDocuments flattens the real content tree', async () => {
   assert.ok(keys.includes('company'));
   assert.ok(keys.includes('about'));
   assert.ok(keys.some((k) => k.startsWith('service:')));
+  const record = docs.find((d) => d.sourceKey === 'person:gokul-madhesh');
+  assert.ok(record, "the CTO's engineering record must be retrievable");
+  assert.equal(record.sourceUrl, '/about/gokul-madhesh');
+  assert.ok(record.body.includes('(Source: '), 'every evidence line should carry its source');
   assert.ok(!keys.some((k) => k.startsWith('pricing:')), 'pricing must never be indexed');
 
   // Every document must have real content, or it will pollute retrieval.

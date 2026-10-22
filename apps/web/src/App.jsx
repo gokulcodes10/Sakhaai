@@ -15,6 +15,7 @@ import { Services, ServiceDetail } from './pages/Services.jsx';
 import { Industries, IndustryDetail } from './pages/Industries.jsx';
 import Work from './pages/Work.jsx';
 import About from './pages/About.jsx';
+import Person from './pages/Person.jsx';
 import ResponsibleAi from './pages/ResponsibleAi.jsx';
 import Contact from './pages/Contact.jsx';
 import { ForgotPassword, ResetPassword, SignIn, SignUp } from './pages/Auth.jsx';
@@ -98,6 +99,7 @@ export default function App() {
         <Route path="work" element={<Work />} />
         <Route path="work/:slug" element={<Work />} />
         <Route path="about" element={<About />} />
+        <Route path="about/:slug" element={<Person />} />
         <Route path="responsible-ai" element={<ResponsibleAi />} />
         <Route path="contact" element={<Contact />} />
 

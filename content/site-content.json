@@ -450,6 +450,291 @@
         "photo": "/team/gokul-madhesh.jpg",
         "linkedin": "https://www.linkedin.com/in/gokul-m-900947255",
         "email": "gokul@asphalix.com",
+        "github": "https://github.com/gokulcodes10",
+        "record": {
+          "_note": "Every line must trace to a source a visitor can check: the DYSL-SM letter of recommendation (lor), Gokul's work at DYSL-SM as stated on his resume (role), or something running on this site (site). No invented metrics, no DRDO emblem, and nothing about lab systems beyond what Gokul has cleared for his public resume.",
+          "headline": "Gokul's engineering record",
+          "summary": "Gokul builds AI systems that run in production: on-premise language-model and agent platforms, enterprise portals and scientific tools. He joined a DRDO laboratory as a research intern and became the engineer who owns its AI platform, ERP and helpdesk end to end, from model serving and retrieval to backend, frontend and deployment.",
+          "sources": {
+            "lor": "Letter of recommendation, DYSL-SM",
+            "role": "Work at DYSL-SM",
+            "site": "Running on this site"
+          },
+          "lifecycle": [
+            {
+              "key": "plan",
+              "label": "Plan",
+              "summary": "Starts from the machine: profiles the hardware, then decides which models can safely run on it.",
+              "evidence": [
+                {
+                  "text": "Hardware-aware model selection for local inference.",
+                  "source": "lor"
+                },
+                {
+                  "text": "DMATRIX turns a machine's hardware profile into a capability tier that governs model selection, engine choice and ingestion policy.",
+                  "source": "role"
+                }
+              ]
+            },
+            {
+              "key": "build",
+              "label": "Build",
+              "summary": "Builds the model, retrieval and agent layers, and the application around them, as the sole engineer.",
+              "evidence": [
+                {
+                  "text": "Local inference pipelines, retrieval-augmented generation, document chunking, tool-using agents and multi-step orchestration.",
+                  "source": "lor"
+                },
+                {
+                  "text": "Architected and shipped DMATRIX, the lab's on-premise LLM platform: an OpenAI-compatible inference gateway, RAG chat and document screening.",
+                  "source": "role"
+                },
+                {
+                  "text": "Delivered the lab's intranet ERP and HRD portal and its IT helpdesk end to end, across Python, TypeScript and Java.",
+                  "source": "role"
+                },
+                {
+                  "text": "Sakha, the assistant on this site: retrieval over our documents, tool calls and handoff to a person.",
+                  "source": "site"
+                }
+              ]
+            },
+            {
+              "key": "test",
+              "label": "Test",
+              "summary": "Ships nothing without automated tests, including tests for what a system must never do.",
+              "evidence": [
+                {
+                  "text": "Automated test suites on every platform he runs.",
+                  "source": "role"
+                },
+                {
+                  "text": "This platform's automated tests check, among other things, that Sakha can never quote a price.",
+                  "source": "site"
+                }
+              ]
+            },
+            {
+              "key": "validate",
+              "label": "Validate & verify",
+              "summary": "Trained in verification and validation of AI systems: was it built right, and was it the right thing to build.",
+              "evidence": [
+                {
+                  "text": "Trained in Verification and Validation (V&V) of AI systems; builds evaluation harnesses that report results with statistical confidence.",
+                  "source": "role"
+                },
+                {
+                  "text": "Understanding of model runtime behaviour, resource constraints and operational oversight.",
+                  "source": "lor"
+                }
+              ]
+            },
+            {
+              "key": "qa",
+              "label": "Quality assurance",
+              "summary": "Makes every action accountable and gates every deliverable before anyone depends on it.",
+              "evidence": [
+                {
+                  "text": "QA tooling that gates each deliverable on both verification and validation.",
+                  "source": "role"
+                },
+                {
+                  "text": "Append-only audit logs that refuse edits at both the application and database level; every DMATRIX inference is written to a tamper-evident ledger.",
+                  "source": "role"
+                },
+                {
+                  "text": "Thorough in documentation and persistent with complex technical problems.",
+                  "source": "lor"
+                }
+              ]
+            },
+            {
+              "key": "deploy",
+              "label": "Deploy",
+              "summary": "Puts it on the production server, keeps services isolated and private, and leaves staff able to run it.",
+              "evidence": [
+                {
+                  "text": "Containerisation, GPU runtime configuration, reverse-proxy architecture, service isolation and secure intranet deployment.",
+                  "source": "lor"
+                },
+                {
+                  "text": "Containerised deployment behind an nginx reverse proxy, versioned database migrations, verified backups and runbooks so staff can run every system unaided.",
+                  "source": "role"
+                },
+                {
+                  "text": "This site runs as isolated containers behind an nginx reverse proxy.",
+                  "source": "site"
+                }
+              ]
+            }
+          ],
+          "projects": [
+            {
+              "name": "DMATRIX",
+              "kind": "On-premise, hardware-aware agentic AI platform · M.Tech thesis",
+              "body": "Inverts the usual self-hosted LLM stack: the machine is the input. It profiles the hardware, decides which models can safely run, and serves private chat, RAG and document screening behind an OpenAI-compatible gateway, with every inference committed to a tamper-evident audit ledger. Manuscript in preparation.",
+              "stack": [
+                "Python",
+                "FastAPI",
+                "vLLM",
+                "llama.cpp",
+                "React",
+                "TypeScript",
+                "PostgreSQL + pgvector",
+                "Redis",
+                "Docker"
+              ]
+            },
+            {
+              "name": "DYSL Intranet Portal and HRD Work-sphere",
+              "kind": "Laboratory-wide ERP",
+              "body": "Built to run itself: role-based access, audited actions, self-verifying nightly backups and a confirmation-gated restore, so a single engineer could hand it to staff with confidence.",
+              "stack": [
+                "Next.js",
+                "TypeScript",
+                "Redux Toolkit",
+                "Prisma",
+                "PostgreSQL",
+                "Docker Compose",
+                "nginx"
+              ]
+            },
+            {
+              "name": "IT Helpdesk",
+              "kind": "Intranet ticketing system",
+              "body": "An enforced ticket lifecycle and an append-only audit log that refuses edits at both the application and database level, so every action on every ticket stays accountable.",
+              "stack": [
+                "Python",
+                "Django",
+                "PostgreSQL",
+                "nginx"
+              ]
+            },
+            {
+              "name": "HESMA",
+              "kind": "Scientific web calculator",
+              "body": "Built with materials researchers to turn their thermodynamic models for high-entropy shape memory alloys into a tool they use.",
+              "stack": []
+            },
+            {
+              "name": "Surrogate-guided search for NiTi shape memory alloys",
+              "kind": "Research · Aug 2026 – present",
+              "body": "Random-forest surrogates with conformal intervals on experimental data, and a planner over the alloy space benchmarked against rejection sampling, line search and Bayesian optimisation. Working toward publication.",
+              "stack": [
+                "Python",
+                "scikit-learn"
+              ]
+            }
+          ],
+          "timeline": [
+            {
+              "period": "Present",
+              "title": "Founder & Chief Technology Officer",
+              "org": "Asphalix",
+              "body": "Leads architecture and the engineering bar every Asphalix agent has to clear. Built this platform and Sakha."
+            },
+            {
+              "period": "Feb 2026 – present",
+              "title": "AI Engineer (joined as AI/ML Research Intern)",
+              "org": "DRDO Young Scientists' Laboratory for Smart Materials (DYSL-SM), Hyderabad",
+              "body": "Joined as a research intern and within months took ownership of production systems used daily by lab scientists and staff, as the sole engineer."
+            },
+            {
+              "period": "Aug 2022 – May 2027 (expected)",
+              "title": "Integrated M.Tech (Hons.), Computer Science and Engineering",
+              "org": "Sri Krishna College of Engineering and Technology, Coimbatore",
+              "body": "Thesis: DMATRIX, an offline, hardware-aware agentic AI platform, developed at DRDO DYSL-SM."
+            }
+          ],
+          "skills": [
+            {
+              "group": "Languages",
+              "items": [
+                "Python",
+                "TypeScript",
+                "JavaScript",
+                "Java",
+                "SQL",
+                "Bash"
+              ]
+            },
+            {
+              "group": "LLM inference and agents",
+              "items": [
+                "vLLM",
+                "llama.cpp",
+                "Ollama",
+                "OpenAI-compatible APIs",
+                "Tool-calling agents",
+                "Model Context Protocol (MCP)",
+                "Hardware-aware model selection",
+                "GPU runtime configuration"
+              ]
+            },
+            {
+              "group": "Retrieval and evaluation",
+              "items": [
+                "pgvector",
+                "FAISS",
+                "ChromaDB",
+                "LangChain",
+                "LangGraph",
+                "Tesseract OCR",
+                "Apache Tika",
+                "Bootstrap confidence intervals",
+                "Permutation tests",
+                "Conformal intervals"
+              ]
+            },
+            {
+              "group": "Backend and frontend",
+              "items": [
+                "FastAPI",
+                "Django",
+                "Spring Boot",
+                "Express",
+                "Next.js",
+                "React",
+                "Vite",
+                "Redux Toolkit",
+                "Tailwind CSS",
+                "Prisma",
+                "SQLAlchemy",
+                "Pydantic",
+                "Zod"
+              ]
+            },
+            {
+              "group": "Data and infrastructure",
+              "items": [
+                "PostgreSQL",
+                "MySQL",
+                "SQLite",
+                "Redis",
+                "MongoDB",
+                "Docker Compose",
+                "nginx reverse proxy",
+                "GitHub Actions",
+                "NVIDIA Container Toolkit",
+                "Air-gapped and offline deployment",
+                "JWT and RBAC"
+              ]
+            }
+          ],
+          "reference": {
+            "quotes": [
+              "Mr. Gokul demonstrates a rare and practical depth in LLM and Generative AI engineering.",
+              "His understanding of model runtime behaviour, resource constraints, and operational oversight is well beyond what is typical at his stage.",
+              "On the engineering side, Mr. Gokul bridges AI research and production deployment with a maturity that stands out.",
+              "He is self-directed, thorough in documentation, persistent to solve complex technical challenges, and fully capable across the frontend, backend, infrastructure, and model layers."
+            ],
+            "name": "KNS Pavan Kumar",
+            "title": "Scientist 'C', DYSL-SM, DRDO",
+            "date": "10 June 2026",
+            "letterRef": "DYSL-SM/LOR/2026/INT-01",
+            "note": "Excerpts from a letter of recommendation. The full letter is available on request."
+          }
+        },
         "order": 1
       },
       {

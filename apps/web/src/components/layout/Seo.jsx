@@ -10,9 +10,9 @@ import { selectContent } from '../../features/content/contentSlice.js';
  * genuinely matters, the answer is prerendering, not a bigger meta library —
  * see docs/DEPLOYMENT.md.
  */
-const SITE_URL = 'https://asphalix.com';
+export const SITE_URL = 'https://asphalix.com';
 
-export default function Seo({ title, description, canonical, noindex }) {
+export default function Seo({ title, description, canonical, noindex, jsonLd }) {
   const content = useSelector(selectContent);
   const seo = content?.seo;
 
@@ -35,6 +35,18 @@ export default function Seo({ title, description, canonical, noindex }) {
     }
     link.href = href;
   }, [title, description, canonical, noindex, seo]);
+
+  // Structured data (schema.org) for pages that describe a specific thing,
+  // e.g. a founder's profile. Removed on unmount so it never leaks to the next route.
+  const ld = jsonLd ? JSON.stringify(jsonLd) : null;
+  useEffect(() => {
+    if (!ld) return undefined;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = ld;
+    document.head.appendChild(script);
+    return () => script.remove();
+  }, [ld]);
 
   return null;
 }
