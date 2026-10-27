@@ -49,3 +49,25 @@ test('the prompt forbids prices and describes support', () => {
   assert.match(DEFAULT_SYSTEM_PROMPT, /request_human/);
   assert.ok(!DEFAULT_SYSTEM_PROMPT.includes('published price tiers'));
 });
+
+test('get_team_member returns the whole published record, never editorial notes or photos', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const { findTeamMembers } = await import('../src/sakha/tools.js');
+  const content = JSON.parse(await readFile(new URL('../../../content/site-content.json', import.meta.url), 'utf8'));
+
+  const { people, note } = findTeamMembers(content, 'Gokul');
+  assert.equal(people.length, 1);
+  const gokul = people[0];
+  assert.ok(gokul.record.lifecycle.length > 0 && gokul.record.timeline.length > 0 && gokul.record.reference.quotes.length > 0);
+  assert.ok(gokul.record.timeline.every((t) => t.period), 'every timeline entry carries its dates');
+  assert.match(note, /Never turn them into a number of years/);
+  assert.ok(!JSON.stringify(people).includes('"_'), 'editorial _ keys leaked');
+  assert.equal(gokul.photo, undefined);
+
+  assert.equal(findTeamMembers(content, 'technical lead').people[0]?.slug, 'gokul-madhesh');
+  assert.equal(findTeamMembers(content, 'CEO').people[0]?.slug, 'malarvizhi');
+
+  const unknown = findTeamMembers(content, 'Sai');
+  assert.equal(unknown.people.length, 0);
+  assert.equal(unknown.team.length, content.about.team.length, 'an unknown name lists the team instead');
+});

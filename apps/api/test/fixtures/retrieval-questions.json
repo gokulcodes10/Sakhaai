@@ -1,0 +1,36 @@
+{
+  "_note": "Retrieval test set. 'expect' lists acceptable document titles (any one is a hit). 'none' questions have no answer in the knowledge base; good retrieval returns nothing or very little for them. Used by src/scripts/evalRetrieval.js.",
+  "answerable": [
+    { "q": "How fast can you go live?", "expect": ["Homepage"] },
+    { "q": "What happens on day 0?", "expect": ["Homepage"] },
+    { "q": "How much does it cost?", "expect": ["How we scope an engagement"] },
+    { "q": "Do you publish prices?", "expect": ["How we scope an engagement"] },
+    { "q": "Who is the CEO?", "expect": ["About Asphalix"] },
+    { "q": "What is Gokul's technical background?", "expect": ["Gokul Madhesh — Founder & Chief Technology Officer: engineering record"] },
+    { "q": "Has your CTO worked with DRDO?", "expect": ["Gokul Madhesh — Founder & Chief Technology Officer: engineering record"] },
+    { "q": "Can you automate WhatsApp replies to customers?", "expect": ["Service — Customer response agents"] },
+    { "q": "We lose leads because nobody follows up", "expect": ["Service — Follow-up and revenue agents"] },
+    { "q": "Can you connect our ERP and CRM?", "expect": ["Service — System integration and data groundwork"] },
+    { "q": "Can an agent update our inventory spreadsheet every day?", "expect": ["Service — Internal operations agents", "Service — System integration and data groundwork"] },
+    { "q": "Do you work with hospitals or clinics?", "expect": ["Industry — Clinics and diagnostics"] },
+    { "q": "Do you work with colleges?", "expect": ["Industry — Colleges and training institutes"] },
+    { "q": "We are a manufacturer with dealers placing orders", "expect": ["Industry — Manufacturing and distribution"] },
+    { "q": "What won't you build?", "expect": ["What we will not build"] },
+    { "q": "Will you build a chatbot that replaces my whole sales team?", "expect": ["What we will not build"] },
+    { "q": "How do I raise a support ticket?", "expect": ["How support works"] },
+    { "q": "What does pending mean on my ticket?", "expect": ["How support works"] },
+    { "q": "What happens if the agent makes a mistake?", "expect": ["Responsible deployment checklist and autonomy levels"] },
+    { "q": "Who owns the code after handover?", "expect": ["Homepage", "About Asphalix", "Responsible deployment checklist and autonomy levels"] },
+    { "q": "How do I contact you?", "expect": ["How to get in touch", "Asphalix — company overview", "About Asphalix"] },
+    { "q": "Why are you so fast?", "expect": ["Reusable modules — why we are fast", "Homepage"] },
+    { "q": "Have you deployed an agent anywhere real?", "expect": ["Case study — Asphalix"] },
+    { "q": "What autonomy levels do you offer?", "expect": ["Responsible deployment checklist and autonomy levels"] }
+  ],
+  "none": [
+    "ping",
+    "Do you sell laptops?",
+    "what's the weather in Chennai",
+    "write me a python function that reverses a string",
+    "Do you build computer vision for defect detection?"
+  ]
+}

@@ -38,7 +38,7 @@ export async function retrieve(query, { topK = config.knowledge.topK, visibility
   const q = String(query ?? '').trim();
   if (!q) return [];
 
-  const lexical = await lexicalSearch(q, { topK: topK * 3, visibility, sources });
+  const lexical = relevant(await lexicalSearch(q, { topK: topK * 3, visibility, sources }));
 
   let combined = lexical;
 
@@ -64,6 +64,14 @@ export async function retrieve(query, { topK = config.knowledge.topK, visibility
   }
   return out;
 }
+
+// A lexical hit scoring under this fraction of the best hit matched on a stray
+// word ("team", "build") rather than on what was asked. Tuned against
+// test/fixtures/retrieval-questions.json: it cut off-target passages by about
+// a third without losing a single correct one.
+const RELATIVE_CUTOFF = 0.3;
+
+const relevant = (rows) => rows.filter((r) => r.score >= RELATIVE_CUTOFF * (rows[0]?.score ?? 0));
 
 /**
  * English stopwords stripped before building the tsquery. Postgres would drop
@@ -116,7 +124,10 @@ const SYNONYMS = {
   hire: ['engagement', 'memo', 'contact'],
 };
 
-/** Turn a natural-language question into a safe, OR-based tsquery string. */
+/**
+ * Turn a natural-language question into safe tsquery strings: the visitor's
+ * own words (OR), their synonyms (OR, scored lower), and all own words (AND).
+ */
 export function buildTsQuery(raw) {
   const words = String(raw)
     .toLowerCase()
@@ -125,11 +136,13 @@ export function buildTsQuery(raw) {
     .filter((w) => w.length > 1 && !STOPWORDS.has(w))
     .slice(0, 12);
 
-  if (!words.length) return { or: '', and: '', words: [] };
+  if (!words.length) return { or: '', syn: '', and: '', words: [] };
 
-  const expanded = new Set(words);
+  // Synonyms widen recall but must not outvote the words actually typed:
+  // "sales team" should not land on the founders' page because team → founder.
+  const synonyms = new Set();
   for (const w of words) {
-    for (const syn of SYNONYMS[w] ?? []) expanded.add(syn);
+    for (const syn of SYNONYMS[w] ?? []) if (!words.includes(syn)) synonyms.add(syn);
   }
 
   // :* gives prefix matching, so "automat" finds "automation" and "automated"
@@ -137,7 +150,8 @@ export function buildTsQuery(raw) {
   const safe = (w) => `${w.replace(/[^a-z0-9]/g, '')}:*`;
 
   return {
-    or: [...expanded].filter(Boolean).map(safe).join(' | '),
+    or: words.map(safe).join(' | '),
+    syn: [...synonyms].map(safe).join(' | '),
     and: words.map(safe).join(' & '),
     words,
   };
@@ -146,16 +160,18 @@ export function buildTsQuery(raw) {
 /**
  * Lexical retrieval.
  *
- * Two tsqueries are run against the same weighted vector:
- *   • an OR query over the question's content words plus their synonyms, which
- *     provides recall — this is what actually finds things;
+ * Three tsqueries are run against the same weighted vector:
+ *   • an OR query over the question's content words, which provides recall —
+ *     this is what actually finds things;
+ *   • an OR query over their synonyms, which finds pages worded differently
+ *     but ranks below a match on the visitor's own words;
  *   • an AND query over the original words only, which provides precision and
  *     is used purely as a ranking bonus.
  * Trigram similarity is added on top so a typo still lands somewhere sensible.
  */
 async function lexicalSearch(q, { topK, visibility, sources }) {
   const vis = visibility.length ? visibility : ['public'];
-  const { or, and, words } = buildTsQuery(q);
+  const { or, syn, and, words } = buildTsQuery(q);
 
   if (!or) return [];
 
@@ -166,6 +182,7 @@ async function lexicalSearch(q, { topK, visibility, sources }) {
         SELECT
           to_tsquery('english', $1) AS or_q,
           CASE WHEN $2 = '' THEN NULL ELSE to_tsquery('english', $2) END AS and_q,
+          CASE WHEN $6 = '' THEN NULL ELSE to_tsquery('english', $6) END AS syn_q,
           $3::text AS raw
       )
       SELECT
@@ -178,6 +195,7 @@ async function lexicalSearch(q, { topK, visibility, sources }) {
         kd.source,
         (
           ts_rank_cd(kc.search_vector, params.or_q) * 6.0
+          + CASE WHEN params.syn_q IS NOT NULL THEN ts_rank_cd(kc.search_vector, params.syn_q) * 3.0 ELSE 0 END
           + CASE WHEN params.and_q IS NOT NULL AND kc.search_vector @@ params.and_q THEN 2.0 ELSE 0 END
           + similarity(kc.content, params.raw) * 1.5
           + similarity(kd.title, params.raw) * 2.5
@@ -186,9 +204,10 @@ async function lexicalSearch(q, { topK, visibility, sources }) {
       JOIN knowledge_documents kd ON kd.id = kc."documentId"
       CROSS JOIN params
       WHERE kc.visibility = ANY($4::text[])
-        ${sources?.length ? 'AND kd.source = ANY($6::text[])' : ''}
+        ${sources?.length ? 'AND kd.source = ANY($7::text[])' : ''}
         AND (
           kc.search_vector @@ params.or_q
+          OR (params.syn_q IS NOT NULL AND kc.search_vector @@ params.syn_q)
           OR similarity(kc.content, params.raw) > 0.08
           OR similarity(kd.title, params.raw) > 0.15
         )
@@ -200,6 +219,7 @@ async function lexicalSearch(q, { topK, visibility, sources }) {
       q,
       vis,
       topK,
+      syn,
       ...(sources?.length ? [sources] : [])
     );
     return rows.map((r) => ({ ...r, score: Number(r.score) }));

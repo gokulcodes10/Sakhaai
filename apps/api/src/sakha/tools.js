@@ -236,6 +236,27 @@ export const TOOLS = [
     },
   },
 
+  {
+    name: 'get_team_member',
+    description:
+      "Everything published about a founder: role, bio, contact, and where it exists the full engineering record — evidence for each lifecycle stage with its source, projects, a dated timeline, skills and reference quotes. Use this, not search, for any question about who someone is or about their background, experience or expertise. Leave name empty to list the team.",
+    parameters: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'A name, first name or role, e.g. "Gokul", "CEO", "technical lead". Optional.' },
+      },
+      required: [],
+    },
+    async handler({ name }, ctx) {
+      const content = await getPublishedContent();
+      const found = findTeamMembers(content, name);
+      for (const person of found.people) {
+        ctx.citations.push({ title: `${person.name} — ${person.role}`, url: `/about/${person.slug}`, source: 'cms', heading: null });
+      }
+      return found;
+    },
+  },
+
   // ── Action ──────────────────────────────────────────────────────────────────
   {
     name: 'capture_lead',
@@ -594,6 +615,46 @@ export const TOOLS = [
     },
   },
 ];
+
+/**
+ * The founders matching `query` (a name, first name or role), as published,
+ * minus editorial `_` keys and the photo. No query, or no match, lists the
+ * team so the model can ask which person was meant.
+ */
+export function findTeamMembers(content, query) {
+  const team = [...(content?.about?.team ?? [])].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+  const q = String(query ?? '').trim().toLowerCase();
+  // Word prefixes, so "technical" finds "Technology" and "founders" finds "Founder".
+  const terms = q.split(/\s+/).filter((t) => t.length > 2).map((t) => t.slice(0, 5));
+  const matches = q
+    ? team.filter((t) => {
+        const hay = [t.name, t.slug, t.role, t.shortRole].join(' ').toLowerCase();
+        return hay.includes(q) || terms.some((term) => hay.includes(term));
+      })
+    : [];
+
+  if (!matches.length) {
+    return {
+      people: [],
+      team: team.map((t) => ({ name: t.name, role: t.role })),
+      note: q ? `No founder matches "${query}". Ask which of these they meant.` : undefined,
+    };
+  }
+  return {
+    people: matches.map(({ photo: _photo, ...person }) => withoutEditorialKeys(person)),
+    note: 'Quote periods and dates exactly as given. Never turn them into a number of years, and never add experience, employers or results that are not listed here.',
+  };
+}
+
+function withoutEditorialKeys(value) {
+  if (Array.isArray(value)) return value.map(withoutEditorialKeys);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).filter(([k]) => !k.startsWith('_')).map(([k, v]) => [k, withoutEditorialKeys(v)])
+    );
+  }
+  return value;
+}
 
 const TOOL_INDEX = Object.fromEntries(TOOLS.map((t) => [t.name, t]));
 
