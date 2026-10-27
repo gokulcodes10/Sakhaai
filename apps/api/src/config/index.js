@@ -69,6 +69,7 @@ const envSchema = z.object({
   GROQ_BASE_URL: z.string().url().default('https://api.groq.com/openai/v1'),
   GROQ_MODEL: z.string().default('openai/gpt-oss-120b'),
   GROQ_MODEL_FAST: z.string().default('openai/gpt-oss-20b'),
+  GROQ_MODEL_FALLBACK: z.string().default('openai/gpt-oss-20b'),
   GROQ_MAX_TOKENS: int(1400),
   GROQ_TEMPERATURE: z
     .string()
@@ -76,6 +77,7 @@ const envSchema = z.object({
     .transform((v) => (v === undefined || v === '' ? 0.25 : Number.parseFloat(v))),
   SAKHA_MAX_TOOL_STEPS: int(5),
   SAKHA_HISTORY_TURNS: int(12),
+  SAKHA_PROMPT_TOKEN_BUDGET: int(6000),
 
   KNOWLEDGE_REFRESH_HOURS: int(10),
   KNOWLEDGE_CRAWL_URLS: list([]),
@@ -179,6 +181,8 @@ export const config = {
     baseUrl: env.GROQ_BASE_URL,
     model: env.GROQ_MODEL,
     fastModel: env.GROQ_MODEL_FAST,
+    /** Used when the main model is out of capacity. Empty disables the switch. */
+    fallbackModel: env.GROQ_MODEL_FALLBACK,
     maxTokens: env.GROQ_MAX_TOKENS,
     temperature: env.GROQ_TEMPERATURE,
     /** True when a real key is present — the UI degrades gracefully when not. */
@@ -190,6 +194,7 @@ export const config = {
   sakha: {
     maxToolSteps: env.SAKHA_MAX_TOOL_STEPS,
     historyTurns: env.SAKHA_HISTORY_TURNS,
+    promptTokenBudget: env.SAKHA_PROMPT_TOKEN_BUDGET,
   },
 
   knowledge: {

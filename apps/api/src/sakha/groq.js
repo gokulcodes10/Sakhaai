@@ -22,16 +22,31 @@ export class LlmError extends Error {
 
 const RETRYABLE_STATUS = new Set([408, 409, 429, 500, 502, 503, 504]);
 
+// 429 is the per-minute limit; 413 is a single request bigger than that limit.
+// Both are about capacity on this model, not about the request being wrong.
+const CAPACITY_STATUS = new Set([413, 429]);
+
+// The longest we will sit on a Retry-After. A visitor watching a spinner will
+// not wait the 30 seconds Groq sometimes asks for; failing fast with an honest
+// message beats an answer that arrives after they have closed the panel.
+const MAX_WAIT_MS = 4_000;
+
 /**
  * One chat completion call, with bounded retry on transient failures.
  *
- * @param {{messages:Array, tools?:Array, model?:string, temperature?:number,
- *          maxTokens?:number, toolChoice?:string, signal?:AbortSignal}} opts
+ * When the model is out of capacity it switches to `fallbackModel` at once
+ * rather than waiting: on Groq each model has its own per-minute allowance, so
+ * the smaller model is usually free when the large one is not.
+ *
+ * @param {{messages:Array, tools?:Array, model?:string, fallbackModel?:string,
+ *          temperature?:number, maxTokens?:number, toolChoice?:string,
+ *          signal?:AbortSignal}} opts
  */
 export async function chatCompletion({
   messages,
   tools,
   model = config.groq.model,
+  fallbackModel = config.groq.fallbackModel,
   temperature = config.groq.temperature,
   maxTokens = config.groq.maxTokens,
   toolChoice,
@@ -44,8 +59,8 @@ export async function chatCompletion({
     );
   }
 
+  let current = model;
   const body = {
-    model,
     messages,
     temperature,
     max_tokens: maxTokens,
@@ -53,9 +68,11 @@ export async function chatCompletion({
   };
 
   let lastError;
+  let busy = false;
 
   for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
     const startedAt = Date.now();
+    body.model = current;
     try {
       const res = await fetch(`${config.groq.baseUrl}/chat/completions`, {
         method: 'POST',
@@ -76,16 +93,29 @@ export async function chatCompletion({
           body: text.slice(0, 800),
         });
 
+        if (CAPACITY_STATUS.has(res.status)) {
+          busy = true;
+          if (fallbackModel && current !== fallbackModel) {
+            logger.warn({ status: res.status, from: current, to: fallbackModel }, 'groq out of capacity, switching model');
+            current = fallbackModel;
+            continue;
+          }
+        }
+
+        // Out of capacity on every model we may use: say "busy", not "broken".
+        if (busy && !retryable) break;
         if (!retryable || attempt === maxRetries) throw lastError;
 
-        // Respect Retry-After when the provider tells us how long to wait.
+        // Respect Retry-After when the provider tells us how long to wait, but
+        // only up to a point: past MAX_WAIT_MS, give up now rather than later.
         const retryAfter = Number.parseFloat(res.headers.get('retry-after') ?? '');
         const waitMs = Number.isFinite(retryAfter)
           ? retryAfter * 1000
           : 2 ** attempt * 500 + Math.random() * 250;
 
-        logger.warn({ status: res.status, attempt, waitMs }, 'groq retryable failure');
-        await sleep(Math.min(waitMs, 10_000));
+        logger.warn({ status: res.status, model: current, attempt, waitMs }, 'groq retryable failure');
+        if (waitMs > MAX_WAIT_MS) break;
+        await sleep(waitMs);
         continue;
       }
 
@@ -97,7 +127,7 @@ export async function chatCompletion({
         message: choice.message,
         finishReason: choice.finish_reason,
         usage: json.usage ?? null,
-        model: json.model ?? model,
+        model: json.model ?? current,
         latencyMs: Date.now() - startedAt,
       };
     } catch (err) {
@@ -111,9 +141,11 @@ export async function chatCompletion({
     }
   }
 
-  logger.error({ err: lastError }, 'groq call failed after retries');
+  logger.error({ err: lastError, busy }, 'groq call failed after retries');
   throw unavailable(
-    'Sakha is having trouble reaching its language model. Try again in a moment, or email hello@asphalix.com.'
+    busy
+      ? 'Sakha is answering a lot of questions right now. Try again in a minute, or use the contact page to reach a founder.'
+      : 'Sakha is having trouble reaching its language model. Try again in a moment, or use the contact page to reach a founder.'
   );
 }
 
