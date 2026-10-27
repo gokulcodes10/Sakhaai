@@ -71,3 +71,23 @@ test('get_team_member returns the whole published record, never editorial notes 
   assert.equal(unknown.people.length, 0);
   assert.equal(unknown.team.length, content.about.team.length, 'an unknown name lists the team instead');
 });
+
+test('optional tool parameters accept null, required ones do not', async () => {
+  const { nullableOptionals } = await import('../src/sakha/tools.js');
+  const schema = nullableOptionals({
+    type: 'object',
+    properties: { query: { type: 'string' }, industry: { type: 'string' }, tier: { type: 'string', enum: ['a', 'b'] } },
+    required: ['query'],
+  });
+  assert.equal(schema.properties.query.type, 'string');
+  assert.deepEqual(schema.properties.industry.type, ['string', 'null']);
+  assert.deepEqual(schema.properties.tier.enum, ['a', 'b', null]);
+
+  // Every advertised tool gets the treatment.
+  for (const t of toolsForContext(anonymous)) {
+    const { properties = {}, required = [] } = t.function.parameters;
+    for (const [key, prop] of Object.entries(properties)) {
+      if (!required.includes(key)) assert.ok([].concat(prop.type).includes('null'), `${t.function.name}.${key} is not nullable`);
+    }
+  }
+});

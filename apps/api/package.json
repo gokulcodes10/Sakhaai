@@ -11,6 +11,7 @@
     "sakha:reset-prompt": "node --env-file=../../.env src/scripts/resetSakhaPrompt.js",
     "content:publish-file": "node --env-file=../../.env src/scripts/publishContentFile.js",
     "sakha:eval-retrieval": "node --env-file=../../.env src/scripts/evalRetrieval.js",
+    "sakha:eval-answers": "node --env-file=../../.env src/scripts/evalAnswers.js",
     "db:generate": "prisma generate",
     "db:migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "db:deploy": "prisma migrate deploy",

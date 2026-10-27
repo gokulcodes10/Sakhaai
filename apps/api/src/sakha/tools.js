@@ -691,8 +691,28 @@ export function toolsForContext(ctx, { enabled } = {}) {
     return true;
   }).map((t) => ({
     type: 'function',
-    function: { name: t.name, description: t.description, parameters: t.parameters },
+    function: { name: t.name, description: t.description, parameters: nullableOptionals(t.parameters) },
   }));
+}
+
+/**
+ * Let optional parameters be null. Models often send `"industry": null` for a
+ * filter they do not want, and Groq validates tool calls against the schema:
+ * a plain "string" turns that into a 400 and the whole turn fails.
+ */
+export function nullableOptionals(schema) {
+  const required = new Set(schema.required ?? []);
+  return {
+    ...schema,
+    properties: Object.fromEntries(
+      Object.entries(schema.properties ?? {}).map(([key, prop]) => [
+        key,
+        required.has(key)
+          ? prop
+          : { ...prop, type: [prop.type, 'null'], ...(prop.enum ? { enum: [...prop.enum, null] } : {}) },
+      ])
+    ),
+  };
 }
 
 /**
@@ -721,6 +741,8 @@ export async function executeTool(name, rawArgs, ctx) {
   } catch {
     return { error: 'Those tool arguments were not valid JSON. Try again with a simpler call.' };
   }
+  // A null optional argument means "not given"; handlers expect it absent.
+  args = Object.fromEntries(Object.entries(args ?? {}).filter(([, v]) => v !== null));
 
   const startedAt = Date.now();
   try {
