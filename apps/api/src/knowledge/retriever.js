@@ -325,26 +325,17 @@ function cosine(a, b) {
   return denom === 0 ? 0 : dot / denom;
 }
 
-/** Format retrieved chunks into the context block the model sees. */
+/**
+ * Format retrieved chunks into the context block the model sees. Passages are
+ * labelled by title, not numbered: numbers invite "[1]"-style markers in the
+ * answer, and a title is what the model should name if it names anything.
+ */
 export function formatContext(results) {
   if (!results.length) return '';
   return results
-    .map((r, i) => {
+    .map((r) => {
       const where = r.sourceUrl ? ` (${r.sourceUrl})` : '';
-      return `[${i + 1}] ${r.title}${r.heading && r.heading !== r.title ? ` › ${r.heading}` : ''}${where}\n${r.content}`;
+      return `Source: ${r.title}${r.heading && r.heading !== r.title ? ` › ${r.heading}` : ''}${where}\n${r.content}`;
     })
     .join('\n\n---\n\n');
-}
-
-/** Citations the UI renders under an answer. */
-export function toCitations(results) {
-  const seen = new Set();
-  const out = [];
-  for (const r of results) {
-    const key = r.sourceUrl ?? r.title;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push({ title: r.title, url: r.sourceUrl ?? null, source: r.source, heading: r.heading ?? null });
-  }
-  return out.slice(0, 5);
 }

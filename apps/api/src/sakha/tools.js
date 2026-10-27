@@ -16,7 +16,8 @@
 import prisma from '../lib/prisma.js';
 import logger from '../lib/logger.js';
 import config from '../config/index.js';
-import { retrieve, toCitations, visibilityFor } from '../knowledge/retriever.js';
+import { retrieve, visibilityFor } from '../knowledge/retriever.js';
+import { candidatesFrom } from './citations.js';
 import { getPublishedContent } from '../modules/content/service.js';
 import { z } from 'zod';
 import { emailSchema, leadSchema, ticketCreateSchema } from '@asphalix/shared';
@@ -67,9 +68,8 @@ export const TOOLS = [
         visibility: visibilityFor(ctx.auth),
       });
 
-      // Record citations on the turn so the UI can render sources under the
-      // answer even when the model does not mention them in prose.
-      ctx.citations.push(...toCitations(results));
+      // Record what was found; the engine shows only the ones the answer used.
+      ctx.citations.push(...candidatesFrom(results));
 
       if (!results.length) {
         return {

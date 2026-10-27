@@ -20,9 +20,10 @@ import config from '../config/index.js';
 import { chatCompletion, quickCompletion } from './groq.js';
 import { buildSystemMessage, DEFAULT_SYSTEM_PROMPT } from './prompt.js';
 import { executeTool, toolsForContext } from './tools.js';
-import { retrieve, formatContext, toCitations, visibilityFor } from '../knowledge/retriever.js';
+import { retrieve, formatContext, visibilityFor } from '../knowledge/retriever.js';
 import { getSetting } from '../modules/ops/settings.js';
 import { estimateTokens, trimHistory } from './budget.js';
+import { candidatesFrom, citationsUsed, stripMarkers, wordStats } from './citations.js';
 
 // Room left at the start of a turn for tool results to come back into.
 const TOOL_RESULT_HEADROOM = 1_500;
@@ -93,7 +94,7 @@ export async function runTurn(input) {
       visibility: visibilityFor(input.auth),
     });
     if (seed.length) {
-      ctx.citations.push(...toCitations(seed));
+      ctx.citations.push(...candidatesFrom(seed));
       seedMessage = {
         role: 'system',
         content: `Possibly relevant context, retrieved before the visitor's question was read. Search again if it does not cover what they asked.\n\n${formatContext(seed)}`,
@@ -155,7 +156,7 @@ export async function runTurn(input) {
     const toolCalls = message.tool_calls ?? [];
 
     if (toolCalls.length === 0) {
-      finalContent = message.content?.trim() ?? '';
+      finalContent = stripMarkers(message.content);
       break;
     }
 
@@ -197,7 +198,8 @@ export async function runTurn(input) {
     data: { conversationId: conversation.id, role: 'user', content: input.message },
   });
 
-  const citations = dedupeCitations(ctx.citations);
+  // Only the sources the answer actually drew on, not everything retrieved.
+  const citations = citationsUsed(finalContent, ctx.citations, await knowledgeWordStats(lastIndex?.finishedAt));
   const tickets = [...new Map(ctx.tickets.map((t) => [t.id, t])).values()];
   if (tickets.length) toolTrace.push({ name: 'tickets', tickets });
   const latencyMs = Date.now() - startedAt;
@@ -298,16 +300,17 @@ async function titleConversation(conversationId, firstMessage) {
   }
 }
 
-function dedupeCitations(citations) {
-  const seen = new Set();
-  const out = [];
-  for (const c of citations) {
-    const key = `${c.url ?? ''}|${c.title}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(c);
-  }
-  return out.slice(0, 6);
+/** Word rarity across the knowledge base, rebuilt only when the index is. */
+let statsCache = { key: undefined, stats: null };
+async function knowledgeWordStats(indexedAt) {
+  const key = indexedAt?.toISOString() ?? null;
+  if (statsCache.stats && statsCache.key === key) return statsCache.stats;
+  const docs = await prisma.knowledgeDocument.findMany({
+    select: { title: true, chunks: { select: { content: true } } },
+  });
+  const stats = wordStats(docs.map((d) => `${d.title} ${d.chunks.map((c) => c.content).join(' ')}`));
+  statsCache = { key, stats };
+  return stats;
 }
 
 const safeParse = (raw) => {
