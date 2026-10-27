@@ -83,7 +83,7 @@ export default function About() {
                   <div className="mt-auto flex flex-wrap gap-x-6 gap-y-3 pt-8 text-base">
                     {person.email && (
                       <a href={`mailto:${person.email}`} className="text-ink transition-colors hover:text-accent">
-                        {person.email}
+                        Email {person.name.split(' ')[0]}
                       </a>
                     )}
                     {person.linkedin && (

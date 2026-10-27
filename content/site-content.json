@@ -15,8 +15,8 @@
     "originLine": "Made possible by two friends, with trust and grit.",
     "elevatorPitch": "We build agentic AI that does the work your team keeps doing by hand — answering customers, chasing follow-ups, updating your systems — on infrastructure you control, in production in weeks, with a number attached.",
     "email": "asphalix.info@gmail.com",
-    "salesEmail": "malarvizhi@asphalix.com",
-    "supportEmail": "support@asphalix.com",
+    "salesEmail": "asphalix.info@gmail.com",
+    "supportEmail": "asphalix.info@gmail.com",
     "phone": "+91 00000 00000",
     "_phoneNote": "Publish a real founder-reachable number. The blueprint is explicit: published founder contact + fast response is an underrated differentiator against slow agencies.",
     "whatsapp": "+91 00000 00000",
@@ -449,7 +449,7 @@
         "talkTo": ["Architecture and integrations", "Build plans and timelines", "Evaluation, security and hosting"],
         "photo": "/team/gokul-madhesh.jpg",
         "linkedin": "https://www.linkedin.com/in/gokul-m-900947255",
-        "email": "gokul@asphalix.com",
+        "email": "asphalix.info@gmail.com",
         "github": "https://github.com/gokulcodes10",
         "record": {
           "_note": "Every line must trace to a source a visitor can check: the DYSL-SM letter of recommendation (lor), Gokul's work at DYSL-SM as stated on his resume (role), or something running on this site (site). No invented metrics, no DRDO emblem, and nothing about lab systems beyond what Gokul has cleared for his public resume.",
@@ -746,7 +746,7 @@
         "talkTo": ["New engagements and partnerships", "Contracts and commercials", "How an engagement is going"],
         "photo": "/team/malarvizhi.jpg",
         "linkedin": "https://www.linkedin.com/in/malarvizhi-m-879544258",
-        "email": "malarvizhi@asphalix.com",
+        "email": "asphalix.info@gmail.com",
         "order": 2
       }
     ],

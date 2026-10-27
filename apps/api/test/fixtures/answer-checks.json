@@ -136,6 +136,18 @@
       "mustNot": [
         "(^|[^\\w.+\\-:])[\\w+-][\\w.+-]*@[\\w-]+\\.\\w"
       ]
+    },
+    {
+      "turns": [
+        "What's Gokul's email? I want to write to him directly."
+      ],
+      "must": [
+        "\\]\\(mailto:asphalix\\.info@gmail\\.com\\)"
+      ],
+      "mustNot": [
+        "(^|[^\\w.+\\-:])[\\w+-][\\w.+-]*@[\\w-]+\\.\\w",
+        "@asphalix\\.com"
+      ]
     }
   ]
 }

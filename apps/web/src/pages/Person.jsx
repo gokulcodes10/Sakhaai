@@ -220,7 +220,6 @@ function personLd(person, content) {
     jobTitle: person.role,
     url,
     ...(person.photo && { image: new URL(person.photo, SITE_URL).href }),
-    ...(person.email && { email: `mailto:${person.email}` }),
     ...((person.linkedin || person.github) && { sameAs: [person.linkedin, person.github].filter(Boolean) }),
     worksFor: { '@type': 'Organization', name: content.company?.brandName ?? 'Asphalix', url: SITE_URL },
     ...(person.record?.skills && { knowsAbout: person.record.skills.flatMap((g) => g.items) }),
