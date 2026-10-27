@@ -111,3 +111,14 @@ test('email addresses in answers become links labelled "email"', async () => {
   assert.equal(linkEmails('[email us](mailto:x@y.com)'), '[email us](mailto:x@y.com)', 'an existing word label stays');
   assert.equal(linkEmails('No address here.'), 'No address here.');
 });
+
+test('phone numbers in answers become WhatsApp links', async () => {
+  const { linkPhones, linkContacts } = await import('@asphalix/shared');
+  assert.equal(linkPhones('Call +91 63742 48957.'), 'Call [WhatsApp us](https://wa.me/916374248957).');
+  assert.equal(linkPhones('or 6374248957 now'), 'or [WhatsApp us](https://wa.me/916374248957) now');
+  assert.equal(linkPhones('[+91 63742 48957](https://wa.me/916374248957)'), '[WhatsApp us](https://wa.me/916374248957)');
+  for (const unchanged of ['[WhatsApp us](https://wa.me/916374248957)', 'Ticket #1042, opened 2026-10-27', 'https://wa.me/916374248957']) {
+    assert.equal(linkPhones(unchanged), unchanged);
+  }
+  assert.equal(linkContacts('x@y.com or 6374248957'), '[email](mailto:x@y.com) or [WhatsApp us](https://wa.me/916374248957)');
+});

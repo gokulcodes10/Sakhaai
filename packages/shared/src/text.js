@@ -5,6 +5,25 @@
 
 const ADDRESS = String.raw`[\w.+-]+@[\w-]+(?:\.[\w-]+)+`;
 
+// An Indian mobile number, with or without +91 and spacing: +91 63742 48957.
+const PHONE = String.raw`(?:\+?91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}`;
+const waLink = (number) => `[WhatsApp us](https://wa.me/91${number.replace(/\D/g, '').slice(-10)})`;
+
+/**
+ * Show phone numbers as a "WhatsApp us" link instead of as text. A number used
+ * as a link's label is relabelled; a number inside a URL is left alone.
+ */
+export function linkPhones(text) {
+  return String(text ?? '')
+    .replace(new RegExp(String.raw`\[\s*${PHONE}\s*\]\((https?:[^)\s]+|tel:[^)\s]+)\)`, 'g'), (link) =>
+      waLink(/\((?:https?:\/\/wa\.me\/|tel:)?([^)]*)\)/.exec(link)[1])
+    )
+    .replace(new RegExp(String.raw`(^|[^\w/=+\[])(${PHONE})(?!\d)`, 'g'), (_, before, number) => `${before}${waLink(number)}`);
+}
+
+/** Both: no email address or phone number left as plain text. */
+export const linkContacts = (text) => linkPhones(linkEmails(text));
+
 /**
  * Show email addresses as a link labelled "email" instead of as text.
  *

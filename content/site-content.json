@@ -806,7 +806,7 @@
     },
     "alternatives": [
       { "label": "Email a founder directly", "value": "Opens your email app", "href": "mailto:asphalix.info@gmail.com" },
-      { "label": "WhatsApp us", "value": "+91 63742 48957", "href": "https://wa.me/916374248957" },
+      { "label": "WhatsApp us", "value": "Opens a WhatsApp chat", "href": "https://wa.me/916374248957" },
       { "label": "Ask Sakha first", "value": "Our assistant knows our services, our process and our support desk", "action": "open-assistant" }
     ]
   },

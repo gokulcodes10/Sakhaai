@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router';
-import { linkEmails } from '@asphalix/shared';
+import { linkContacts } from '@asphalix/shared';
 import clsx from 'clsx';
 import {
   askSakha,
@@ -161,7 +161,7 @@ export default function SakhaPanel() {
               ))}
               {pending &&
                 (streaming?.text ? (
-                  <Message message={{ id: 'streaming', role: 'assistant', content: linkEmails(streaming.text), local: true }} />
+                  <Message message={{ id: 'streaming', role: 'assistant', content: linkContacts(streaming.text), local: true }} />
                 ) : (
                   <Thinking status={streaming?.status} />
                 ))}

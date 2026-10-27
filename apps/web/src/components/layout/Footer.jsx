@@ -30,9 +30,14 @@ export default function Footer() {
                   Email us
                 </a>
               )}
-              {company?.phone && (
-                <a href={`tel:${company.phone.replace(/\s/g, '')}`} className="block text-muted transition-colors hover:text-accent">
-                  {company.phone}
+              {company?.whatsapp && (
+                <a
+                  href={`https://wa.me/${company.whatsapp.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="block text-muted transition-colors hover:text-accent"
+                >
+                  WhatsApp us
                 </a>
               )}
               {company?.address?.city && (
