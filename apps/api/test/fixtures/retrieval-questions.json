@@ -1,30 +1,222 @@
 {
-  "_note": "Retrieval test set. 'expect' lists acceptable document titles (any one is a hit). 'none' questions have no answer in the knowledge base; good retrieval returns nothing or very little for them. Used by src/scripts/evalRetrieval.js.",
+  "_note": "Retrieval test set. 'expect' lists acceptable document titles (any one is a hit). 'followUps' pair a previous question with a follow-up; 'expect' is for the follow-up. 'none' questions have no answer in the knowledge base; good retrieval returns nothing or very little for them. Used by src/scripts/evalRetrieval.js.",
   "answerable": [
-    { "q": "How fast can you go live?", "expect": ["Homepage"] },
-    { "q": "What happens on day 0?", "expect": ["Homepage"] },
-    { "q": "How much does it cost?", "expect": ["How we scope an engagement"] },
-    { "q": "Do you publish prices?", "expect": ["How we scope an engagement"] },
-    { "q": "Who is the CEO?", "expect": ["About Asphalix"] },
-    { "q": "What is Gokul's technical background?", "expect": ["Gokul Madhesh — Founder & Chief Technology Officer: engineering record"] },
-    { "q": "Has your CTO worked with DRDO?", "expect": ["Gokul Madhesh — Founder & Chief Technology Officer: engineering record"] },
-    { "q": "Can you automate WhatsApp replies to customers?", "expect": ["Service — Customer response agents"] },
-    { "q": "We lose leads because nobody follows up", "expect": ["Service — Follow-up and revenue agents"] },
-    { "q": "Can you connect our ERP and CRM?", "expect": ["Service — System integration and data groundwork"] },
-    { "q": "Can an agent update our inventory spreadsheet every day?", "expect": ["Service — Internal operations agents", "Service — System integration and data groundwork"] },
-    { "q": "Do you work with hospitals or clinics?", "expect": ["Industry — Clinics and diagnostics"] },
-    { "q": "Do you work with colleges?", "expect": ["Industry — Colleges and training institutes"] },
-    { "q": "We are a manufacturer with dealers placing orders", "expect": ["Industry — Manufacturing and distribution"] },
-    { "q": "What won't you build?", "expect": ["What we will not build"] },
-    { "q": "Will you build a chatbot that replaces my whole sales team?", "expect": ["What we will not build"] },
-    { "q": "How do I raise a support ticket?", "expect": ["How support works"] },
-    { "q": "What does pending mean on my ticket?", "expect": ["How support works"] },
-    { "q": "What happens if the agent makes a mistake?", "expect": ["Responsible deployment checklist and autonomy levels"] },
-    { "q": "Who owns the code after handover?", "expect": ["Homepage", "About Asphalix", "Responsible deployment checklist and autonomy levels"] },
-    { "q": "How do I contact you?", "expect": ["How to get in touch", "Asphalix — company overview", "About Asphalix"] },
-    { "q": "Why are you so fast?", "expect": ["Reusable modules — why we are fast", "Homepage"] },
-    { "q": "Have you deployed an agent anywhere real?", "expect": ["Case study — Asphalix"] },
-    { "q": "What autonomy levels do you offer?", "expect": ["Responsible deployment checklist and autonomy levels"] }
+    {
+      "q": "How fast can you go live?",
+      "expect": [
+        "Homepage"
+      ]
+    },
+    {
+      "q": "What happens on day 0?",
+      "expect": [
+        "Homepage"
+      ]
+    },
+    {
+      "q": "How much does it cost?",
+      "expect": [
+        "How we scope an engagement"
+      ]
+    },
+    {
+      "q": "Do you publish prices?",
+      "expect": [
+        "How we scope an engagement"
+      ]
+    },
+    {
+      "q": "Who is the CEO?",
+      "expect": [
+        "About Asphalix"
+      ]
+    },
+    {
+      "q": "What is Gokul's technical background?",
+      "expect": [
+        "Gokul Madhesh — Founder & Chief Technology Officer: engineering record"
+      ]
+    },
+    {
+      "q": "Has your CTO worked with DRDO?",
+      "expect": [
+        "Gokul Madhesh — Founder & Chief Technology Officer: engineering record"
+      ]
+    },
+    {
+      "q": "Can you automate WhatsApp replies to customers?",
+      "expect": [
+        "Service — Customer response agents"
+      ]
+    },
+    {
+      "q": "We lose leads because nobody follows up",
+      "expect": [
+        "Service — Follow-up and revenue agents"
+      ]
+    },
+    {
+      "q": "Can you connect our ERP and CRM?",
+      "expect": [
+        "Service — System integration and data groundwork"
+      ]
+    },
+    {
+      "q": "Can an agent update our inventory spreadsheet every day?",
+      "expect": [
+        "Service — Internal operations agents",
+        "Service — System integration and data groundwork"
+      ]
+    },
+    {
+      "q": "Do you work with hospitals or clinics?",
+      "expect": [
+        "Industry — Clinics and diagnostics"
+      ]
+    },
+    {
+      "q": "Do you work with colleges?",
+      "expect": [
+        "Industry — Colleges and training institutes"
+      ]
+    },
+    {
+      "q": "We are a manufacturer with dealers placing orders",
+      "expect": [
+        "Industry — Manufacturing and distribution"
+      ]
+    },
+    {
+      "q": "What won't you build?",
+      "expect": [
+        "What we will not build"
+      ]
+    },
+    {
+      "q": "Will you build a chatbot that replaces my whole sales team?",
+      "expect": [
+        "What we will not build"
+      ]
+    },
+    {
+      "q": "How do I raise a support ticket?",
+      "expect": [
+        "How support works"
+      ]
+    },
+    {
+      "q": "What does pending mean on my ticket?",
+      "expect": [
+        "How support works"
+      ]
+    },
+    {
+      "q": "What happens if the agent makes a mistake?",
+      "expect": [
+        "Responsible deployment checklist and autonomy levels"
+      ]
+    },
+    {
+      "q": "Who owns the code after handover?",
+      "expect": [
+        "Homepage",
+        "About Asphalix",
+        "Responsible deployment checklist and autonomy levels"
+      ]
+    },
+    {
+      "q": "How do I contact you?",
+      "expect": [
+        "How to get in touch",
+        "Asphalix — company overview",
+        "About Asphalix"
+      ]
+    },
+    {
+      "q": "Why are you so fast?",
+      "expect": [
+        "Reusable modules — why we are fast",
+        "Homepage"
+      ]
+    },
+    {
+      "q": "Have you deployed an agent anywhere real?",
+      "expect": [
+        "Case study — Asphalix"
+      ]
+    },
+    {
+      "q": "What autonomy levels do you offer?",
+      "expect": [
+        "Responsible deployment checklist and autonomy levels"
+      ]
+    }
+  ],
+  "followUps": [
+    {
+      "previous": "who is responsible for tech",
+      "previousAnswer": "The technical side is led by Gokul Madhesh, Founder & Chief Technology Officer.",
+      "q": "and the business and research?",
+      "expect": [
+        "About Asphalix"
+      ]
+    },
+    {
+      "previous": "who's the lead tech person?",
+      "previousAnswer": "The technical lead is Gokul Madhesh, Founder & Chief Technology Officer.",
+      "q": "business head?",
+      "expect": [
+        "About Asphalix"
+      ]
+    },
+    {
+      "previous": "What's Gokul's technical background?",
+      "previousAnswer": "Gokul Madhesh is an AI Engineer at DRDO DYSL-SM since Feb 2026 and built DMATRIX, an on-premise LLM platform.",
+      "q": "has he actually deployed anything on-prem, or is it just research?",
+      "expect": [
+        "Gokul Madhesh — Founder & Chief Technology Officer: engineering record"
+      ]
+    },
+    {
+      "previous": "How fast can you go live?",
+      "previousAnswer": "A working prototype on day 5, and production in four to six weeks.",
+      "q": "what happens on day 5?",
+      "expect": [
+        "Homepage"
+      ]
+    },
+    {
+      "previous": "Do you work with hospitals or clinics?",
+      "previousAnswer": "Yes. Clinics and diagnostics is one of the industries we work in.",
+      "q": "what would the agent actually do there?",
+      "expect": [
+        "Industry — Clinics and diagnostics"
+      ]
+    },
+    {
+      "previous": "How do I raise a support ticket?",
+      "previousAnswer": "Sign in to the client portal and open Tickets, or ask me to raise one.",
+      "q": "and how quickly do you reply?",
+      "expect": [
+        "How support works"
+      ]
+    },
+    {
+      "previous": "team?",
+      "previousAnswer": "Asphalix has two founders: Gokul Madhesh (CTO) and Malarvizhi Madesan (CEO).",
+      "q": "How fast can you go live?",
+      "expect": [
+        "Homepage"
+      ]
+    },
+    {
+      "previous": "What won't you build?",
+      "previousAnswer": "We decline work with no system to read from, no CRM, or too little volume.",
+      "q": "Do you work with colleges?",
+      "expect": [
+        "Industry — Colleges and training institutes"
+      ]
+    }
   ],
   "none": [
     "ping",

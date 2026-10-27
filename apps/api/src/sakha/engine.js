@@ -10,8 +10,9 @@
  *  One deliberate design note: retrieval is NOT done automatically before the
  *  model runs. The model decides what to search for, which lets it issue
  *  several targeted searches for a compound question instead of one blurry one.
- *  A cheap first-turn pre-fetch is still done for the very first user message,
- *  because that is where latency is most visible.
+ *  A cheap pre-fetch is still done on every turn: on the first it saves a round
+ *  trip, and on follow-ups it stops the model answering from memory of its own
+ *  earlier replies (see followUp.js).
  */
 
 import prisma from '../lib/prisma.js';
@@ -23,6 +24,7 @@ import { executeTool, toolsForContext } from './tools.js';
 import { retrieve, formatContext, visibilityFor } from '../knowledge/retriever.js';
 import { getSetting } from '../modules/ops/settings.js';
 import { estimateTokens, trimHistory } from './budget.js';
+import { interleave, searchQueryFor } from './followUp.js';
 import { candidatesFrom, citationsUsed, stripMarkers, wordStats } from './citations.js';
 
 // Room left at the start of a turn for tool results to come back into.
@@ -85,21 +87,26 @@ export async function runTurn(input) {
     knowledgeUpdatedAt: lastIndex?.finishedAt?.toISOString() ?? null,
   });
 
-  // First message in a thread: pre-fetch context so the very first answer does
-  // not pay for an extra round trip before it can say anything useful.
+  // Pre-fetch context on every turn. A follow-up is searched both as typed and
+  // as rewritten to stand alone, and the two are merged, so a poor rewrite can
+  // only add passages, never lose the ones the typed words would have found.
+  const visibility = visibilityFor(input.auth);
+  const topK = rawHistory.length ? 4 : 5;
+  const searchQuery = await searchQueryFor(input.message, rawHistory);
+  const asTyped = await retrieve(input.message, { topK, visibility });
+  const seed =
+    searchQuery === input.message
+      ? asTyped
+      : interleave(asTyped, await retrieve(searchQuery, { topK, visibility }), topK);
+
   let seedMessage = null;
-  if (rawHistory.length === 0) {
-    const seed = await retrieve(input.message, {
-      topK: 5,
-      visibility: visibilityFor(input.auth),
-    });
-    if (seed.length) {
-      ctx.citations.push(...candidatesFrom(seed));
-      seedMessage = {
-        role: 'system',
-        content: `Possibly relevant context, retrieved before the visitor's question was read. Search again if it does not cover what they asked.\n\n${formatContext(seed)}`,
-      };
-    }
+  if (seed.length) {
+    ctx.citations.push(...candidatesFrom(seed));
+    const searchedAs = searchQuery === input.message ? '' : ` (also searched as "${searchQuery}")`;
+    seedMessage = {
+      role: 'system',
+      content: `Possibly relevant context for the visitor's latest message${searchedAs}, retrieved before you read it. Search again if it does not cover what they asked.\n\n${formatContext(seed)}`,
+    };
   }
 
   const userTurn = { role: 'user', content: input.message };
@@ -289,8 +296,7 @@ async function loadHistory(conversationId) {
 
 async function titleConversation(conversationId, firstMessage) {
   const title = await quickCompletion(
-    `Summarise this website visitor's question as a title of at most six words. Reply with the title only, no quotes, no full stop.\n\nQuestion: ${firstMessage}`,
-    { maxTokens: 24 }
+    `Summarise this website visitor's question as a title of at most six words. Reply with the title only, no quotes, no full stop.\n\nQuestion: ${firstMessage}`
   );
   if (title) {
     await prisma.conversation.update({

@@ -122,6 +122,17 @@ const SYNONYMS = {
   whatsapp: ['channel', 'message', 'customer'],
   contact: ['email', 'phone', 'founder', 'touch'],
   hire: ['engagement', 'memo', 'contact'],
+  business: ['executive', 'development', 'malarvizhi'],
+  head: ['chief', 'lead'],
+  hospital: ['clinic', 'diagnostic', 'healthcare'],
+  hospitals: ['clinic', 'diagnostic', 'healthcare'],
+  clinic: ['diagnostic', 'healthcare'],
+  clinics: ['diagnostic', 'healthcare'],
+  college: ['education', 'institute', 'training'],
+  colleges: ['education', 'institute', 'training'],
+  school: ['education', 'institute'],
+  reply: ['response', 'respond'],
+  manufacturer: ['manufacturing', 'distribution', 'dealer'],
 };
 
 /**

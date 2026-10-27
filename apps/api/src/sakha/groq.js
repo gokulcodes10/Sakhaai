@@ -49,6 +49,7 @@ export async function chatCompletion({
   fallbackModel = config.groq.fallbackModel,
   temperature = config.groq.temperature,
   maxTokens = config.groq.maxTokens,
+  reasoningEffort,
   toolChoice,
   signal,
   maxRetries = 2,
@@ -64,6 +65,7 @@ export async function chatCompletion({
     messages,
     temperature,
     max_tokens: maxTokens,
+    ...(reasoningEffort ? { reasoning_effort: reasoningEffort } : {}),
     ...(tools?.length ? { tools, tool_choice: toolChoice ?? 'auto' } : {}),
   };
 
@@ -149,13 +151,22 @@ export async function chatCompletion({
   );
 }
 
-/** Short, cheap completion for titles and query rewriting. */
-export async function quickCompletion(prompt, { maxTokens = 60 } = {}) {
+/**
+ * Short, cheap completion for titles and query rewriting.
+ *
+ * gpt-oss models reason before they answer, and the reasoning counts against
+ * max_tokens: with a small cap they spend all of it thinking and return an
+ * empty string (which is why conversation titles were always blank). So the
+ * cap here leaves room for that, and reasoning is turned down where supported.
+ */
+export async function quickCompletion(prompt, { maxTokens = 300 } = {}) {
+  const model = config.groq.fastModel;
   const { message } = await chatCompletion({
-    model: config.groq.fastModel,
+    model,
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.2,
     maxTokens,
+    reasoningEffort: /gpt-oss/.test(model) ? 'low' : undefined,
     maxRetries: 1,
   });
   return message?.content?.trim() ?? '';
