@@ -83,6 +83,15 @@ test('optional tool parameters accept null, required ones do not', async () => {
   assert.deepEqual(schema.properties.industry.type, ['string', 'null']);
   assert.deepEqual(schema.properties.tier.enum, ['a', 'b', null]);
 
+  const odd = nullableOptionals({
+    type: 'object',
+    properties: { many: { type: ['string', 'integer'] }, already: { type: ['string', 'null'], enum: ['x', null] }, anything: {} },
+  });
+  assert.deepEqual(odd.properties.many.type, ['string', 'integer', 'null']);
+  assert.deepEqual(odd.properties.already.type, ['string', 'null']);
+  assert.deepEqual(odd.properties.already.enum, ['x', null]);
+  assert.deepEqual(odd.properties.anything, {}, 'an untyped property already accepts null');
+
   // Every advertised tool gets the treatment.
   for (const t of toolsForContext(anonymous)) {
     const { properties = {}, required = [] } = t.function.parameters;

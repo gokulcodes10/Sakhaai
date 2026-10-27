@@ -47,43 +47,46 @@ async function turn(message, conversationId) {
 }
 
 let passed = 0;
-for (const [i, c] of cases.entries()) {
-  if (i) await sleep(PAUSE_MS);
-  const label = c.turns.join(' → ');
-  let result;
-  try {
-    let conversationId = null;
-    for (const [t, message] of c.turns.entries()) {
-      if (t) await sleep(PAUSE_MS);
-      result = await turn(message, conversationId);
-      conversationId = result.conversationId;
+try {
+  for (const [i, c] of cases.entries()) {
+    if (i) await sleep(PAUSE_MS);
+    const label = c.turns.join(' → ');
+    let result;
+    try {
+      let conversationId = null;
+      for (const [t, message] of c.turns.entries()) {
+        if (t) await sleep(PAUSE_MS);
+        result = await turn(message, conversationId);
+        conversationId = result.conversationId;
+      }
+    } catch (err) {
+      console.log(`  ERROR ${label}: ${err.message}`);
+      continue;
     }
-  } catch (err) {
-    console.log(`  ERROR ${label}: ${err.message}`);
-    continue;
+
+    const answer = plain(result.message.content);
+    const failures = [
+      ...(c.must ?? []).filter((p) => !new RegExp(p, 'im').test(answer)).map((p) => `missing /${p}/`),
+      ...(c.mustNot ?? []).filter((p) => new RegExp(p, 'im').test(answer)).map((p) => `contains /${p}/`),
+      ...ALWAYS_NOT.filter(([, re]) => re.test(answer)).map(([what]) => `contains ${what}`),
+    ];
+    const titles = (result.message.citations ?? []).map((s) => s.title);
+    if (c.sources && !titles.some((t) => c.sources.includes(t))) failures.push(`sources were [${titles.join(' | ')}]`);
+
+    if (failures.length) {
+      console.log(`  FAIL  ${label}\n        ${failures.join('; ')}\n        answer: ${answer.slice(0, 300).replace(/\n/g, ' ')}`);
+    } else {
+      passed += 1;
+      console.log(`  pass  ${label}`);
+    }
   }
 
-  const answer = plain(result.message.content);
-  const failures = [
-    ...(c.must ?? []).filter((p) => !new RegExp(p, 'im').test(answer)).map((p) => `missing /${p}/`),
-    ...(c.mustNot ?? []).filter((p) => new RegExp(p, 'im').test(answer)).map((p) => `contains /${p}/`),
-    ...ALWAYS_NOT.filter(([, re]) => re.test(answer)).map(([what]) => `contains ${what}`),
-  ];
-  const titles = result.message.citations.map((s) => s.title);
-  if (c.sources && !titles.some((t) => c.sources.includes(t))) failures.push(`sources were [${titles.join(' | ')}]`);
-
-  if (failures.length) {
-    console.log(`  FAIL  ${label}\n        ${failures.join('; ')}\n        answer: ${answer.slice(0, 300).replace(/\n/g, ' ')}`);
-  } else {
-    passed += 1;
-    console.log(`  pass  ${label}`);
-  }
+  console.log(`\n  ${passed}/${cases.length} passed`);
+} finally {
+  // Sakha titles a new conversation in the background after answering; let that
+  // land before deleting the conversation out from under it.
+  await sleep(5_000);
+  await prisma.message.deleteMany({ where: { conversationId: { in: [...created] } } });
+  await prisma.conversation.deleteMany({ where: { id: { in: [...created] }, visitorId: 'sakha-eval' } });
+  await prisma.$disconnect();
 }
-
-console.log(`\n  ${passed}/${cases.length} passed`);
-// Sakha titles a new conversation in the background after answering; let that
-// land before deleting the conversation out from under it.
-await sleep(5_000);
-await prisma.message.deleteMany({ where: { conversationId: { in: [...created] } } });
-await prisma.conversation.deleteMany({ where: { id: { in: [...created] }, visitorId: 'sakha-eval' } });
-await prisma.$disconnect();

@@ -699,6 +699,7 @@ export function toolsForContext(ctx, { enabled } = {}) {
  * Let optional parameters be null. Models often send `"industry": null` for a
  * filter they do not want, and Groq validates tool calls against the schema:
  * a plain "string" turns that into a 400 and the whole turn fails.
+ * Top-level properties only: every tool schema here is flat.
  */
 export function nullableOptionals(schema) {
   const required = new Set(schema.required ?? []);
@@ -707,9 +708,13 @@ export function nullableOptionals(schema) {
     properties: Object.fromEntries(
       Object.entries(schema.properties ?? {}).map(([key, prop]) => [
         key,
-        required.has(key)
+        required.has(key) || prop.type === undefined
           ? prop
-          : { ...prop, type: [prop.type, 'null'], ...(prop.enum ? { enum: [...prop.enum, null] } : {}) },
+          : {
+              ...prop,
+              type: [...new Set([].concat(prop.type, 'null'))],
+              ...(prop.enum && !prop.enum.includes(null) ? { enum: [...prop.enum, null] } : {}),
+            },
       ])
     ),
   };
