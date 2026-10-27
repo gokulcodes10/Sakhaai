@@ -38,9 +38,12 @@ const MAX_WAIT_MS = 4_000;
  * rather than waiting: on Groq each model has its own per-minute allowance, so
  * the smaller model is usually free when the large one is not.
  *
+ * With `onDelta`, the answer is streamed: each piece of text is passed to it as
+ * it arrives, and the assembled message is returned at the end as usual.
+ *
  * @param {{messages:Array, tools?:Array, model?:string, fallbackModel?:string,
  *          temperature?:number, maxTokens?:number, toolChoice?:string,
- *          signal?:AbortSignal}} opts
+ *          onDelta?:(text:string)=>void, signal?:AbortSignal}} opts
  */
 export async function chatCompletion({
   messages,
@@ -51,6 +54,7 @@ export async function chatCompletion({
   maxTokens = config.groq.maxTokens,
   reasoningEffort,
   toolChoice,
+  onDelta,
   signal,
   maxRetries = 2,
 } = {}) {
@@ -67,10 +71,19 @@ export async function chatCompletion({
     max_tokens: maxTokens,
     ...(reasoningEffort ? { reasoning_effort: reasoningEffort } : {}),
     ...(tools?.length ? { tools, tool_choice: toolChoice ?? 'auto' } : {}),
+    ...(onDelta ? { stream: true } : {}),
   };
 
   let lastError;
   let busy = false;
+  // Once text has reached the visitor, a retry would repeat it. Fail instead.
+  let streamed = false;
+  const emit = onDelta
+    ? (text) => {
+        streamed = true;
+        onDelta(text);
+      }
+    : null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
     const startedAt = Date.now();
@@ -121,6 +134,10 @@ export async function chatCompletion({
         continue;
       }
 
+      if (emit) {
+        return { ...(await readStream(res, emit)), model: current, latencyMs: Date.now() - startedAt };
+      }
+
       const json = await res.json();
       const choice = json.choices?.[0];
       if (!choice) throw new LlmError('Groq returned no choices', { body: JSON.stringify(json).slice(0, 500) });
@@ -135,7 +152,7 @@ export async function chatCompletion({
     } catch (err) {
       if (err instanceof LlmError && !err.retryable) throw err;
       lastError = err;
-      if (attempt === maxRetries) break;
+      if (streamed || attempt === maxRetries) break;
       if (err.name === 'AbortError' || err.name === 'TimeoutError') {
         logger.warn({ attempt }, 'groq request timed out, retrying');
       }
@@ -149,6 +166,56 @@ export async function chatCompletion({
       ? 'Sakha is answering a lot of questions right now. Try again in a minute, or use the contact page to reach a founder.'
       : 'Sakha is having trouble reaching its language model. Try again in a moment, or use the contact page to reach a founder.'
   );
+}
+
+/**
+ * Assemble a streamed (server-sent events) completion into the same shape a
+ * normal call returns, passing text deltas on as they arrive. Tool calls come
+ * in fragments keyed by index and are stitched back together.
+ */
+export async function readStream(res, onDelta) {
+  const decoder = new TextDecoder();
+  const message = { role: 'assistant', content: '', tool_calls: [] };
+  let finishReason = null;
+  let usage = null;
+  let buffer = '';
+
+  const handle = (line) => {
+    if (!line.startsWith('data:')) return;
+    const data = line.slice(5).trim();
+    if (!data || data === '[DONE]') return;
+    const json = JSON.parse(data);
+    if (json.error) throw new LlmError(json.error.message ?? 'Groq stream error', { retryable: true });
+    usage = json.x_groq?.usage ?? json.usage ?? usage;
+    const choice = json.choices?.[0];
+    if (!choice) return;
+    const delta = choice.delta ?? {};
+    if (delta.content) {
+      message.content += delta.content;
+      onDelta(delta.content);
+    }
+    for (const part of delta.tool_calls ?? []) {
+      const call = (message.tool_calls[part.index ?? 0] ??= { id: '', type: 'function', function: { name: '', arguments: '' } });
+      if (part.id) call.id = part.id;
+      if (part.function?.name) call.function.name += part.function.name;
+      if (part.function?.arguments) call.function.arguments += part.function.arguments;
+    }
+    if (choice.finish_reason) finishReason = choice.finish_reason;
+  };
+
+  for await (const chunk of res.body) {
+    buffer += decoder.decode(chunk, { stream: true });
+    let newline;
+    while ((newline = buffer.indexOf('\n')) !== -1) {
+      handle(buffer.slice(0, newline).trim());
+      buffer = buffer.slice(newline + 1);
+    }
+  }
+  handle(buffer.trim());
+
+  message.tool_calls = message.tool_calls.filter(Boolean);
+  if (!message.tool_calls.length) delete message.tool_calls;
+  return { message, finishReason, usage };
 }
 
 /**

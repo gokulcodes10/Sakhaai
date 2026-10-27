@@ -50,7 +50,7 @@ export const TOOLS = [
   {
     name: 'search_knowledge',
     description:
-      "Search the Asphalix knowledge base — website content, services, support guides, case studies, policies, published documents and crawled public pages. Use this for almost every factual question about the company. Prefer several specific searches over one broad one.",
+      "Search the Asphalix knowledge base — website content, services, support guides, case studies, policies, published documents and crawled public pages. The visitor's latest message has already been searched and the results are in your context; call this only to look up something those results do not cover, with a specific query.",
     parameters: {
       type: 'object',
       properties: {
@@ -655,6 +655,22 @@ function withoutEditorialKeys(value) {
   }
   return value;
 }
+
+/** What the panel shows while a tool runs, so a pause reads as work, not a hang. */
+export const TOOL_STATUS = {
+  search_knowledge: 'Searching the knowledge base…',
+  get_team_member: "Reading the founders' profiles…",
+  list_services: 'Checking the services…',
+  list_case_studies: 'Checking the case studies…',
+  get_engagement_process: 'Checking how an engagement runs…',
+  get_company_facts: 'Checking the latest facts…',
+  capture_lead: 'Passing this to a founder…',
+  request_human: 'Handing this to a person…',
+  create_ticket: 'Raising a ticket…',
+  add_ticket_message: 'Adding to your ticket…',
+  get_my_tickets: 'Looking up your tickets…',
+  get_my_projects: 'Looking up your projects…',
+};
 
 const TOOL_INDEX = Object.fromEntries(TOOLS.map((t) => [t.name, t]));
 

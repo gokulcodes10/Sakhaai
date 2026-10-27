@@ -6,7 +6,8 @@ import { asyncHandler } from '../../middleware/error.js';
 import { validate, validateQuery } from '../../middleware/validate.js';
 import { sakhaLimiter } from '../../middleware/rateLimit.js';
 import { requirePermission } from '../../middleware/auth.js';
-import { forbidden, notFound } from '../../lib/errors.js';
+import { AppError, forbidden, notFound } from '../../lib/errors.js';
+import logger from '../../lib/logger.js';
 import { runTurn } from '../../sakha/engine.js';
 import { getSetting, setSetting } from '../ops/settings.js';
 import { audit } from '../../lib/audit.js';
@@ -61,6 +62,56 @@ router.post(
     return res.json(result);
   })
 );
+
+/**
+ * The same turn, streamed as server-sent events so the visitor sees the answer
+ * being written instead of a blank pause. Events, one JSON object per message:
+ *   {type:'status', text}  a tool is running ("Searching the knowledge base…")
+ *   {type:'delta', text}   more of the answer
+ *   {type:'reset'}         discard the text so far; the model went to a tool
+ *   {type:'done', ...}     the saved turn, exactly what POST /chat returns
+ *   {type:'error', code, message, status}
+ * Rate limiting and validation still answer with ordinary JSON errors, before
+ * the stream starts.
+ */
+router.post('/chat/stream', sakhaLimiter, validate(sakhaMessageSchema), async (req, res) => {
+  res.status(200).set({
+    'content-type': 'text/event-stream; charset=utf-8',
+    // no-transform keeps the compression middleware from buffering the stream.
+    'cache-control': 'no-cache, no-transform',
+    'x-accel-buffering': 'no',
+    connection: 'keep-alive',
+  });
+  res.flushHeaders();
+  const send = (event) => {
+    if (!res.writableEnded) res.write(`data: ${JSON.stringify(event)}\n\n`);
+  };
+
+  try {
+    const result = await runTurn(
+      {
+        conversationId: req.body.conversationId ?? null,
+        message: req.body.message,
+        pageContext: req.body.pageContext,
+        auth: req.auth,
+        visitorId: req.visitorId,
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+      },
+      { onEvent: send }
+    );
+    send({ type: 'done', ...result });
+  } catch (err) {
+    if (err instanceof AppError) {
+      if (err.status >= 500) logger.error({ err, reqId: req.id }, err.message);
+      send({ type: 'error', code: err.code, message: err.message, status: err.status });
+    } else {
+      logger.error({ err, reqId: req.id, path: req.originalUrl }, 'unhandled error in sakha stream');
+      send({ type: 'error', code: 'INTERNAL', message: 'Something went wrong on our side. It has been logged.', status: 500 });
+    }
+  }
+  res.end();
+});
 
 /** Load a thread the caller owns. Ownership is checked, never assumed. */
 router.get(

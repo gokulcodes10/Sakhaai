@@ -42,6 +42,7 @@ export default function SakhaPanel() {
     open,
     messages,
     pending,
+    streaming,
     error,
     errorCode,
     available,
@@ -75,7 +76,7 @@ export default function SakhaPanel() {
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages.length, pending]);
+  }, [messages.length, pending, streaming?.text]);
 
   useEffect(() => {
     if (open) {
@@ -157,7 +158,12 @@ export default function SakhaPanel() {
                   onRate={(rating) => dispatch(rateMessage({ messageId: m.id, rating }))}
                 />
               ))}
-              {pending && <Thinking />}
+              {pending &&
+                (streaming?.text ? (
+                  <Message message={{ id: 'streaming', role: 'assistant', content: streaming.text, local: true }} />
+                ) : (
+                  <Thinking status={streaming?.status} />
+                ))}
             </ul>
           )}
 
@@ -428,11 +434,11 @@ function TicketCards({ tickets }) {
   );
 }
 
-function Thinking() {
+function Thinking({ status }) {
   return (
     <li className="flex gap-2.5">
       <SakhaMark className="h-7 w-7 rounded-sm" size={17} />
-      <div className="flex items-center gap-1 pt-2.5" aria-label="Sakha is thinking">
+      <div className="flex items-center gap-1 pt-2.5" role="status" aria-label={status ?? 'Sakha is thinking'}>
         {[0, 1, 2].map((i) => (
           <span
             key={i}
@@ -440,6 +446,7 @@ function Thinking() {
             style={{ animationDelay: `${i * 0.18}s` }}
           />
         ))}
+        {status && <span className="ml-1.5 text-xs text-muted">{status}</span>}
       </div>
     </li>
   );

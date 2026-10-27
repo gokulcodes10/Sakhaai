@@ -1,20 +1,24 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import api from '../../lib/api.js';
+import api, { stream } from '../../lib/api.js';
 
 export const loadSakhaStatus = createAsyncThunk('sakha/status', async () => api.get('/sakha/status'));
 
 /**
  * Send one message. The user's text is added optimistically so the panel feels
- * instant, then reconciled when the real reply lands — a turn can take several
- * seconds when Sakha decides to call three tools, and a frozen input during
- * that time reads as broken.
+ * instant, and the reply streams in: a status line while Sakha runs tools, then
+ * the answer as it is written. The saved reply (cleaned, with its sources)
+ * replaces the streamed text when it lands.
  */
 export const sendMessage = createAsyncThunk(
   'sakha/send',
-  async ({ message, pageContext }, { getState, rejectWithValue }) => {
+  async ({ message, pageContext }, { dispatch, getState, rejectWithValue }) => {
     const { conversationId } = getState().sakha;
     try {
-      return await api.post('/sakha/chat', { conversationId, message, pageContext });
+      return await stream(
+        '/sakha/chat/stream',
+        { conversationId, message, pageContext },
+        { onEvent: (event) => dispatch(sakhaSlice.actions.streamEvent(event)) }
+      );
     } catch (err) {
       return rejectWithValue({ message: err.message, code: err.code, status: err.status });
     }
@@ -61,6 +65,8 @@ const sakhaSlice = createSlice({
     conversationId: restoreConversationId(),
     messages: [],
     pending: false,
+    // The reply being written right now: { text, status }, or null.
+    streaming: null,
     error: null,
     available: null,
     knowledge: null,
@@ -95,6 +101,17 @@ const sakhaSlice = createSlice({
     dismissError(state) {
       state.error = null;
     },
+    /** One event from a streaming reply: status, more text, or a reset. */
+    streamEvent(state, action) {
+      const event = action.payload;
+      if (!state.streaming) return;
+      if (event.type === 'status') state.streaming.status = event.text;
+      if (event.type === 'delta') {
+        state.streaming.text += event.text;
+        state.streaming.status = null;
+      }
+      if (event.type === 'reset') state.streaming.text = '';
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -108,6 +125,7 @@ const sakhaSlice = createSlice({
       })
       .addCase(sendMessage.pending, (state, action) => {
         state.pending = true;
+        state.streaming = { text: '', status: null };
         state.error = null;
         state.messages.push({
           id: `local-${Date.now()}`,
@@ -118,6 +136,7 @@ const sakhaSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.pending = false;
+        state.streaming = null;
         state.conversationId = action.payload.conversationId;
         state.messages.push(action.payload.message);
         if (!state.open) state.unreadReply = true;
@@ -129,6 +148,7 @@ const sakhaSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.pending = false;
+        state.streaming = null;
         state.error = action.payload?.message ?? 'Sakha could not answer just then.';
         state.errorCode = action.payload?.code;
         // Drop the optimistic message so the user can edit and resend it.

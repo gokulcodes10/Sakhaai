@@ -20,12 +20,12 @@ import logger from '../lib/logger.js';
 import config from '../config/index.js';
 import { chatCompletion, quickCompletion } from './groq.js';
 import { buildSystemMessage, DEFAULT_SYSTEM_PROMPT } from './prompt.js';
-import { executeTool, toolsForContext } from './tools.js';
+import { executeTool, toolsForContext, TOOL_STATUS } from './tools.js';
 import { retrieve, formatContext, visibilityFor } from '../knowledge/retriever.js';
 import { getSetting } from '../modules/ops/settings.js';
 import { estimateTokens, trimHistory } from './budget.js';
 import { interleave, searchQueryFor } from './followUp.js';
-import { candidatesFrom, citationsUsed, stripMarkers, wordStats } from './citations.js';
+import { candidatesFrom, citationsUsed, markerFilter, stripMarkers, wordStats } from './citations.js';
 
 // Room left at the start of a turn for tool results to come back into.
 const TOOL_RESULT_HEADROOM = 1_500;
@@ -34,6 +34,8 @@ const TOOL_RESULT_CHARS = 6_000;
 // Tools that change something outside the conversation. Once one has run, a
 // turn that fails afterwards is kept, so the visitor learns what was done.
 const ACTION_TOOLS = new Set(['capture_lead', 'request_human', 'create_ticket', 'add_ticket_message']);
+
+const CUT_OFF_NOTE = '(That ran longer than I can answer in one go. Ask me to carry on if you want the rest.)';
 
 /**
  * Run one turn of conversation.
@@ -47,8 +49,12 @@ const ACTION_TOOLS = new Set(['capture_lead', 'request_human', 'create_ticket', 
  *   ip?: string,
  *   userAgent?: string,
  * }} input
+ * @param {{ onEvent?: (event: {type:'status', text:string} | {type:'delta', text:string} | {type:'reset'}) => void }} [opts]
+ *   With onEvent the turn streams: a status line while tools run, the answer's
+ *   text as it is written, and a reset if text was shown before the model
+ *   decided to call a tool instead. The return value is the same either way.
  */
-export async function runTurn(input) {
+export async function runTurn(input, { onEvent } = {}) {
   const startedAt = Date.now();
 
   const { conversation, created } = await resolveConversation(input);
@@ -105,7 +111,7 @@ export async function runTurn(input) {
     const searchedAs = searchQuery === input.message ? '' : ` (also searched as "${searchQuery}")`;
     seedMessage = {
       role: 'system',
-      content: `Possibly relevant context for the visitor's latest message${searchedAs}, retrieved before you read it. Search again if it does not cover what they asked.\n\n${formatContext(seed)}`,
+      content: `The knowledge base has already been searched for the visitor's latest message${searchedAs}. These are the results. Answer from them when they cover the question; call search_knowledge only for something they do not cover.\n\n${formatContext(seed)}`,
     };
   }
 
@@ -127,6 +133,7 @@ export async function runTurn(input) {
   const toolTrace = [];
   let usage = { prompt: 0, completion: 0 };
   let finalContent = null;
+  let finishReason = null;
   let modelUsed = config.groq.model;
 
   for (let step = 0; step < maxSteps; step += 1) {
@@ -135,9 +142,26 @@ export async function runTurn(input) {
     // schemas also makes that last request smaller.
     const mustAnswer = step === maxSteps - 1 || estimateTokens(messages) + toolTokens > budget;
 
+    const filter = markerFilter();
+    let shown = false;
+    const onDelta = onEvent
+      ? (text) => {
+          const clean = filter.push(text);
+          if (clean) {
+            shown = true;
+            onEvent({ type: 'delta', text: clean });
+          }
+        }
+      : undefined;
+
     let completion;
     try {
-      completion = await chatCompletion({ messages, tools: mustAnswer ? undefined : tools });
+      completion = await chatCompletion({ messages, tools: mustAnswer ? undefined : tools, onDelta });
+      const rest = onEvent ? filter.flush() : '';
+      if (rest) {
+        shown = true;
+        onEvent({ type: 'delta', text: rest });
+      }
     } catch (err) {
       // Nothing has changed yet (at most a search ran): fail the turn and save
       // nothing, so the visitor can resend and the question does not sit
@@ -153,6 +177,7 @@ export async function runTurn(input) {
       break;
     }
     const { message, usage: turnUsage, model } = completion;
+    finishReason = completion.finishReason;
 
     modelUsed = model ?? modelUsed;
     usage = {
@@ -166,6 +191,11 @@ export async function runTurn(input) {
       finalContent = stripMarkers(message.content);
       break;
     }
+
+    // Text shown so far was thinking aloud before a tool call; take it back.
+    if (shown) onEvent({ type: 'reset' });
+    const status = [...new Set(toolCalls.map((c) => TOOL_STATUS[c.function?.name]).filter(Boolean))].join(' ');
+    if (status) onEvent?.({ type: 'status', text: status });
 
     // Push the assistant's tool-call message before the results, or the
     // provider rejects the next request as malformed.
@@ -198,6 +228,11 @@ export async function runTurn(input) {
   if (!finalContent) {
     finalContent =
       'I could not get to a confident answer on that one. A founder can — use the contact page and a person will reply.';
+  } else if (finishReason === 'length') {
+    // Hit the token cap mid-answer: end on the last whole sentence and say so,
+    // rather than saving half a sentence as if it were the answer.
+    logger.warn({ conversationId: conversation.id }, 'sakha answer cut off at max_tokens');
+    finalContent = `${endOnSentence(finalContent)}\n\n${CUT_OFF_NOTE}`;
   }
 
   // Saved only now, with its answer, so a failed turn leaves no orphan behind.
@@ -317,6 +352,13 @@ async function knowledgeWordStats(indexedAt) {
   const stats = wordStats(docs.map((d) => `${d.title} ${d.chunks.map((c) => c.content).join(' ')}`));
   statsCache = { key, stats };
   return stats;
+}
+
+/** Trim text back to its last complete sentence (or line), if it has one. */
+export function endOnSentence(text) {
+  if (/[.!?]$/.test(text.trim())) return text.trim();
+  const end = Math.max(...['. ', '.\n', '! ', '? ', '\n'].map((p) => text.lastIndexOf(p)));
+  return end > 0 ? text.slice(0, end + 1).trim() : text.trim();
 }
 
 const safeParse = (raw) => {

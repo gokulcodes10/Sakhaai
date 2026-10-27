@@ -94,6 +94,62 @@ export async function request(path, { method = 'GET', body, signal, retry = true
   return payload;
 }
 
+/**
+ * POST and read the reply as server-sent events. `onEvent` gets every event
+ * except the last: the stream ends with {type:'done'}, whose payload is
+ * returned, or {type:'error'}, which is thrown as an ApiError. A response that
+ * is not a stream (rate limiting, validation) is handled like any other error.
+ */
+export async function stream(path, body, { onEvent, signal, retry = true } = {}) {
+  const res = await fetch(`${BASE}${path}`, {
+    method: 'POST',
+    credentials: 'include',
+    signal,
+    headers: { 'content-type': 'application/json', accept: 'text/event-stream' },
+    body: JSON.stringify(body),
+  });
+
+  if (res.status === 401 && retry && (await refreshSession())) {
+    return stream(path, body, { onEvent, signal, retry: false });
+  }
+
+  if (!res.ok || !(res.headers.get('content-type') ?? '').includes('text/event-stream')) {
+    const err = (await parse(res))?.error ?? {};
+    throw new ApiError(err.message ?? `Request failed (${res.status})`, {
+      status: res.status,
+      code: err.code ?? 'UNKNOWN',
+      details: err.details,
+    });
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  for (;;) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+    let end;
+    while ((end = buffer.indexOf('\n\n')) !== -1) {
+      const data = buffer
+        .slice(0, end)
+        .split('\n')
+        .filter((line) => line.startsWith('data:'))
+        .map((line) => line.slice(5).trim())
+        .join('');
+      buffer = buffer.slice(end + 2);
+      if (!data) continue;
+      const event = JSON.parse(data);
+      if (event.type === 'done') return event;
+      if (event.type === 'error') {
+        throw new ApiError(event.message, { status: event.status, code: event.code });
+      }
+      onEvent?.(event);
+    }
+    if (done) break;
+  }
+  throw new ApiError('The answer was cut off on the way. Try again.', { status: 502, code: 'STREAM_CUT' });
+}
+
 export const api = {
   get: (path, opts) => request(path, { ...opts, method: 'GET' }),
   post: (path, body, opts) => request(path, { ...opts, method: 'POST', body }),

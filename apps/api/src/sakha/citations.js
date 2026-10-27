@@ -13,6 +13,32 @@
 // passage numbers like [1] or [2, 3]. The panel shows sources separately.
 const MARKERS = /\s?【[^】]*】|\s?\[\d+(?:\s*[,–-]\s*\d+)*\]/g;
 
+/**
+ * The same clean-up for text that arrives in pieces. A marker can be split
+ * across two pieces, so text from an unclosed bracket onwards is held back
+ * until it closes (or is clearly not a marker). The final saved answer is
+ * cleaned again in full, so this only has to be good enough to look right.
+ */
+export function markerFilter() {
+  let held = '';
+  return {
+    push(text) {
+      held += text;
+      const open = Math.max(held.lastIndexOf('【'), held.lastIndexOf('['));
+      const closed = open !== -1 && /[】\]]/.test(held.slice(open));
+      const cut = open !== -1 && !closed && held.length - open < 40 ? open : held.length;
+      const out = held.slice(0, cut).replace(MARKERS, '');
+      held = held.slice(cut);
+      return out;
+    },
+    flush() {
+      const out = held.replace(MARKERS, '');
+      held = '';
+      return out;
+    },
+  };
+}
+
 /** Remove citation markers the model writes into its prose. */
 export function stripMarkers(text) {
   return String(text ?? '')

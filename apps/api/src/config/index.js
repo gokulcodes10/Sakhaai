@@ -70,7 +70,7 @@ const envSchema = z.object({
   GROQ_MODEL: z.string().default('openai/gpt-oss-120b'),
   GROQ_MODEL_FAST: z.string().default('openai/gpt-oss-20b'),
   GROQ_MODEL_FALLBACK: z.string().default('openai/gpt-oss-20b'),
-  GROQ_MAX_TOKENS: int(1400),
+  GROQ_MAX_TOKENS: int(800),
   GROQ_TEMPERATURE: z
     .string()
     .optional()
