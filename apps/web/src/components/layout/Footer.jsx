@@ -26,8 +26,8 @@ export default function Footer() {
 
             <div className="mt-6 space-y-1.5 text-sm">
               {company?.email && (
-                <a href={`mailto:${company.email}`} className="block font-mono text-muted transition-colors hover:text-accent">
-                  {company.email}
+                <a href={`mailto:${company.email}`} className="block text-muted transition-colors hover:text-accent">
+                  Email us
                 </a>
               )}
               {company?.phone && (

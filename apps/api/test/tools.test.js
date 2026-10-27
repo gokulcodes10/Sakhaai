@@ -100,3 +100,14 @@ test('optional tool parameters accept null, required ones do not', async () => {
     }
   }
 });
+
+test('email addresses in answers become links labelled "email"', async () => {
+  const { linkEmails } = await import('@asphalix/shared');
+  assert.equal(linkEmails('Write to a.b+c@gmail.com.'), 'Write to [email](mailto:a.b+c@gmail.com).');
+  assert.equal(
+    linkEmails('Use [gokul@asphalix.com](mailto:gokul@asphalix.com) or [email Malarvizhi](mailto:m@asphalix.com)'),
+    'Use [email](mailto:gokul@asphalix.com) or [email Malarvizhi](mailto:m@asphalix.com)'
+  );
+  assert.equal(linkEmails('[email us](mailto:x@y.com)'), '[email us](mailto:x@y.com)', 'an existing word label stays');
+  assert.equal(linkEmails('No address here.'), 'No address here.');
+});

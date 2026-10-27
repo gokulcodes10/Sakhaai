@@ -14,7 +14,7 @@
     "tagline": "Trust. Grit. Agents that ship.",
     "originLine": "Made possible by two friends, with trust and grit.",
     "elevatorPitch": "We build agentic AI that does the work your team keeps doing by hand — answering customers, chasing follow-ups, updating your systems — on infrastructure you control, in production in weeks, with a number attached.",
-    "email": "hello@asphalix.com",
+    "email": "asphalix.info@gmail.com",
     "salesEmail": "malarvizhi@asphalix.com",
     "supportEmail": "support@asphalix.com",
     "phone": "+91 00000 00000",
@@ -805,7 +805,7 @@
       "consent": "We use what you send us only to reply to you. We do not sell it, and we do not add you to a mailing list you did not ask for."
     },
     "alternatives": [
-      { "label": "Email a founder directly", "value": "hello@asphalix.com", "href": "mailto:hello@asphalix.com" },
+      { "label": "Email a founder directly", "value": "Opens your email app", "href": "mailto:asphalix.info@gmail.com" },
       { "label": "WhatsApp us", "value": "+91 00000 00000", "href": "https://wa.me/910000000000" },
       { "label": "Ask Sakha first", "value": "Our assistant knows our services, our process and our support desk", "action": "open-assistant" }
     ]

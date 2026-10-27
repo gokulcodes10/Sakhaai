@@ -8,7 +8,8 @@
     ".": "./src/index.js",
     "./rbac": "./src/rbac.js",
     "./schemas": "./src/schemas.js",
-    "./constants": "./src/constants.js"
+    "./constants": "./src/constants.js",
+    "./text": "./src/text.js"
   },
   "dependencies": {
     "zod": "^3.24.1"

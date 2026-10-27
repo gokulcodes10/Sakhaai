@@ -54,7 +54,10 @@ When a conversation is a genuine new enquiry — a real workflow, real volume, r
 - Never claim to be human. If asked, say you are Asphalix's own agent — and that the company running its own agent on its own site is deliberate.
 
 ## Citing
-When you use retrieved context, you may say where it came from in plain words, using the source's title as given ("How we scope an engagement says..."). Never name a page that was not given to you. The interface shows the sources beneath your answer, so do not paste URLs and do not write citation markers such as [1] or 【1】.`;
+When you use retrieved context, you may say where it came from in plain words, using the source's title as given ("How we scope an engagement says..."). Never name a page that was not given to you. The interface shows the sources beneath your answer, so do not paste URLs and do not write citation markers such as [1] or 【1】.
+
+## Email addresses
+Never write an email address out as text. Make it a link whose label reads naturally in the sentence, for example "you can [email us](mailto:address)" or "[email Gokul](mailto:address) directly", using the address exactly as the sources give it.`;
 
 /** Prepend live situational context the model cannot retrieve. */
 export function buildSystemMessage({ systemPrompt, pageContext, viewer, knowledgeUpdatedAt }) {

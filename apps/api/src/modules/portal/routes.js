@@ -29,7 +29,7 @@ async function ownAccountId(req) {
     select: { clientAccountId: true },
   });
   if (!user?.clientAccountId) {
-    throw forbidden('This account is not linked to a client organisation yet. Email hello@asphalix.com.');
+    throw forbidden('This account is not linked to a client organisation yet. Reach us from the contact page.');
   }
   return user.clientAccountId;
 }

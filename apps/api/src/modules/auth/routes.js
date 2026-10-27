@@ -185,7 +185,7 @@ router.post(
     }
 
     if (user.status === USER_STATUS.SUSPENDED) {
-      throw forbidden('That account is suspended. Email hello@asphalix.com if that is unexpected.');
+      throw forbidden('That account is suspended. Reach us from the contact page if that is unexpected.');
     }
 
     // Upgrade the hash if our argon parameters have got stronger since signup.

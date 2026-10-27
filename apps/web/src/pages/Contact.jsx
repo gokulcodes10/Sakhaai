@@ -69,7 +69,7 @@ export default function Contact() {
         setErrors(err.fields);
         setServerError(err.message);
       } else {
-        setServerError('Something went wrong. Email hello@asphalix.com and we will pick it up there.');
+        setServerError('Something went wrong. Use “Email a founder directly” on this page and we will pick it up there.');
       }
     }
   }

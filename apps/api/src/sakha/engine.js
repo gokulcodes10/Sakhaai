@@ -23,6 +23,7 @@ import { buildSystemMessage, DEFAULT_SYSTEM_PROMPT } from './prompt.js';
 import { executeTool, toolsForContext, TOOL_STATUS } from './tools.js';
 import { retrieve, formatContext, visibilityFor } from '../knowledge/retriever.js';
 import { getSetting } from '../modules/ops/settings.js';
+import { linkEmails } from '@asphalix/shared';
 import { estimateTokens, trimHistory } from './budget.js';
 import { interleave, searchQueryFor } from './followUp.js';
 import { candidatesFrom, citationsUsed, markerFilter, stripMarkers, wordStats } from './citations.js';
@@ -188,7 +189,7 @@ export async function runTurn(input, { onEvent } = {}) {
     const toolCalls = message.tool_calls ?? [];
 
     if (toolCalls.length === 0) {
-      finalContent = stripMarkers(message.content);
+      finalContent = linkEmails(stripMarkers(message.content));
       break;
     }
 

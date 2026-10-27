@@ -18,6 +18,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router';
+import { linkEmails } from '@asphalix/shared';
 import clsx from 'clsx';
 import {
   askSakha,
@@ -112,7 +113,7 @@ export default function SakhaPanel() {
   );
 
   const suggestions = copy.emptyStateSuggestions ?? [];
-  const supportEmail = content?.company?.supportEmail ?? content?.company?.email ?? 'hello@asphalix.com';
+  const supportEmail = content?.company?.supportEmail ?? content?.company?.email;
   const askHuman = () => dispatch(askSakha(copy.humanMessage ?? "I'd like to talk to a human, please."));
 
   return (
@@ -160,7 +161,7 @@ export default function SakhaPanel() {
               ))}
               {pending &&
                 (streaming?.text ? (
-                  <Message message={{ id: 'streaming', role: 'assistant', content: streaming.text, local: true }} />
+                  <Message message={{ id: 'streaming', role: 'assistant', content: linkEmails(streaming.text), local: true }} />
                 ) : (
                   <Thinking status={streaming?.status} />
                 ))}
@@ -170,11 +171,11 @@ export default function SakhaPanel() {
           {error && (
             <div className="mt-5 rounded-md border border-danger/30 bg-danger/5 p-3 text-sm text-danger">
               <p>{error}</p>
-              {errorCode === 'RATE_LIMITED' && (
+              {errorCode === 'RATE_LIMITED' && supportEmail && (
                 <p className="mt-2 text-xs">
-                  Or email the team directly —{' '}
+                  Or{' '}
                   <a className="underline" href={`mailto:${supportEmail}`}>
-                    {supportEmail}
+                    email the team directly
                   </a>
                   .
                 </p>
@@ -576,9 +577,26 @@ function renderMarkdown(text) {
 }
 
 /** Bold and inline code. Everything else is rendered as literal text. */
+// [text](target) where the target is a mailto:, an http(s) URL or a site path.
+// Anything else stays plain text, so a reply can never smuggle in javascript:.
+const LINK = /^\[([^\]]+)\]\(((?:mailto:|https?:\/\/|\/)[^)\s]*)\)$/;
+
 function inline(text) {
-  const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+  const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)\s]+\))/g);
   return parts.map((part, i) => {
+    const link = LINK.exec(part);
+    if (link) {
+      const [, label, href] = link;
+      return href.startsWith('/') ? (
+        <Link key={i} to={href} className="underline underline-offset-2 hover:text-accent">
+          {label}
+        </Link>
+      ) : (
+        <a key={i} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer noopener" className="underline underline-offset-2 hover:text-accent">
+          {label}
+        </a>
+      );
+    }
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
         <strong key={i} className="font-semibold">
