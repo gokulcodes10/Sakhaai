@@ -48,7 +48,7 @@ const ACTION_TOOLS = new Set(['capture_lead', 'request_human', 'create_ticket', 
 export async function runTurn(input) {
   const startedAt = Date.now();
 
-  const conversation = await resolveConversation(input);
+  const { conversation, created } = await resolveConversation(input);
 
   const [systemPrompt, enabledTools, lastIndex] = await Promise.all([
     getSetting('sakha.systemPrompt', DEFAULT_SYSTEM_PROMPT),
@@ -136,6 +136,8 @@ export async function runTurn(input) {
       // unanswered in the thread, to be answered out of order next time.
       if (!toolTrace.some((t) => ACTION_TOOLS.has(t.name) && t.ok)) {
         logger.warn({ conversationId: conversation.id, step, chars: input.message.length }, 'sakha turn failed, question not saved');
+        // A thread opened for this question alone would otherwise stay behind empty.
+        if (created) await prisma.conversation.delete({ where: { id: conversation.id } }).catch(() => {});
         throw err;
       }
       // A ticket or lead now exists, so keep the turn; the cards show what was done.
@@ -255,12 +257,12 @@ async function resolveConversation({ conversationId, auth, visitorId, pageContex
     if (existing) {
       const ownedByUser = auth?.userId && existing.userId === auth.userId;
       const ownedByVisitor = !existing.userId && visitorId && existing.visitorId === visitorId;
-      if (ownedByUser || ownedByVisitor) return existing;
+      if (ownedByUser || ownedByVisitor) return { conversation: existing, created: false };
       logger.warn({ conversationId }, 'conversation ownership mismatch — starting a new thread');
     }
   }
 
-  return prisma.conversation.create({
+  const conversation = await prisma.conversation.create({
     data: {
       userId: auth?.userId ?? null,
       visitorId: auth?.userId ? null : (visitorId ?? null),
@@ -269,6 +271,7 @@ async function resolveConversation({ conversationId, auth, visitorId, pageContex
       userAgent: userAgent?.slice(0, 400) ?? null,
     },
   });
+  return { conversation, created: true };
 }
 
 /** Recent turns, oldest first, trimmed to the configured window. */
